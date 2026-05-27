@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jennifer Groh | Chief Learning Architect</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --teal: #2a8c8c;
+      --teal-dark: #1d6464;
+      --teal-light: #3db8b8;
+      --teal-pale: #e8f5f5;
+      --gray-900: #1a1f2e;
+      --gray-700: #3d4456;
+      --gray-500: #6b7280;
+      --gray-200: #e5e7eb;
+      --gray-100: #f4f6f7;
+      --white: #ffffff;
+      --accent: #c8a45a;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--white);
+      color: var(--gray-700);
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--gray-200);
+      z-index: 100;
+      padding: 0 2rem;
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-brand {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.1rem;
+      color: var(--teal-dark);
+      letter-spacing: 0.02em;
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--gray-500);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--teal); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding-top: 60px;
+      overflow: hidden;
+    }
+    .hero-left {
+      background: var(--gray-900);
+      padding: 5rem 4rem 5rem 5rem;
+      display: flex; flex-direction: column; justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-left::before {
+      content: '';
+      position: absolute;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(42,140,140,0.15) 0%, transparent 70%);
+      top: -100px; right: -100px;
+    }
+    .hero-left::after {
+      content: '';
+      position: absolute;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(42,140,140,0.1) 0%, transparent 70%);
+      bottom: -80px; left: -80px;
+    }
+    .hero-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--teal-light);
+      margin-bottom: 1.5rem;
+    }
+    .hero-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.5rem, 4vw, 3.8rem);
+      color: var(--white);
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+    }
+    .hero-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1rem, 1.8vw, 1.4rem);
+      color: var(--teal-light);
+      font-style: italic;
+      margin-bottom: 2rem;
+    }
+    .hero-summary {
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.7);
+      max-width: 440px;
+      margin-bottom: 2.5rem;
+    }
+    .hero-creds {
+      display: flex; flex-wrap: wrap; gap: 0.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .cred-tag {
+      background: rgba(42,140,140,0.2);
+      border: 1px solid rgba(42,140,140,0.4);
+      color: var(--teal-light);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      padding: 0.3rem 0.7rem;
+      border-radius: 2px;
+      text-transform: uppercase;
+    }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--teal);
+      color: var(--white);
+      padding: 0.75rem 1.75rem;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      border-radius: 3px;
+      transition: background 0.2s, transform 0.15s;
+      display: inline-block;
+    }
+    .btn-primary:hover { background: var(--teal-dark); transform: translateY(-1px); }
+    .btn-outline {
+      border: 1px solid rgba(255,255,255,0.3);
+      color: rgba(255,255,255,0.8);
+      padding: 0.75rem 1.75rem;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      border-radius: 3px;
+      transition: border-color 0.2s, color 0.2s, transform 0.15s;
+      display: inline-block;
+    }
+    .btn-outline:hover { border-color: var(--teal-light); color: var(--teal-light); transform: translateY(-1px); }
+
+    .hero-right {
+      background: var(--teal-pale);
+      padding: 5rem 4rem;
+      display: flex; flex-direction: column; justify-content: center;
+      position: relative;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .stat-card {
+      background: var(--white);
+      padding: 1.5rem;
+      border-radius: 4px;
+      border-left: 3px solid var(--teal);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.6s forwards;
+    }
+    .stat-card:nth-child(1) { animation-delay: 0.2s; }
+    .stat-card:nth-child(2) { animation-delay: 0.35s; }
+    .stat-card:nth-child(3) { animation-delay: 0.5s; }
+    .stat-card:nth-child(4) { animation-delay: 0.65s; }
+    .stat-number {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.2rem;
+      color: var(--teal-dark);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      line-height: 1.5;
+      font-weight: 500;
+    }
+    .tools-section { }
+    .tools-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gray-500);
+      margin-bottom: 0.75rem;
+    }
+    .tools-list {
+      display: flex; flex-wrap: wrap; gap: 0.5rem;
+    }
+    .tool-tag {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      color: var(--gray-700);
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.3rem 0.65rem;
+      border-radius: 2px;
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* SECTION BASE */
+    section { padding: 5rem 5rem; }
+    .section-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 0.75rem;
+    }
+    .section-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      color: var(--gray-900);
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+    .section-subtitle {
+      font-size: 1rem;
+      color: var(--gray-500);
+      max-width: 580px;
+      line-height: 1.7;
+      margin-bottom: 3rem;
+    }
+
+    /* WORK / PROJECTS */
+    #work { background: var(--white); }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .project-card {
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      padding: 2rem;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--teal);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s;
+    }
+    .project-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); border-color: var(--teal); }
+    .project-card:hover::before { transform: scaleX(1); }
+    .project-tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--teal);
+      background: var(--teal-pale);
+      padding: 0.25rem 0.6rem;
+      border-radius: 2px;
+      margin-bottom: 1rem;
+    }
+    .project-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.25rem;
+      color: var(--gray-900);
+      margin-bottom: 0.6rem;
+      line-height: 1.3;
+    }
+    .project-desc {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+    .project-link {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--teal);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: gap 0.2s;
+    }
+    .project-link:hover { gap: 0.7rem; }
+    .project-link::after { content: '→'; }
+
+    /* EXPERTISE */
+    #expertise { background: var(--gray-900); }
+    #expertise .section-title { color: var(--white); }
+    #expertise .section-subtitle { color: rgba(255,255,255,0.5); }
+    #expertise .section-eyebrow { color: var(--teal-light); }
+    .expertise-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+    .expertise-item {
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 1.5rem;
+      border-radius: 4px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .expertise-item:hover { border-color: var(--teal); background: rgba(42,140,140,0.05); }
+    .expertise-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .expertise-name {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 0.4rem;
+    }
+    .expertise-detail {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.4);
+      line-height: 1.6;
+    }
+
+    /* CONTACT */
+    #contact {
+      background: var(--teal);
+      text-align: center;
+      padding: 5rem;
+    }
+    #contact .section-eyebrow { color: rgba(255,255,255,0.6); }
+    #contact .section-title { color: var(--white); }
+    #contact .section-subtitle { color: rgba(255,255,255,0.75); margin: 0 auto 2.5rem; }
+    .contact-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; }
+    .contact-link {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: var(--white);
+      padding: 0.75rem 1.75rem;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      border-radius: 3px;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .contact-link:hover { background: rgba(255,255,255,0.25); transform: translateY(-2px); }
+
+    /* FOOTER */
+    footer {
+      background: var(--gray-900);
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; min-height: auto; }
+      .hero-left { padding: 4rem 2rem; }
+      .hero-right { padding: 3rem 2rem; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      section { padding: 3.5rem 2rem; }
+      #contact { padding: 3.5rem 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <span class="nav-brand">Jennifer Groh</span>
+    <ul class="nav-links">
+      <li><a href="#work">Work</a></li>
+      <li><a href="#expertise">Expertise</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <p class="hero-eyebrow">Portfolio</p>
+      <h1 class="hero-name">Jennifer Groh</h1>
+      <p class="hero-title">Chief Learning Architect</p>
+      <p class="hero-summary">
+        I design and build learning ecosystems — not just courses. Full-stack practitioner across ADDIE and SAM, from competency framework design through multimedia development, SCORM packaging, and LMS architecture. AI-native. Outcome-driven.
+      </p>
+      <div class="hero-creds">
+        <span class="cred-tag">PMP</span>
+        <span class="cred-tag">PSM-II</span>
+        <span class="cred-tag">SAFe 6</span>
+        <span class="cred-tag">M.Ed. ID</span>
+        <span class="cred-tag">MBA</span>
+        <span class="cred-tag">Certified Agile Leader</span>
+      </div>
+      <div class="hero-actions">
+        <a href="https://sites.google.com/view/jennifergroh/" target="_blank" class="btn-primary">View Full Portfolio</a>
+        <a href="mailto:jennifergroh17@gmail.com" class="btn-outline">Get in Touch</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number">40+</div>
+          <div class="stat-label">Courses architected across 4 strategic tracks</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">300+</div>
+          <div class="stat-label">Associates trained across 3 continents at PayPal</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">15+</div>
+          <div class="stat-label">Hours saved weekly via AI-integrated workflows</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">5+</div>
+          <div class="stat-label">Industries: L&D, SaaS, EdTech, defense, association</div>
+        </div>
+      </div>
+      <div class="tools-section">
+        <p class="tools-label">Tools & Platforms</p>
+        <div class="tools-list">
+          <span class="tool-tag">Articulate Rise 360</span>
+          <span class="tool-tag">Storyline</span>
+          <span class="tool-tag">Camtasia</span>
+          <span class="tool-tag">LearnWorlds</span>
+          <span class="tool-tag">TopClass LMS</span>
+          <span class="tool-tag">Claude</span>
+          <span class="tool-tag">Gemini</span>
+          <span class="tool-tag">Copilot</span>
+          <span class="tool-tag">SCORM / xAPI</span>
+          <span class="tool-tag">Adobe CC</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORK -->
+  <section id="work">
+    <p class="section-eyebrow">Selected Work</p>
+    <h2 class="section-title">Projects & Deliverables</h2>
+    <p class="section-subtitle">A cross-section of instructional design, LMS development, and learning architecture work spanning compliance, professional development, and performance support.</p>
+    <div class="projects-grid">
+
+      <div class="project-card">
+        <span class="project-tag">eLearning Catalog</span>
+        <h3 class="project-title">Brazen Learning — 40+ Course Catalog</h3>
+        <p class="project-desc">Architected and built a full eLearning catalog across four tracks: defense contracting compliance, DFARS/CMMC, AI by Role professional development, and Special Education teacher preparation. Full ADDIE lifecycle, Rise 360, LearnWorlds deployment.</p>
+        <a href="https://www.brazenlearning.com" target="_blank" class="project-link">Visit Brazen Learning</a>
+      </div>
+
+      <div class="project-card">
+        <span class="project-tag">Branching Scenario</span>
+        <h3 class="project-title">Storyline Branching Scenario</h3>
+        <p class="project-desc">Interactive decision-based scenario built in Articulate Storyline 360 — 11 scenes, 3 decision points, consequence-driven feedback loops, and replay functionality. Demonstrates instructional interactivity and learner-centered design.</p>
+        <a href="https://jennifergroh17-pro.github.io/Case-Study/story.html" target="_blank" class="project-link">View Scenario</a>
+      </div>
+
+      <div class="project-card">
+        <span class="project-tag">Compliance Course</span>
+        <h3 class="project-title">FAR Contracts Course</h3>
+        <p class="project-desc">Copyright-registered compliance course covering Federal Acquisition Regulations. Demonstrates subject matter expertise in defense contracting alongside full instructional design production capability.</p>
+        <a href="https://jennifergroh17-pro.github.io/FAR-Contracts" target="_blank" class="project-link">View Project</a>
+      </div>
+
+      <div class="project-card">
+        <span class="project-tag">Performance Support</span>
+        <h3 class="project-title">Time Mastery for Managers</h3>
+        <p class="project-desc">Professional development course focused on time management frameworks for managers. Demonstrates competency-aligned objective design and application-based learning structure.</p>
+        <a href="https://jennifergroh17-pro.github.io/Time-Mastery-for-Managers" target="_blank" class="project-link">View Project</a>
+      </div>
+
+      <div class="project-card">
+        <span class="project-tag">Instructional Framework</span>
+        <h3 class="project-title">CubeClear Methodology</h3>
+        <p class="project-desc">Proprietary systems-mapping instructional framework translated from a cognitive methodology into a structured two-course learning architecture, including learner journey design and competency mapping.</p>
+        <a href="https://sites.google.com/view/jennifergroh/" target="_blank" class="project-link">Learn More</a>
+      </div>
+
+      <div class="project-card">
+        <span class="project-tag">Case Study</span>
+        <h3 class="project-title">PM & ID Case Study</h3>
+        <p class="project-desc">HTML-based case study documenting a complex, multi-workstream project management engagement — demonstrating systems thinking, stakeholder management, and structured documentation capability.</p>
+        <a href="https://jennifergroh17-pro.github.io/Case-Study" target="_blank" class="project-link">View Case Study</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- EXPERTISE -->
+  <section id="expertise">
+    <p class="section-eyebrow">Core Capabilities</p>
+    <h2 class="section-title">What I Bring</h2>
+    <p class="section-subtitle">End-to-end learning architecture capability — from strategy to deployment.</p>
+    <div class="expertise-grid">
+      <div class="expertise-item">
+        <div class="expertise-icon">🏗️</div>
+        <div class="expertise-name">Learning Architecture</div>
+        <div class="expertise-detail">Competency frameworks, curriculum design, multi-track program structure, learning ecosystem strategy</div>
+      </div>
+      <div class="expertise-item">
+        <div class="expertise-icon">⚙️</div>
+        <div class="expertise-name">Full-Stack ID Production</div>
+        <div class="expertise-detail">ADDIE & SAM, Rise 360, Storyline, Camtasia, SCORM/xAPI packaging, multimedia development</div>
+      </div>
+      <div class="expertise-item">
+        <div class="expertise-icon">🤖</div>
+        <div class="expertise-name">AI-Augmented Design</div>
+        <div class="expertise-detail">Claude, Gemini, Copilot integrated natively into ADDIE workflows — saving 15+ hrs/week</div>
+      </div>
+      <div class="expertise-item">
+        <div class="expertise-icon">📊</div>
+        <div class="expertise-name">LMS Administration</div>
+        <div class="expertise-detail">LearnWorlds, TopClass, Canvas, Moodle — content lifecycle, configuration, deployment</div>
+      </div>
+      <div class="expertise-item">
+        <div class="expertise-icon">🎯</div>
+        <div class="expertise-name">Agile Program Management</div>
+        <div class="expertise-detail">PMP, PSM-II, SAFe 6 — sprint planning, backlog management, multi-track delivery</div>
+      </div>
+      <div class="expertise-item">
+        <div class="expertise-icon">✍️</div>
+        <div class="expertise-name">Technical Documentation</div>
+        <div class="expertise-detail">SaaS user guides, SOPs, knowledge bases, workflow documentation for global audiences</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <p class="section-eyebrow">Let's Connect</p>
+    <h2 class="section-title">Ready to Build Something?</h2>
+    <p class="section-subtitle">Available for instructional design, learning architecture, and eLearning development engagements.</p>
+    <div class="contact-links">
+      <a href="mailto:jennifergroh17@gmail.com" class="contact-link">✉ Email Me</a>
+      <a href="https://sites.google.com/view/jennifergroh/" target="_blank" class="contact-link">🌐 Full Portfolio</a>
+      <a href="https://www.linkedin.com/in/jennifergroh" target="_blank" class="contact-link">💼 LinkedIn</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 Jennifer Groh · Chief Learning Architect · Greenville, TX</p>
+  </footer>
+
+</body>
+</html>
