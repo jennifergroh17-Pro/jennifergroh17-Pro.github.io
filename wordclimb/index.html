@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WordClimb</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #f5f1ea;
+    --ink: #1f2a37;
+    --muted: #5b6675;
+    --card: #ffffff;
+    --line: #e3dccf;
+    --navy: #22314d;
+    --navy-2: #2f4369;
+    --sun: #ee7f1c;
+    --sun-soft: #fde6cf;
+    --teal: #0f8476;
+    --teal-soft: #d4efea;
+    --red: #cf3f3f;
+    --red-soft: #fbe1e1;
+    --gold: #f2b705;
+    --violet: #5f4fc9;
+    --violet-soft: #e6e2fb;
+    --radius: 16px;
+    --shadow: 0 2px 0 rgba(34,49,77,.08), 0 8px 24px rgba(34,49,77,.06);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    font-family: 'Lexend', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 18px; line-height: 1.5;
+    background: var(--bg); color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; cursor: pointer; color: inherit; }
+  input, textarea { font: inherit; color: inherit; }
+  h1, h2, h3 { line-height: 1.2; margin: 0 0 .4em; }
+  h1 { font-size: 2rem; } h2 { font-size: 1.5rem; } h3 { font-size: 1.15rem; }
+  p { margin: 0 0 .8em; }
+  .muted { color: var(--muted); }
+  .small { font-size: .85rem; }
+
+  /* Top bar */
+  #top {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--navy); color: #fff;
+    padding: 10px 16px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .brand { font-weight: 700; font-size: 1.25rem; letter-spacing: .01em; margin-right: auto; background: none; border: 0; color: #fff; padding: 4px 0; }
+  .brand span { color: var(--gold); }
+  .pill {
+    background: var(--navy-2); color: #fff; border: 1px solid rgba(255,255,255,.18);
+    border-radius: 999px; padding: 6px 12px; font-size: .85rem; white-space: nowrap;
+  }
+  .pill:hover { background: #3a5180; }
+  .pill.on { background: var(--teal); border-color: var(--teal); }
+  .pill.key { background: var(--sun); border-color: var(--sun); font-weight: 600; }
+
+  main { max-width: 980px; margin: 0 auto; padding: 20px 16px 80px; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px;
+  }
+  .grid { display: grid; gap: 16px; }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .g3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    border: 0; border-radius: 12px; padding: 12px 20px; font-weight: 600;
+    background: var(--navy); color: #fff; min-height: 48px;
+    box-shadow: 0 3px 0 rgba(0,0,0,.18); transition: transform .05s;
+  }
+  .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.18); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn.sun { background: var(--sun); }
+  .btn.teal { background: var(--teal); }
+  .btn.violet { background: var(--violet); }
+  .btn.ghost { background: transparent; color: var(--navy); box-shadow: none; border: 2px solid var(--line); }
+  .btn.small { min-height: 38px; padding: 6px 14px; font-size: .9rem; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .spacer { flex: 1; }
+
+  .speak {
+    border: 2px solid var(--line); background: #fff; border-radius: 12px;
+    min-width: 48px; min-height: 48px; font-size: 1.2rem; padding: 4px 10px;
+  }
+  .speak:hover { border-color: var(--teal); }
+
+  .field {
+    width: 100%; padding: 14px 16px; border: 2px solid var(--line); border-radius: 12px;
+    background: #fff; font-size: 1.15rem; outline: none;
+  }
+  .field:focus { border-color: var(--teal); }
+  .code-field { text-transform: uppercase; letter-spacing: .12em; font-weight: 600; }
+
+  /* Start */
+  .hero { text-align: center; padding: 26px 8px 8px; }
+  .hero h1 { font-size: 2.4rem; }
+  .hero .mtn { font-size: 3rem; }
+  .levelpick { border: 3px solid var(--line); border-radius: var(--radius); background: #fff; padding: 16px; text-align: left; width: 100%; }
+  .levelpick.sel { border-color: var(--teal); background: var(--teal-soft); }
+  .levelpick .ic { font-size: 2rem; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+  .tab { flex: 1; border: 2px solid var(--line); background: #fff; border-radius: 12px; padding: 12px; font-weight: 600; }
+  .tab.sel { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .err { color: var(--red); font-weight: 600; min-height: 1.5em; }
+
+  /* Home trail */
+  .week {
+    position: relative; text-align: left; border: 2px solid var(--line); background: #fff;
+    border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); width: 100%;
+  }
+  .week:hover { border-color: var(--sun); }
+  .week .num { font-size: .8rem; font-weight: 700; color: var(--sun); text-transform: uppercase; letter-spacing: .08em; }
+  .week h3 { margin: 4px 0 2px; }
+  .week .done { position: absolute; top: 12px; right: 14px; font-size: 1.4rem; }
+  .stars { color: var(--gold); letter-spacing: 2px; white-space: nowrap; }
+  .stars .off { color: #d8d1c3; }
+  .meter { height: 10px; background: #eee6d8; border-radius: 99px; overflow: hidden; margin-top: 8px; }
+  .meter > div { height: 100%; background: linear-gradient(90deg, var(--teal), #2bb3a0); border-radius: 99px; }
+  .tag { display: inline-block; font-size: .75rem; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: var(--sun-soft); color: #9a4b07; }
+  .tag.g { background: var(--violet-soft); color: var(--violet); }
+  .tag.w { background: var(--teal-soft); color: var(--teal); }
+
+  .act {
+    display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
+    border: 2px solid var(--line); background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 10px;
+  }
+  .act:hover { border-color: var(--teal); }
+  .act .ic { font-size: 1.8rem; width: 44px; text-align: center; }
+  .act .t { font-weight: 600; }
+  .tip { background: var(--violet-soft); border-radius: 14px; padding: 14px 16px; margin-bottom: 14px; }
+  .tip.s { background: var(--sun-soft); }
+  .ex { font-size: .95rem; margin: 4px 0 0; }
+
+  .wordlist { display: flex; flex-wrap: wrap; gap: 8px; }
+  .wl { border: 2px solid var(--line); border-radius: 10px; background: #fff; padding: 6px 12px; font-weight: 500; }
+  .wl b { color: var(--sun); }
+
+  /* Activities */
+  .progress { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .progress .meter { flex: 1; margin: 0; }
+  .big-q { font-size: 1.35rem; font-weight: 600; margin: 8px 0 14px; }
+  .sentence-card { background: #fbf9f5; border: 2px dashed var(--line); border-radius: 14px; padding: 16px; font-size: 1.3rem; display: flex; gap: 12px; align-items: center; margin-bottom: 16px; }
+  .sentence-card .txt { flex: 1; }
+  .opts { display: grid; gap: 10px; }
+  .opt-row { display: flex; gap: 8px; }
+  .opt {
+    flex: 1; text-align: left; border: 2px solid var(--line); border-radius: 12px; background: #fff;
+    padding: 14px 16px; font-size: 1.1rem; min-height: 54px;
+  }
+  .opt:hover:not(:disabled) { border-color: var(--navy); }
+  .opt.right { background: var(--teal-soft); border-color: var(--teal); }
+  .opt.wrong { background: var(--red-soft); border-color: var(--red); opacity: .75; }
+  .feedback { min-height: 2em; font-weight: 600; margin: 12px 0; }
+  .feedback.good { color: var(--teal); }
+  .feedback.bad { color: var(--red); }
+  .hint-word { font-size: 2rem; letter-spacing: .3em; font-weight: 700; color: var(--navy); }
+  .hint-word b { color: var(--sun); }
+
+  .chunkword { font-size: 2.6rem; font-weight: 700; letter-spacing: .06em; text-align: center; margin: 10px 0 20px; }
+  .chunkword .blank { display: inline-block; min-width: 1.6em; border-bottom: 5px solid var(--sun); color: var(--sun); margin: 0 3px; }
+
+  .buckets { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); margin-bottom: 18px; }
+  .bucket { border: 3px dashed var(--line); border-radius: 14px; background: #fff; padding: 12px; min-height: 120px; text-align: left; }
+  .bucket.ready { border-color: var(--teal); border-style: solid; }
+  .bucket h4 { margin: 0 0 8px; font-size: 1rem; }
+  .bucket .in { display: flex; flex-wrap: wrap; gap: 6px; }
+  .bucket .in span { background: var(--teal-soft); border-radius: 8px; padding: 3px 8px; font-size: .95rem; }
+  .pool { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .chip {
+    border: 2px solid var(--line); background: #fff; border-radius: 12px; padding: 10px 16px; font-size: 1.1rem; font-weight: 500;
+  }
+  .chip:hover { border-color: var(--navy); }
+  .chip.sel { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .shake { animation: shake .35s; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+
+  .split { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .split .w { border: 2px solid var(--line); background: #fff; border-radius: 10px; padding: 8px 12px; font-size: 1.2rem; }
+  .split .w.subj { background: #dbe7fb; border-color: #8aa8dd; }
+  .split .w.pred { background: var(--sun-soft); border-color: var(--sun); }
+  .split .w.wrong { background: var(--red-soft); border-color: var(--red); }
+
+  /* Result */
+  .result { text-align: center; }
+  .result .bigstars { font-size: 3.2rem; color: var(--gold); letter-spacing: 6px; }
+  .result .bigstars .off { color: #e1d9c9; }
+  .codebox { background: var(--navy); color: #fff; border-radius: 14px; padding: 16px; margin: 16px 0; text-align: center; }
+  .codebox .code { font-size: 1.7rem; font-weight: 700; letter-spacing: .1em; word-break: break-all; margin: 6px 0 10px; color: var(--gold); }
+
+  /* Writing */
+  .frame { border: 2px solid var(--line); border-radius: 14px; background: #fff; padding: 14px 16px; margin-bottom: 10px; font-size: 1.2rem; line-height: 2.1; }
+  .frame.active { border-color: var(--teal); }
+  .frame .n { font-size: .8rem; font-weight: 700; color: var(--muted); margin-right: 6px; }
+  .blank-btn {
+    border: 0; border-bottom: 3px solid var(--sun); background: var(--sun-soft); border-radius: 6px 6px 0 0;
+    padding: 0 10px; font-size: 1.1rem; color: #9a4b07; font-weight: 500; line-height: 1.7;
+  }
+  .blank-btn.filled { background: var(--teal-soft); border-color: var(--teal); color: var(--ink); }
+  .blank-btn.on { outline: 3px solid var(--teal); }
+  .ref { background: var(--violet-soft); padding: 0 8px; border-radius: 6px; }
+  .blank-in {
+    border: 0; border-bottom: 3px solid var(--sun); background: var(--sun-soft); border-radius: 6px 6px 0 0;
+    padding: 2px 8px; font-size: 1.1rem; min-width: 8ch; max-width: 100%; outline: none;
+  }
+  .blank-in:focus { border-color: var(--teal); background: var(--teal-soft); }
+  .tray { background: #fbf9f5; border-radius: 12px; padding: 12px; margin-top: 8px; line-height: 1.4; }
+  .tray .pool { justify-content: flex-start; }
+  .tray .chip { font-size: 1rem; padding: 8px 12px; text-align: left; }
+  .preview { background: #fffdf8; border: 2px solid var(--sun); border-radius: 14px; padding: 16px; font-size: 1.15rem; }
+  .preview .gap { color: #b9ae9a; }
+  textarea.write { width: 100%; min-height: 260px; padding: 16px; border: 2px solid var(--line); border-radius: 14px; font-size: 1.15rem; line-height: 1.7; resize: vertical; outline: none; }
+  textarea.write:focus { border-color: var(--teal); }
+  .check { list-style: none; padding: 0; margin: 0; }
+  .check li { padding: 4px 0; }
+  .steps { display: flex; gap: 6px; }
+  .steps i { width: 14px; height: 14px; border-radius: 50%; background: #e1d9c9; display: inline-block; }
+  .steps i.on { background: var(--teal); }
+
+  /* Modal + toast */
+  .modal-bg { position: fixed; inset: 0; background: rgba(20,28,45,.55); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 100; }
+  .modal { background: #fff; border-radius: 18px; padding: 22px; width: 100%; max-width: 480px; max-height: 90vh; overflow: auto; }
+  #toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--navy); color: #fff; padding: 12px 20px; border-radius: 12px; font-weight: 600; z-index: 200; opacity: 0; transition: opacity .2s; pointer-events: none; max-width: calc(100% - 32px); text-align: center; }
+  #toast.show { opacity: 1; }
+
+  table.t { width: 100%; border-collapse: collapse; font-size: .85rem; background: #fff; }
+  table.t th, table.t td { border: 1px solid var(--line); padding: 6px 8px; text-align: center; white-space: nowrap; }
+  table.t th { background: var(--navy); color: #fff; position: sticky; top: 0; }
+  table.t td:first-child { text-align: left; font-weight: 600; }
+  .scroll-x { overflow-x: auto; }
+
+  .print-area { display: none; }
+  @media print {
+    body * { visibility: hidden; }
+    .print-area, .print-area * { visibility: visible; }
+    .print-area { display: block; position: absolute; left: 0; top: 0; width: 100%; padding: 24px; font-size: 14pt; line-height: 2; }
+  }
+  @media (max-width: 560px) {
+    body { font-size: 17px; }
+    .hero h1 { font-size: 1.9rem; }
+    .chunkword { font-size: 2rem; }
+    .pill { padding: 5px 9px; font-size: .78rem; }
+  }
+</style>
+</head>
+<body>
+<header id="top"></header>
+<main id="app"></main>
+<div id="toast"></div>
+<div class="print-area" id="printArea"></div>
+
+<script>
+/* =========================================================
+   WordClimb: spelling, grammar, and writing practice
+   Progress is saved in a "save code" so it works on shared
+   devices with no server, no login, and no API.
+   ========================================================= */
+
+/* ---------------- LEVELS ---------------- */
+const LEVELS = {
+  1: { name: 'Base Camp', icon: '🏕️', desc: 'Shorter words and simpler sentences. A solid place to start.' },
+  2: { name: 'Ridge',     icon: '🥾', desc: 'Middle-level words and longer sentences. A real climb.' },
+  3: { name: 'Summit',    icon: '🏔️', desc: 'Big words and tough sentences. Bring snacks.' }
+};
+
+/* ---------------- SPELLING ----------------
+   Word format: "w[o]rd|categoryIndex|sentence"
+   Brackets mark the spelling pattern. Two brackets = split pattern like c[a]k[e] (a_e).
+*/
+const SPELL = [
+  {
+    title: 'Short Vowels', short: 'Short vowels',
+    tip: 'Short vowels make a quick sound: a in cat, e in bed, i in pig, o in hot, u in sun. They usually sit between two consonants.',
+    cats: [
+      { label: 'short a (cat)', chunks: ['a'] }, { label: 'short e (bed)', chunks: ['e'] },
+      { label: 'short i (pig)', chunks: ['i'] }, { label: 'short o (hot)', chunks: ['o'] },
+      { label: 'short u (sun)', chunks: ['u'] }
+    ],
+    words: {
+      1: ['c[a]mp|0|We will camp by the lake this weekend.', 'sl[e]d|1|She raced her sled down the hill.',
+          'br[i]ck|2|The wall is made of red brick.', 'fr[o]g|3|A frog jumped into the pond.',
+          'dr[u]m|4|He plays the drum in the band.', 'sn[a]ck|0|I packed a snack for the bus ride.',
+          'sp[e]nd|1|How much money did you spend?', 'bl[o]ck|3|We live on the same block.'],
+      2: ['pl[a]stic|0|Recycle the plastic bottles in the blue bin.', 'm[e]ssage|1|I sent my mom a message.',
+          'tr[i]ckle|2|Water began to trickle from the faucet.', 'c[o]mmon|3|It is common to feel nervous before a test.',
+          'b[u]cket|4|Fill the bucket with water.', 'tr[a]ffic|0|Traffic was slow after the game.',
+          'sk[e]tch|1|She drew a quick sketch of the dog.', 'cr[u]mble|4|The cookie began to crumble in my hand.'],
+      3: ['tr[a]nsfer|0|I want to transfer to a new class.', '[e]ffort|1|Your effort shows in your work.',
+          'l[i]mited|2|We have a limited amount of time.', 'c[o]nfident|3|She felt confident before the game.',
+          'str[u]ggle|4|It is normal to struggle when learning something new.', 'st[a]mina|0|Running every day builds stamina.',
+          'd[e]licate|1|Handle the delicate glass with care.', 'cr[i]tical|2|Sleep is critical for your brain.']
+    }
+  },
+  {
+    title: 'Long Vowels', short: 'Long vowels',
+    tip: 'Long vowels say their own name. Look for vowel teams: ai, ay, a_e for long a. ee, ea for long e. igh, i_e, y for long i. oa, ow, o_e for long o.',
+    cats: [
+      { label: 'long a (rain)', chunks: ['ai', 'ay', 'a_e'] }, { label: 'long e (seed)', chunks: ['ee', 'ea'] },
+      { label: 'long i (night)', chunks: ['igh', 'i_e', 'y'] }, { label: 'long o (boat)', chunks: ['oa', 'ow', 'o_e'] }
+    ],
+    words: {
+      1: ['tr[ai]n|0|The train was late today.', 'pl[ay]|0|Let us play outside after lunch.',
+          'sh[ee]p|1|The sheep ate the green grass.', 'dr[ea]m|1|I had a strange dream last night.',
+          'n[igh]t|2|The stars come out at night.', 'b[i]k[e]|2|I ride my bike to school.',
+          'b[oa]t|3|We rode a boat across the lake.', 'sn[ow]|3|Snow covered the whole yard.'],
+      2: ['expl[ai]n|0|Can you explain how you got that answer?', 'displ[ay]|0|The art is on display in the hall.',
+          'agr[ee]|1|I agree with your idea.', 'r[ea]son|1|Give one reason for your answer.',
+          'fr[igh]ten|2|Loud thunder can frighten the dog.', 'surv[i]v[e]|2|Plants need water to survive.',
+          'appr[oa]ch|3|The deer ran when we tried to approach.', 'foll[ow]|3|Follow the directions carefully.'],
+      3: ['compl[ai]nt|0|The manager listened to the complaint.', 'portr[ay]|0|The actor will portray a famous scientist.',
+          'proc[ee]d|1|Please proceed to the next question.', 'r[ea]listic|1|Make sure your goal is realistic.',
+          'del[igh]tful|2|We had a delightful time at the fair.', 'recogn[i]z[e]|2|Did you recognize your old friend?',
+          'overfl[ow]|3|Heavy rain made the river overflow.', 'repr[oa]ch|3|Her honesty was beyond reproach.']
+    }
+  },
+  {
+    title: 'oo and u Sounds', short: 'oo and u sounds',
+    tip: 'Three sounds to listen for: oo like moon (oo, ew, ue, u_e), oo like book (oo, ou, u), and "you" like cute (u_e, ew, ue).',
+    cats: [
+      { label: 'oo like moon', chunks: ['oo', 'ew', 'ue', 'u_e'] },
+      { label: 'oo like book', chunks: ['oo', 'ou', 'u'] },
+      { label: '"you" like cute', chunks: ['u_e', 'ew', 'ue'] }
+    ],
+    words: {
+      1: ['sp[oo]n|0|Eat your soup with a spoon.', 'gr[ew]|0|The plant grew taller this week.',
+          'bl[ue]|0|The sky is bright blue.', 'b[oo]k|1|I left my book in my locker.',
+          'c[ou]ld|1|Could you help me with this?', 'f[oo]t|1|I hurt my foot in gym class.',
+          'c[u]t[e]|2|The puppy is so cute.', 'f[ew]|2|Only a few students were late.'],
+      2: ['ball[oo]n|0|The balloon floated away.', 'cr[ew]|0|The crew worked on the ship all night.',
+          'incl[u]d[e]|0|Please include your name on the paper.', 'underst[oo]d|1|I finally understood the lesson.',
+          'sh[ou]ld|1|You should drink more water.', 'p[u]sh|1|Push the door to open it.',
+          'ref[u]s[e]|2|Do not refuse help when you need it.', 'c[ue]|2|The actor waited for her cue.'],
+      3: ['purs[ue]|0|She will pursue her dream of being a nurse.', 'j[ew]elry|0|The store sells silver jewelry.',
+          'attit[u]d[e]|0|A positive attitude helps you learn.', 'f[oo]tprint|1|We found a footprint in the mud.',
+          'b[u]lletin|1|Check the bulletin board for updates.', 'neighborh[oo]d|1|Our neighborhood has a new park.',
+          'comp[u]t[e]|2|Use a calculator to compute the total.', 'contin[ue]|2|We will continue the story tomorrow.']
+    }
+  },
+  {
+    title: 'ar, air, or', short: 'ar, air, or',
+    tip: 'When r comes after a vowel, it bosses the sound around. ar like car. air, are, ear like hair. or, ore, oar, our like storm.',
+    cats: [
+      { label: 'ar like car', chunks: ['ar'] },
+      { label: 'air like hair', chunks: ['air', 'are', 'ear'] },
+      { label: 'or like storm', chunks: ['or', 'ore', 'oar', 'our'] }
+    ],
+    words: {
+      1: ['f[ar]m|0|The farm has cows and pigs.', 'sh[ar]k|0|A shark swam near the boat.',
+          'h[air]|1|She put her hair in a ponytail.', 'c[are]|1|Take care of your new puppy.',
+          'p[ear]|1|I ate a pear at lunch.', 'st[or]m|2|The storm knocked out the power.',
+          'm[ore]|2|Can I have more time?', 'b[oar]d|2|Write your name on the board.'],
+      2: ['c[ar]toon|0|We watched a cartoon after school.', 'g[ar]den|0|We planted tomatoes in the garden.',
+          'rep[air]|1|Dad will repair the broken chair.', 'comp[are]|1|Compare the two stories.',
+          'aw[are]|1|Be aware of your surroundings.', 'imp[or]tant|2|This is an important test.',
+          'expl[ore]|2|Let us explore the old cave.', 's[oar]|2|Eagles soar high in the sky.'],
+      3: ['h[ar]mony|0|The choir sang in perfect harmony.', 'rem[ar]kable|0|Her progress this year is remarkable.',
+          'd[air]y|1|Milk and cheese are dairy foods.', 'prep[are]|1|We will prepare for the big game.',
+          'nightm[are]|1|I woke up from a scary nightmare.', '[or]chestra|2|She plays violin in the orchestra.',
+          'ign[ore]|2|Try to ignore the noise and focus.', 'c[our]se|2|The race course was very muddy.']
+    }
+  },
+  {
+    title: 'er, ir, ur', short: 'er, ir, ur',
+    tip: 'er, ir, and ur all make the same sound, like in her, bird, and turn. Your ears cannot tell them apart, so your eyes have to remember which one a word uses.',
+    cats: [
+      { label: 'er like her', chunks: ['er'] }, { label: 'ir like bird', chunks: ['ir'] }, { label: 'ur like turn', chunks: ['ur'] }
+    ],
+    words: {
+      1: ['h[er]d|0|A herd of cows crossed the road.', 'f[er]n|0|A fern grew in the shady spot.',
+          'g[ir]l|1|The girl won the race.', 'b[ir]d|1|A bird built a nest in the tree.',
+          'sh[ir]t|1|My shirt has a stain on it.', 'h[ur]t|2|Did you hurt your knee?',
+          't[ur]n|2|It is your turn to read.', 'c[ur]l|2|The cat likes to curl up and sleep.'],
+      2: ['p[er]fect|0|Nobody is perfect, and that is okay.', 's[er]vice|0|The service at the restaurant was fast.',
+          'th[ir]sty|1|Running makes me thirsty.', 'c[ir]cle|1|Draw a circle around the answer.',
+          'conf[ir]m|1|Text me to confirm the time.', 'p[ur]pose|2|What is the purpose of this tool?',
+          'ret[ur]n|2|Please return your books by Friday.', 'n[ur]se|2|The nurse checked my temperature.'],
+      3: ['int[er]pret|0|Can you interpret this graph?', 'c[er]tificate|0|She earned a certificate for perfect attendance.',
+          'c[ir]cumstance|1|Under no circumstance should you give up.', 'b[ir]thplace|1|This town is my grandmother\'s birthplace.',
+          'squ[ir]m|1|The puppy started to squirm in my arms.', 'dist[ur]bance|2|The fire alarm caused a disturbance.',
+          's[ur]geon|2|The surgeon fixed his broken arm.', 'p[ur]chase|2|Keep the receipt from your purchase.']
+    }
+  }
+];
+const REVIEW_SPELL = { title: 'Unit Review', short: 'Review', tip: 'Mixed words from every week. Think about which pattern each word uses.' };
+
+const SPELL_ACTS = [
+  { id: 'listen', name: 'Listen & Spell', icon: '🎧', desc: 'Hear it, type it.' },
+  { id: 'sort',   name: 'Pattern Sort',   icon: '🧺', desc: 'Sort words by their sound.' },
+  { id: 'chunk',  name: 'Missing Piece',  icon: '🧩', desc: 'Pick the letters that finish the word.' }
+];
+
+/* ---------------- GRAMMAR ----------------
+   spot items: mc "sentence|answerIndex"   split "subject | predicate"
+   fix items:  choice "prompt|correct|wrong|wrong"   punct "sentence|mark(s)"
+*/
+const GRAMMAR = [
+  {
+    title: 'Sentences & Fragments',
+    tip: 'A complete sentence has a subject (who or what) and a predicate (what they do or are). It is a complete thought. A fragment is missing a piece or leaves you hanging.',
+    ex: ['✅ The bus stopped.', '❌ After the bus stopped.'],
+    spot: { kind: 'mc', prompt: 'Is this a complete sentence or a fragment?', options: ['Complete sentence', 'Fragment'],
+      items: {
+        1: ['The dog ran across the yard.|0', 'After the big game.|1', 'My little brother.|1', 'We ate pizza for lunch.|0', 'Running down the hall.|1', 'I lost my shoe.|0'],
+        2: ['Although the test was hard.|1', 'The students who finished early.|1', 'Maya finished her essay before lunch.|0', 'Walking to school in the rain.|1', 'The coach blew the whistle loudly.|0', 'Listen to the directions.|0'],
+        3: ['Despite the warnings posted along the trail.|1', 'Whoever left the door open owes us an apology.|0', 'The scientist, who had studied the volcano for years.|1', 'Exhausted, the runners collapsed at the finish line.|0', 'Which explains why the experiment failed.|1', 'Listen carefully.|0']
+      } },
+    fix: { kind: 'choice', prompt: 'This is a fragment. Which choice turns it into a complete sentence?',
+      items: {
+        1: ['In the morning.|I eat cereal in the morning.|Cereal in the morning.|In the morning and cereal.',
+            'The big brown bear.|The big brown bear slept in the cave.|The big brown bear in the cave.|Slept in the cave the bear.',
+            'Because it was raining.|We stayed inside because it was raining.|Because it was raining outside.|Raining because it was.',
+            'Jumped over the fence.|The cat jumped over the fence.|Jumped over the fence fast.|Over the fence jumped.',
+            'My best friend.|My best friend lives next door.|My best friend next door.|Next door my best friend.'],
+        2: ['While we waited for the bus.|We played a word game while we waited for the bus.|While we waited for the bus to come.|We while waited for the bus.',
+            'The team with the red jerseys.|The team with the red jerseys won the game.|The team with the red jerseys on the field.|With the red jerseys the team.',
+            'Trying to find my phone.|I spent ten minutes trying to find my phone.|Trying to find my phone in my bag.|Find my phone trying.',
+            'After the movie ended.|After the movie ended, we went home.|After the movie ended late.|The movie after ended.',
+            'A book about sharks.|I checked out a book about sharks.|A big book about sharks.|About sharks a book.'],
+        3: ['Since the budget was cut last year.|Since the budget was cut last year, the club has fewer supplies.|Since the budget was cut last year and the club.|The budget, since it was cut last year.',
+            'The novel that everyone has been talking about.|The novel that everyone has been talking about is finally in the library.|The novel that everyone has been talking about for weeks.|Everyone talking about the novel.',
+            'Hoping to make the varsity team.|Hoping to make the varsity team, Jordan practiced every day.|Hoping to make the varsity team this year.|Jordan, hoping to make the varsity team.',
+            'Which made the crowd go wild.|The player scored in the final second, which made the crowd go wild.|Which made the whole crowd go wild.|The crowd, which went wild.',
+            'Unless we leave right now.|We will miss the bus unless we leave right now.|Unless we leave right now for the bus.|Unless right now we leave.']
+      } }
+  },
+  {
+    title: 'Subjects & Predicates',
+    tip: 'The complete subject is who or what the sentence is about. The complete predicate tells what the subject does or is. The predicate starts with the verb.',
+    ex: ['[The tall girl] [kicked the ball.]', 'subject ➜ predicate'],
+    spot: { kind: 'split', prompt: 'Tap the FIRST word of the predicate (the part that tells what the subject does or is).',
+      items: {
+        1: ['The cat | slept on my bed.', 'My mom | made tacos.', 'The bus | was late today.', 'Tom and Ana | played soccer.', 'A big dog | barked at me.'],
+        2: ['The students in Room 12 | finished their project early.', 'My older sister | works at the mall.', 'The old wooden bridge | creaked under our feet.', 'Every player on the team | needs a water bottle.', 'The loud thunder | scared my little brother.'],
+        3: ['The documentary about ocean pollution | changed the way I think about plastic.', 'Both the coach and the players | celebrated the surprising victory.', 'The girl who sits next to me in science | won the art contest.', 'A sudden gust of wind | knocked the umbrella out of my hand.', 'Nearly everyone in the auditorium | stood up and cheered.']
+      } },
+    fix: { kind: 'choice', prompt: 'Which choice best completes the sentence?',
+      items: {
+        1: ['___ ran to the bus stop.|The kids|Fast and quick|Down the street', 'My dog ___.|chewed my shoe|the brown one|in the yard', '___ is my favorite food.|Pizza|Eating at|Very hungry', 'The baby ___.|cried all night|the small one|in the crib', '___ fell off the table.|The glass|Off the edge|Very loudly'],
+        2: ['___ cheered for the home team.|The crowd in the stands|Loud and excited|During the game', 'The new student from Texas ___.|joined our science club|from the big city|with a blue backpack', '___ will start at 7 p.m.|The concert|Tonight at the school|Really exciting', 'My grandmother\'s garden ___.|is full of tomatoes|behind the house|with lots of flowers', '___ forgot their homework.|Several students|In the morning|Without thinking'],
+        3: ['___ requires patience and practice.|Learning a new language|Because it is hard|For many students', 'The mayor of our town ___.|announced a plan for a new park|who was elected last year|in front of city hall', '___ surprised everyone in the room.|The final score of the debate|Suddenly and loudly|After the long wait', 'The article about climate change ___.|included several helpful charts|that we read in class|with many facts', '___ have improved over the past ten years.|Cell phone cameras|Since then|Taking pictures']
+      } }
+  },
+  {
+    title: 'Kinds of Sentences',
+    tip: 'A statement tells something (.). A question asks something (?). A command tells someone to do something (. or !). An exclamation shows strong feeling (!).',
+    ex: ['Statement: I like tacos.', 'Question: Do you like tacos?', 'Command: Pass the tacos.', 'Exclamation: These tacos are amazing!'],
+    spot: { kind: 'mc', prompt: 'What kind of sentence is this?', options: ['Statement', 'Question', 'Command', 'Exclamation'],
+      items: {
+        1: ['I like apples.|0', 'Do you have a pencil?|1', 'Close the door.|2', 'Wow, that was amazing!|3', 'Where is my bag?|1', 'Please sit down.|2'],
+        2: ['The library closes at five o\'clock.|0', 'Have you finished the reading?|1', 'Turn in your papers by Friday.|2', 'I can\'t believe we won!|3', 'Grab a partner and find a seat.|2', 'Why did the character lie?|1'],
+        3: ['The results of the survey surprised the researchers.|0', 'Would you consider joining the debate team?|1', 'Read the passage twice before answering.|2', 'What an incredible comeback that was!|3', 'Make sure you cite your sources.|2', 'Isn\'t it strange that nobody noticed?|1']
+      } },
+    fix: { kind: 'punct', prompt: 'Which end mark belongs here?',
+      items: {
+        1: ['What time is lunch|?', 'I have two cats|.', 'Wow, that is so cool|!', 'Put your book away|.', 'Can we go outside|?'],
+        2: ['How many pages do we have to read|?', 'Watch out for that car|!', 'Our class is going on a field trip next week|.', 'Did anyone see my water bottle|?', 'Hand me the scissors, please|.'],
+        3: ['I wonder why the experiment failed|.', 'Who decided that homework should be due at midnight|?', 'Wow, that was the best concert I have ever seen|!', 'Explain your reasoning in complete sentences|.', 'Do you know whether the game was canceled|?']
+      } }
+  },
+  {
+    title: 'Compound Sentences',
+    tip: 'A compound sentence joins two complete sentences with a comma and a FANBOYS word: for, and, nor, but, or, yet, so. The comma goes BEFORE the joining word.',
+    ex: ['I was tired, but I finished my work.', 'Watch out: "Sam and Jo ran" is NOT compound. It has one subject part and one predicate part.'],
+    spot: { kind: 'mc', prompt: 'Is this a simple sentence or a compound sentence?', options: ['Simple', 'Compound'],
+      items: {
+        1: ['I ran, and I won.|1', 'The dog barked.|0', 'I was cold, so I put on a jacket.|1', 'My friend and I ate lunch.|0', 'She likes art, but he likes music.|1', 'We played games all day.|0'],
+        2: ['The game was close, but our team pulled ahead.|1', 'Marcus and Leo built a robot for the fair.|0', 'I wanted to go, yet I stayed home.|1', 'The teacher smiled and handed back the tests.|0', 'You can text me, or you can call.|1', 'The movie was long and boring.|0'],
+        3: ['The storm knocked out the power, so the game was postponed.|1', 'The author researched and wrote for three years before publishing.|0', 'Some students prefer quizzes, but others prefer projects.|1', 'The coach, the players, and their families celebrated together.|0', 'She had never been on a plane, nor had she seen the ocean.|1', 'Walking into the room, Jamal noticed the surprise decorations.|0']
+      } },
+    fix: { kind: 'choice', prompt: 'Which choice correctly joins the two sentences?',
+      items: {
+        1: ['I was hungry. I ate a snack.|I was hungry, so I ate a snack.|I was hungry, I ate a snack.|I was hungry so, I ate a snack.',
+            'It rained. We played inside.|It rained, so we played inside.|It rained we played inside.|It rained, we played inside.',
+            'I like cats. My sister likes dogs.|I like cats, but my sister likes dogs.|I like cats but, my sister likes dogs.|I like cats my sister likes dogs.',
+            'You can walk. You can ride the bus.|You can walk, or you can ride the bus.|You can walk or, you can ride the bus.|You can walk, you can ride the bus.',
+            'The sun came out. We went to the park.|The sun came out, and we went to the park.|The sun came out we went to the park.|The sun came out, we went to the park.'],
+        2: ['The test was hard. I felt ready.|The test was hard, but I felt ready.|The test was hard but, I felt ready.|The test was hard, I felt ready.',
+            'My phone died. I couldn\'t call my mom.|My phone died, so I couldn\'t call my mom.|My phone died, I couldn\'t call my mom.|My phone died so I, couldn\'t call my mom.',
+            'We could watch a movie. We could play cards.|We could watch a movie, or we could play cards.|We could watch a movie or we, could play cards.|We could watch a movie we could play cards.',
+            'Jada practiced every day. She made the team.|Jada practiced every day, and she made the team.|Jada practiced every day she made the team.|Jada practiced, every day and she made the team.',
+            'The store was open. It had no bread left.|The store was open, but it had no bread left.|The store was open, it had no bread left.|The store was open but, it had no bread left.'],
+        3: ['The evidence was strong. The jury was not convinced.|The evidence was strong, yet the jury was not convinced.|The evidence was strong, the jury was not convinced.|The evidence was strong yet, the jury was not convinced.',
+            'The company lowered its prices. Sales increased quickly.|The company lowered its prices, so sales increased quickly.|The company lowered its prices sales increased quickly.|The company lowered its prices, sales increased quickly.',
+            'Students may write an essay. They may create a presentation.|Students may write an essay, or they may create a presentation.|Students may write an essay or, they may create a presentation.|Students may write an essay, they may create a presentation.',
+            'The bridge was old. Engineers decided to replace it.|The bridge was old, so engineers decided to replace it.|The bridge was old so, engineers decided to replace it.|The bridge was old engineers decided to replace it.',
+            'He did not apologize. He did not explain himself.|He did not apologize, nor did he explain himself.|He did not apologize, nor he did explain himself.|He did not apologize nor, did he explain himself.']
+      } }
+  },
+  {
+    title: 'Run-ons & Comma Splices',
+    tip: 'A run-on smashes two sentences together with nothing between them. A comma splice glues them with only a comma. Fix them with a period, a comma + FANBOYS word, a semicolon, or a word like because.',
+    ex: ['❌ I was late I missed the bus.', '❌ I was late, I missed the bus.', '✅ I was late because I missed the bus.'],
+    spot: { kind: 'mc', prompt: 'Is this sentence correct, or is it a run-on?', options: ['Correct', 'Run-on'],
+      items: {
+        1: ['I like pizza it is good.|1', 'I like pizza because it is good.|0', 'The bell rang we went home.|1', 'The bell rang, and we went home.|0', 'My dog is fast he runs all day.|1', 'We read a book about space.|0'],
+        2: ['The bus was late, we missed first period.|1', 'The bus was late, so we missed first period.|0', 'I studied all night I still felt nervous.|1', 'Even though I studied, I still felt nervous.|0', 'Our team lost the game we played our best.|1', 'The cafeteria was loud; nobody could hear the announcement.|0'],
+        3: ['The experiment failed, the hypothesis was incorrect.|1', 'The experiment failed because the hypothesis was incorrect.|0', 'Social media can connect people however it can also isolate them.|1', 'Social media can connect people; however, it can also isolate them.|0', 'The author uses vivid imagery the reader can picture every scene.|1', 'Because the author uses vivid imagery, the reader can picture every scene.|0']
+      } },
+    fix: { kind: 'choice', prompt: 'Which choice correctly fixes the run-on?',
+      items: {
+        1: ['I am tired I want to sleep.|I am tired. I want to sleep.|I am tired I want, to sleep.|I am, tired I want to sleep.',
+            'The cat is soft she is white.|The cat is soft, and she is white.|The cat is soft she, is white.|The cat is soft, she is white.',
+            'We went to the zoo we saw a lion.|We went to the zoo. We saw a lion.|We went to the zoo, we saw a lion.|We went, to the zoo we saw a lion.',
+            'It is hot I want ice cream.|It is hot, so I want ice cream.|It is hot, I want ice cream.|It is hot so I, want ice cream.',
+            'Sam is my friend he is funny.|Sam is my friend. He is funny.|Sam is my friend, he is funny.|Sam is my, friend he is funny.'],
+        2: ['The movie was scary I covered my eyes.|The movie was scary, so I covered my eyes.|The movie was scary, I covered my eyes.|The movie was, scary I covered my eyes.',
+            'My brother plays guitar he practices every night.|My brother plays guitar. He practices every night.|My brother plays guitar, he practices every night.|My brother plays guitar he, practices every night.',
+            'I forgot my lunch, my friend shared hers.|I forgot my lunch, but my friend shared hers.|I forgot my lunch my friend shared hers.|I forgot, my lunch my friend shared hers.',
+            'The hallway was crowded we could barely move.|The hallway was crowded; we could barely move.|The hallway was crowded, we could barely move.|The hallway was crowded we, could barely move.',
+            'It started snowing school was canceled.|It started snowing, so school was canceled.|It started snowing, school was canceled.|It started snowing school, was canceled.'],
+        3: ['The data was incomplete, the scientists repeated the study.|Because the data was incomplete, the scientists repeated the study.|The data was incomplete, the scientists, repeated the study.|The data was incomplete the scientists repeated the study.',
+            'Many teens work part-time jobs this helps them learn responsibility.|Many teens work part-time jobs, which helps them learn responsibility.|Many teens work part-time jobs, this helps them learn responsibility.|Many teens work part-time jobs this, helps them learn responsibility.',
+            'The character seems confident however she is actually afraid.|The character seems confident; however, she is actually afraid.|The character seems confident, however she is actually afraid.|The character seems confident however, she is actually afraid.',
+            'The city built a new stadium, taxes went up.|After the city built a new stadium, taxes went up.|The city built a new stadium taxes went up.|The city built, a new stadium taxes went up.',
+            'Recycling reduces waste it also saves energy.|Recycling reduces waste, and it also saves energy.|Recycling reduces waste, it also saves energy.|Recycling reduces waste it, also saves energy.']
+      } }
+  }
+];
+const REVIEW_GRAM = { title: 'Unit Review', tip: 'A mix of everything: fragments, subjects and predicates, kinds of sentences, compound sentences, and run-ons.', ex: [] };
+const GRAM_ACTS = [
+  { id: 'spot', name: 'Spot It', icon: '🔍', desc: 'Look closely and identify.' },
+  { id: 'fix',  name: 'Fix It',  icon: '🔧', desc: 'Pick the version that works.' }
+];
+
+/* ---------------- WRITING ----------------
+   Frames use {key} blanks. {=key} repeats an earlier answer.
+   Keys ending in a number (fact1, reason2) share the list for the base key.
+*/
+const BANKS = {
+  when:    { 1: ['One day', 'Last summer', 'One time', 'Last year'], 2: ['One rainy Saturday', 'Last winter break', 'Last summer', 'One afternoon'], 3: ['Two summers ago', 'On a cold morning last January', 'Late one Friday night', 'Last spring'] },
+  feeling: { 1: ['happy', 'sad', 'scared', 'excited', 'mad', 'proud'], 2: ['nervous', 'proud', 'relieved', 'shocked', 'thrilled', 'frustrated'], 3: ['overwhelmed', 'exhilarated', 'anxious', 'astonished', 'determined', 'grateful'] },
+  body:    { 2: ['was pounding', 'raced', 'skipped a beat', 'felt light'], 3: ['was pounding in my chest', 'raced faster than ever', 'skipped a beat', 'finally slowed down'] },
+  wrap:    { 2: ['In the end', 'After that', 'Finally'], 3: ['Eventually', 'In the end', 'After what felt like forever'] },
+  reflect: { 3: ['I carry that with me today', 'it changed how I see myself', 'I am grateful it happened'] },
+  opener:  { 2: ['There is a lot to learn about', 'Here are some important facts about', 'Let me explain some facts about'] },
+  first:   { 2: ['First', 'To begin', 'First of all'], 3: ['First and foremost', 'To begin', 'Most importantly'] },
+  next:    { 2: ['Next', 'Also', 'In addition'], 3: ['Furthermore', 'In addition', 'Moreover'] },
+  last:    { 2: ['Finally', 'Lastly', 'Most importantly'] },
+  proof:   { 3: ['For example,', 'For instance,', 'To illustrate,'] },
+  concl:   { 3: ['Clearly', 'For these reasons', 'In the end'] }
+};
+const LABELS = {
+  when: 'when?', where: 'where?', who: 'with who?', start: 'how it started', event: 'what happened', feeling: 'a feeling', body: 'how your heart reacted',
+  why: 'why', resolve: 'how it ended', lesson: 'what you learned', reflect: 'final thought', wrap: 'transition',
+  topic: 'topic', opener: 'opener', first: 'transition', next: 'transition', last: 'transition', fact: 'a fact', detail: 'an example',
+  hook: 'hook', thesis: 'main idea', effect: 'a result', issue: 'the issue', claim: 'your claim', reason: 'a reason', evidence: 'evidence',
+  counter: 'the other side', rebuttal: 'your comeback', concl: 'wrap-up word', proof: 'example starter'
+};
+
+const WRITING = [
+  {
+    id: 'narrative', name: 'Narrative', icon: '📖', blurb: 'Tell a true story about something that happened to you.',
+    frames: {
+      1: ['{when}, I was {where} with {who}.', 'Then {event}.', 'I felt {feeling} because {why}.', 'I will always remember this day because {lesson}.'],
+      2: ['{when}, I was {where} with {who}.', 'At first, {start}.', 'Suddenly, {event}.', 'I felt {feeling}, and my heart {body}.', '{wrap}, {resolve}.', 'That day taught me that {lesson}.'],
+      3: ['{when}, I was {where} with {who}, and it is a day I will never forget.', 'At first, {start}.', 'Without warning, {event}.', 'I felt {feeling}, and my heart {body}.', 'I remember thinking that {why}.', '{wrap}, {resolve}.', 'Looking back, I realize that {lesson}, and {reflect}.']
+    },
+    topics: [
+      { title: 'A time I was surprised', ideas: {
+        where: ['at home', 'at school', 'at my grandma\'s house', 'at the park', 'at a birthday party'],
+        who: ['my family', 'my best friend', 'my little brother', 'my cousins', 'my class'],
+        start: ['it seemed like a normal, boring day', 'we were just hanging out and talking', 'I was doing my homework', 'everyone was acting a little strange'],
+        event: ['everyone jumped out and yelled surprise', 'I found out I had won a contest', 'my dad walked in with a new puppy', 'my old friend showed up at the door', 'the lights went out all at once'],
+        why: ['I never saw it coming', 'nobody had told me anything', 'it was something I had wanted for a long time'],
+        resolve: ['I started laughing and could not stop', 'we celebrated for the rest of the night', 'I hugged everyone in the room', 'I finally caught my breath and smiled'],
+        lesson: ['the best moments are the ones you do not plan', 'people care about me more than I knew', 'surprises can turn a normal day into a great one'] } },
+      { title: 'My best day ever', ideas: {
+        where: ['at the beach', 'at an amusement park', 'at a basketball game', 'on a road trip', 'at a family cookout'],
+        who: ['my family', 'my best friend', 'my cousins', 'my team', 'my grandparents'],
+        start: ['the sun was shining and the air was warm', 'we woke up early because we were so excited', 'we packed snacks and loaded the car', 'music was playing and everyone was in a good mood'],
+        event: ['we rode the biggest roller coaster in the park', 'I scored the winning point', 'we saw dolphins jumping in the waves', 'my favorite song came on and everyone danced', 'we stayed up late telling stories by the fire'],
+        why: ['I got to spend time with people I love', 'everything went right for once', 'I did something I had never done before'],
+        resolve: ['we drove home tired but happy', 'the day ended with the best dinner ever', 'we promised to do it again next year', 'I fell asleep the second my head hit the pillow'],
+        lesson: ['simple days can be the best days', 'time with family matters more than stuff', 'it is worth trying new things'] } },
+      { title: 'A time I learned something hard', ideas: {
+        where: ['at practice', 'in class', 'at home', 'at my first job', 'at the skate park'],
+        who: ['my coach', 'my teacher', 'my older sister', 'my friends', 'my uncle'],
+        start: ['I thought this would be easy', 'I had tried this many times before', 'I was nervous before we even started', 'I wanted to quit before I began'],
+        event: ['I failed on my first try', 'I fell and everyone saw', 'I got the answer wrong in front of everyone', 'I realized I had no idea what I was doing', 'I wanted to give up'],
+        why: ['I really wanted to get it right', 'I did not want to let anyone down', 'it was harder than I expected'],
+        resolve: ['I kept practicing until I got it', 'someone showed me a better way to do it', 'I tried again and finally succeeded', 'I took a deep breath and started over'],
+        lesson: ['mistakes are part of learning', 'asking for help is not weak', 'hard work pays off', 'I am stronger than I think'] } }
+    ]
+  },
+  {
+    id: 'informative', name: 'Informative', icon: '💡', blurb: 'Teach your reader facts about a topic.',
+    frames: {
+      1: ['I want to tell you about {topic}.', 'One fact is that {fact1}.', 'Another fact is that {fact2}.', 'This topic matters because {why}.'],
+      2: ['{opener} {topic}.', '{first}, {fact1}.', '{next}, {fact2}.', 'For example, {detail}.', '{last}, {fact3}.', 'Learning about {topic} matters because {why}.'],
+      3: ['{hook}', 'In this paragraph, I will explain {thesis}.', '{first}, {fact1}.', 'For instance, {detail}.', '{next}, {fact2}.', 'As a result, {effect}.', 'In conclusion, understanding {topic} matters because {why}.']
+    },
+    topics: [
+      { title: 'Sharks', ideas: {
+        topic: ['sharks'],
+        fact: ['sharks have lived on Earth for over 400 million years', 'sharks can have several rows of teeth', 'some sharks can sense electricity from other animals', 'some sharks must keep swimming to breathe', 'the whale shark is the biggest fish in the world'],
+        detail: ['a shark can lose and regrow thousands of teeth in its life', 'great white sharks have a very powerful sense of smell', 'sharks have no bones, only cartilage like your ears'],
+        why: ['sharks keep ocean food chains in balance', 'people often fear sharks without knowing the facts', 'oceans need healthy shark populations'],
+        hook: ['What animal is older than the dinosaurs?', 'Imagine a fish with teeth that never run out.', 'Sharks are not the monsters movies make them out to be.'],
+        thesis: ['why sharks are important to the ocean', 'how sharks have survived for so long', 'what makes sharks such amazing hunters'],
+        effect: ['sharks have become some of the best survivors on the planet', 'the ocean stays healthier when sharks are around', 'scientists keep studying them to learn more'] } },
+      { title: 'Sleep and your brain', ideas: {
+        topic: ['sleep'],
+        fact: ['teenagers need about 8 to 10 hours of sleep each night', 'your brain sorts and saves memories while you sleep', 'screens at night can make it harder to fall asleep', 'not getting enough sleep can make it hard to focus', 'your body repairs itself while you sleep'],
+        detail: ['students who sleep more often remember more of what they study', 'the light from phones can trick your brain into thinking it is daytime', 'athletes who sleep well often react faster'],
+        why: ['sleep affects how well we learn and feel', 'many teens do not get enough rest', 'better sleep can lead to better grades'],
+        hook: ['Have you ever felt like a zombie in first period?', 'What if the secret to better grades was a pillow?', 'Your brain is busy even when you are fast asleep.'],
+        thesis: ['why sleep matters for teenagers', 'how sleep helps the brain', 'what happens when we do not get enough rest'],
+        effect: ['tired students can struggle in school', 'getting enough sleep can improve mood and focus', 'healthy sleep habits can help for a lifetime'] } },
+      { title: 'Volcanoes', ideas: {
+        topic: ['volcanoes'],
+        fact: ['a volcano is an opening in Earth\'s crust', 'hot melted rock under the ground is called magma', 'when magma reaches the surface it is called lava', 'there are volcanoes under the ocean', 'some volcanoes have not erupted in thousands of years'],
+        detail: ['the Hawaiian Islands were formed by volcanoes', 'ash from a big eruption can travel hundreds of miles', 'lava can be hotter than 2,000 degrees Fahrenheit'],
+        why: ['millions of people live near volcanoes', 'volcanoes shape the land we live on', 'scientists can warn people before an eruption'],
+        hook: ['What if the ground beneath your feet started to melt?', 'Some islands were built by fire.', 'Volcanoes are one of nature\'s most powerful forces.'],
+        thesis: ['how volcanoes form', 'why volcanoes erupt', 'how volcanoes change the land around them'],
+        effect: ['volcanoes can create new land', 'scientists watch active volcanoes closely', 'people near volcanoes need emergency plans'] } }
+    ]
+  },
+  {
+    id: 'argument', name: 'Argumentative', icon: '⚖️', blurb: 'Pick a side and convince your reader.',
+    frames: {
+      1: ['I think {claim}.', 'One reason is that {reason1}.', 'Another reason is that {reason2}.', 'That is why I believe {=claim}.'],
+      2: ['I believe that {claim}.', '{first}, {reason1}.', 'For example, {evidence}.', '{next}, {reason2}.', 'Some people think {counter}, but {rebuttal}.', 'For these reasons, {=claim}.'],
+      3: ['Many people debate whether {issue}.', 'I firmly believe that {claim}.', '{first}, {reason1}.', '{proof} {evidence}.', '{next}, {reason2}.', 'Although some argue that {counter}, {rebuttal}.', '{concl}, {=claim}.']
+    },
+    topics: [
+      { title: 'Phones in class', ideas: { issue: ['students should be allowed to use phones in class'] },
+        sides: [
+          { label: 'YES, allow phones', ideas: {
+            claim: ['students should be allowed to use phones in class', 'phones can be useful learning tools in class'],
+            reason: ['phones can be used to look up information quickly', 'students can use calculators and apps to learn', 'phones help students stay in touch with family in emergencies', 'learning to use phones responsibly is an important life skill'],
+            evidence: ['many teachers use apps for quizzes and practice', 'a student can check a fact in seconds', 'parents feel safer when they can reach their kids'],
+            counter: ['phones are too distracting', 'students will just play games'],
+            rebuttal: ['clear rules can keep phone use on track', 'teachers can decide when phones are allowed'] } },
+          { label: 'NO, put them away', ideas: {
+            claim: ['phones should not be allowed in class', 'phones should stay put away during class'],
+            reason: ['phones distract students from learning', 'students may use phones to cheat', 'less screen time helps students focus', 'students talk to each other more without phones'],
+            evidence: ['one notification can pull a student\'s attention away for minutes', 'some schools have reported better focus after limiting phones', 'students often check social media instead of working'],
+            counter: ['phones can be used for learning', 'students need phones for emergencies'],
+            rebuttal: ['schools already have computers for learning', 'the office can always call home in an emergency'] } }
+        ] },
+      { title: 'Should school start later?', ideas: { issue: ['school should start later in the morning'] },
+        sides: [
+          { label: 'YES, start later', ideas: {
+            claim: ['school should start later in the morning', 'high school should start later in the day'],
+            reason: ['teenagers need more sleep', 'students learn better when they are rested', 'fewer students would be late or absent', 'students would be safer driving to school when they are awake'],
+            evidence: ['doctors recommend that teens get 8 to 10 hours of sleep', 'many students fall asleep during first period', 'some schools that start later have seen better attendance'],
+            counter: ['a later start would mess up after-school activities', 'parents need kids at school early'],
+            rebuttal: ['schedules can be adjusted to fit', 'healthy, rested students are worth the change'] } },
+          { label: 'NO, keep it the same', ideas: {
+            claim: ['school should keep its current start time', 'school should not start later'],
+            reason: ['a later start means school ends later', 'sports and jobs would be pushed later into the evening', 'students might just stay up later', 'many parents need to drop kids off before work'],
+            evidence: ['athletes would get home after dark', 'students with jobs would lose work hours', 'bus schedules would have to change for the whole district'],
+            counter: ['teens need more sleep', 'students are tired in the morning'],
+            rebuttal: ['students can go to bed earlier instead', 'better sleep habits would help more than a new schedule'] } }
+        ] },
+      { title: 'School uniforms', ideas: { issue: ['students should wear school uniforms'] },
+        sides: [
+          { label: 'YES, uniforms', ideas: {
+            claim: ['students should wear school uniforms', 'schools should require uniforms'],
+            reason: ['uniforms make getting ready faster', 'uniforms can reduce bullying about clothes', 'uniforms help everyone feel like part of a team', 'families can save money on clothes'],
+            evidence: ['students would not need to worry about name brands', 'some schools report fewer arguments over clothing', 'a few uniform pieces can last the whole year'],
+            counter: ['uniforms take away self-expression', 'uniforms can be uncomfortable'],
+            rebuttal: ['students can still express themselves through their ideas and talents', 'schools can choose comfortable uniform options'] } },
+          { label: 'NO, free choice', ideas: {
+            claim: ['students should not have to wear uniforms', 'schools should let students choose their clothes'],
+            reason: ['clothes are a way to express who you are', 'uniforms can cost families extra money', 'students learn to make their own choices', 'uniforms do not fix bigger problems like bullying'],
+            evidence: ['students already have clothes they could wear', 'many uniforms must be bought from special stores', 'a dress code can keep clothes appropriate without uniforms'],
+            counter: ['uniforms stop bullying', 'uniforms make school more serious'],
+            rebuttal: ['kids who bully will find other things to pick on', 'students can take school seriously in any outfit'] } }
+        ] }
+    ]
+  }
+];
+const WRITE_STEPS = [
+  { name: 'Build It', icon: '🧱', desc: 'Tap word cards to fill in the blanks.' },
+  { name: 'Boost It', icon: '🚀', desc: 'Type your own words in the blanks. Ideas are there if you need them.' },
+  { name: 'Write It', icon: '✍️', desc: 'Write the whole paragraph yourself with sentence starters to help.' }
+];
+const FREE_WORDS = { 1: 30, 2: 55, 3: 80 };
+
+/* ---------------- SAVE CODE ----------------
+   Slots (2 bits each, value 0-3):
+   week w: spelling acts at w*5+0..2, grammar acts at w*5+3..4  (6 weeks = 30 slots)
+   writing types at 30..32 (value = steps completed)
+*/
+const WEEKS = 6, SLOTS = 33, CODE_VERSION = 1;
+const AB = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+const spellSlot = (w, a) => w * 5 + a;
+const gramSlot = (w, a) => w * 5 + 3 + a;
+const writeSlot = t => 30 + t;
+
+function fnv(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+const bitsOf = (n, len) => n.toString(2).padStart(len, '0');
+
+function encodeCode(st) {
+  let bits = bitsOf(CODE_VERSION, 3) + bitsOf(st.level - 1, 2) + st.prog.map(v => bitsOf(v, 2)).join('');
+  while (bits.length % 5) bits += '0';
+  let data = '';
+  for (let i = 0; i < bits.length; i += 5) data += AB[parseInt(bits.slice(i, i + 5), 2)];
+  data = data.replace(/2+$/, '');
+  const c = fnv(st.name + '|' + data) % 1024;
+  data += AB[c >> 5] + AB[c & 31];
+  return st.name + '-' + data.match(/.{1,4}/g).join('-');
+}
+
+function decodeCode(raw) {
+  const s = String(raw || '').toUpperCase().replace(/\s+/g, '');
+  const i = s.indexOf('-');
+  if (i < 1) throw new Error('Your code starts with your name and a dash, like MARIA-7K2P.');
+  const name = s.slice(0, i).replace(/[^A-Z]/g, '');
+  const data = s.slice(i + 1).replace(/-/g, '');
+  if (!name) throw new Error('Your code starts with your name and a dash, like MARIA-7K2P.');
+  if (/[01IO]/.test(data)) throw new Error('Codes never use the letters I or O or the numbers 0 or 1. Double check it.');
+  if (data.length < 3 || /[^A-Z2-9]/.test(data)) throw new Error('That code does not look right. Double check each letter.');
+  const body = data.slice(0, -2), chk = data.slice(-2);
+  const c = fnv(name + '|' + body) % 1024;
+  if (AB[c >> 5] + AB[c & 31] !== chk) throw new Error('That code does not match. Check each letter and number carefully.');
+  let bits = '';
+  for (const ch of body) bits += bitsOf(AB.indexOf(ch), 5);
+  const need = 3 + 2 + SLOTS * 2;
+  bits = bits.padEnd(need, '0');
+  if (parseInt(bits.slice(0, 3), 2) !== CODE_VERSION) throw new Error('That code is from a different version of WordClimb.');
+  const level = parseInt(bits.slice(3, 5), 2) + 1;
+  if (level > 3) throw new Error('That code does not look right.');
+  const prog = [];
+  for (let k = 0; k < SLOTS; k++) prog.push(parseInt(bits.slice(5 + k * 2, 7 + k * 2), 2));
+  return { name, level, prog };
+}
+
+/* ---------------- STATE ---------------- */
+let S = null;               // { name, level, prog }
+let codeCopied = true;      // has the newest code been copied/seen?
+let ACT = null;             // current activity
+let WS = null;              // writing state
+let settings = { read: false, slow: false };
+try { Object.assign(settings, JSON.parse(localStorage.getItem('wc_settings') || '{}')); } catch (e) {}
+function saveSettings() { try { localStorage.setItem('wc_settings', JSON.stringify(settings)); } catch (e) {} }
+
+function persist() {
+  codeCopied = false;
+  try { sessionStorage.setItem('wc_session', encodeCode(S)); } catch (e) {}
+}
+function totalStars(st = S) {
+  let n = 0; for (let k = 0; k < 30; k++) n += st.prog[k];
+  for (let t = 0; t < 3; t++) n += st.prog[writeSlot(t)];
+  return n;
+}
+const MAX_STARS = 30 * 3 + 9;
+
+/* ---------------- HELPERS ---------------- */
+const $ = (s, el = document) => el.querySelector(s);
+const app = $('#app');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+function starsHTML(n, max = 3) { let s = ''; for (let i = 0; i < max; i++) s += i < n ? '★' : '<span class="off">★</span>'; return `<span class="stars">${s}</span>`; }
+function render(html) { app.innerHTML = html; window.scrollTo(0, 0); }
+let toastT;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200); }
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch (e) {
+    const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand('copy'); } catch (e2) {}
+    ta.remove(); return ok;
+  }
+}
+
+/* ---------------- SPEECH ---------------- */
+let voice = null;
+function pickVoice() {
+  if (!('speechSynthesis' in window)) return;
+  const vs = speechSynthesis.getVoices();
+  voice = vs.find(v => /en-US/i.test(v.lang) && /Google|Samantha|Natural/i.test(v.name)) || vs.find(v => /en-US/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
+}
+if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function speak(text, rate) {
+  if (!('speechSynthesis' in window) || !text) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text.replace(/_+/g, 'blank'));
+  if (voice) u.voice = voice;
+  u.rate = rate || (settings.slow ? 0.7 : 0.95);
+  speechSynthesis.speak(u);
+}
+
+/* ---------------- TOP BAR ---------------- */
+function renderTop() {
+  const top = $('#top');
+  if (!S) { top.innerHTML = `<button class="brand" data-act="goStart">⛰️ Word<span>Climb</span></button>`; return; }
+  const L = LEVELS[S.level];
+  top.innerHTML = `
+    <button class="brand" data-act="goHome">⛰️ Word<span>Climb</span></button>
+    <span class="pill" title="Stars">★ ${totalStars()}</span>
+    <button class="pill" data-act="levelModal">${L.icon} ${L.name}</button>
+    <button class="pill ${settings.read ? 'on' : ''}" data-act="toggleRead">🔊 Read to me: ${settings.read ? 'On' : 'Off'}</button>
+    <button class="pill ${settings.slow ? 'on' : ''}" data-act="toggleSlow">🐢 Slow voice</button>
+    <button class="pill key" data-act="codeModal">🔑 My Code</button>`;
+}
+
+/* ---------------- MODALS ---------------- */
+function modal(html) {
+  closeModal();
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg'; bg.id = 'modalBg';
+  bg.innerHTML = `<div class="modal" role="dialog" aria-modal="true">${html}</div>`;
+  bg.addEventListener('click', e => { if (e.target === bg) closeModal(); });
+  document.body.appendChild(bg);
+}
+function closeModal() { const m = $('#modalBg'); if (m) m.remove(); }
+
+function codeModal(first) {
+  const code = encodeCode(S);
+  modal(`
+    <h2>${first ? '🎉 Here is your save code!' : '🔑 Your save code'}</h2>
+    <p>This code IS your progress. Copy it into your notes or write it down. Next time, paste it in to pick up right where you left off.</p>
+    <div class="codebox"><div class="small">YOUR CODE</div><div class="code">${esc(code)}</div>
+      <button class="btn sun" data-act="copyCode">📋 Copy my code</button></div>
+    <p class="small muted">Your code changes every time you earn stars, so grab the newest one before you leave.</p>
+    <div class="row"><button class="btn ghost" data-act="closeModal">Got it</button><span class="spacer"></span><button class="btn ghost small" data-act="logout">Done for today</button></div>`);
+}
+
+function levelModal() {
+  modal(`
+    <h2>Pick your trail</h2>
+    <p class="muted">Switch any time. Your stars stay with you.</p>
+    <div class="grid">${[1, 2, 3].map(l => `
+      <button class="levelpick ${S.level === l ? 'sel' : ''}" data-act="setLevel" data-l="${l}">
+        <span class="ic">${LEVELS[l].icon}</span> <b>${LEVELS[l].name}</b><br><span class="small muted">${LEVELS[l].desc}</span>
+      </button>`).join('')}</div>`);
+}
+
+/* ---------------- START SCREEN ---------------- */
+let startTab = 'new', newLevel = 1;
+function renderStart(msg) {
+  S = null; renderTop();
+  render(`
+    <div class="hero">
+      <div class="mtn">⛰️</div>
+      <h1>WordClimb</h1>
+      <p class="muted">Spelling, grammar, and writing. One step at a time.</p>
+    </div>
+    <div class="card" style="max-width:620px;margin:16px auto">
+      <div class="tabs">
+        <button class="tab ${startTab === 'new' ? 'sel' : ''}" data-act="startTab" data-t="new">I'm new</button>
+        <button class="tab ${startTab === 'code' ? 'sel' : ''}" data-act="startTab" data-t="code">I have a code</button>
+      </div>
+      ${startTab === 'new' ? `
+        <label for="nm"><b>Your first name</b> <span class="small muted">(add your last initial if someone has the same name)</span></label>
+        <input id="nm" class="field" maxlength="12" autocomplete="off" placeholder="Example: MariaG" style="margin:8px 0 16px" />
+        <b>Choose your trail</b>
+        <div class="grid g3" style="margin:8px 0 16px">${[1, 2, 3].map(l => `
+          <button class="levelpick ${newLevel === l ? 'sel' : ''}" data-act="pickNewLevel" data-l="${l}">
+            <div class="ic">${LEVELS[l].icon}</div><b>${LEVELS[l].name}</b><div class="small muted">${LEVELS[l].desc}</div>
+          </button>`).join('')}</div>
+        <div class="err" id="err">${esc(msg || '')}</div>
+        <button class="btn sun" style="width:100%" data-act="startNew">Start climbing ➜</button>
+      ` : `
+        <label for="cd"><b>Paste or type your code</b></label>
+        <input id="cd" class="field code-field" autocomplete="off" spellcheck="false" placeholder="MARIA-7K2P-Q9XM" style="margin:8px 0 12px" />
+        <div class="err" id="err">${esc(msg || '')}</div>
+        <button class="btn sun" style="width:100%" data-act="loadCode">Continue my climb ➜</button>
+      `}
+    </div>
+    <p style="text-align:center"><button class="btn ghost small" data-act="teacher">👩‍🏫 Teacher view</button></p>`);
+  const f = $('#nm') || $('#cd');
+  if (f) { f.focus(); f.addEventListener('keydown', e => { if (e.key === 'Enter') ACTIONS[startTab === 'new' ? 'startNew' : 'loadCode'](); }); }
+}
+
+/* ---------------- HOME ---------------- */
+function weekStars(w) {
+  let n = 0; for (let a = 0; a < 3; a++) n += S.prog[spellSlot(w, a)];
+  for (let a = 0; a < 2; a++) n += S.prog[gramSlot(w, a)];
+  return n;
+}
+function renderHome() {
+  ACT = null; WS = null; renderTop();
+  const total = totalStars();
+  render(`
+    <div class="row" style="margin-bottom:12px">
+      <div><h1 style="margin:0">Hey, ${esc(cap(S.name.toLowerCase()))}! 👋</h1>
+      <div class="muted">${LEVELS[S.level].icon} ${LEVELS[S.level].name} trail · ${total} of ${MAX_STARS} stars</div></div>
+    </div>
+    <div class="meter" style="margin-bottom:22px"><div style="width:${Math.round(total / MAX_STARS * 100)}%"></div></div>
+
+    <h2>Unit 1 Trail</h2>
+    <div class="grid g3" style="margin-bottom:26px">
+      ${Array.from({ length: WEEKS }, (_, w) => {
+        const st = weekStars(w), sp = w < 5 ? SPELL[w] : REVIEW_SPELL, gr = w < 5 ? GRAMMAR[w] : REVIEW_GRAM;
+        return `<button class="week" data-act="openWeek" data-w="${w}">
+          ${st === 15 ? '<span class="done">🏁</span>' : ''}
+          <div class="num">${w < 5 ? 'Week ' + (w + 1) : 'Week 6 · Review'}</div>
+          <h3>${esc(sp.title)}</h3>
+          <div class="small muted">Grammar: ${esc(gr.title)}</div>
+          <div class="meter"><div style="width:${Math.round(st / 15 * 100)}%"></div></div>
+          <div class="small" style="margin-top:6px">★ ${st} / 15</div>
+        </button>`;
+      }).join('')}
+    </div>
+
+    <h2>Writing Studio</h2>
+    <div class="grid g3">
+      ${WRITING.map((t, i) => {
+        const done = S.prog[writeSlot(i)];
+        return `<button class="week" data-act="openWriting" data-t="${i}">
+          <div style="font-size:2rem">${t.icon}</div>
+          <h3>${t.name}</h3>
+          <div class="small muted">${t.blurb}</div>
+          <div class="row" style="margin-top:8px"><span class="steps">${[0, 1, 2].map(s => `<i class="${s < done ? 'on' : ''}"></i>`).join('')}</span><span class="small">${done} of 3 steps</span></div>
+        </button>`;
+      }).join('')}
+    </div>`);
+}
+
+/* ---------------- WEEK SCREEN ---------------- */
+function parseWord(str, wk) {
+  const [raw, cat, sentence] = str.split('|');
+  const parts = [], chunks = [];
+  const re = /\[([^\]]+)\]/g; let last = 0, m;
+  while ((m = re.exec(raw))) {
+    if (m.index > last) parts.push({ t: raw.slice(last, m.index) });
+    parts.push({ b: m[1] }); chunks.push(m[1]); last = re.lastIndex;
+  }
+  if (last < raw.length) parts.push({ t: raw.slice(last) });
+  return { word: raw.replace(/[\[\]]/g, ''), parts, chunk: chunks.join('_'), cat: +cat, sentence, wk };
+}
+function weekWords(w) {
+  if (w < 5) return SPELL[w].words[S.level].map(s => parseWord(s, w));
+  let out = [];
+  for (let k = 0; k < 5; k++) out = out.concat(shuffle(SPELL[k].words[S.level]).slice(0, 2).map(s => parseWord(s, k)));
+  return shuffle(out);
+}
+function wordHTML(wd) { return wd.parts.map(p => p.b ? `<b>${esc(p.b)}</b>` : esc(p.t)).join(''); }
+
+function renderWeek(w) {
+  ACT = null; renderTop();
+  const sp = w < 5 ? SPELL[w] : REVIEW_SPELL, gr = w < 5 ? GRAMMAR[w] : REVIEW_GRAM;
+  const words = w < 5 ? weekWords(w) : [];
+  render(`
+    <button class="btn ghost small" data-act="goHome">← Trail</button>
+    <h1 style="margin-top:12px">${w < 5 ? 'Week ' + (w + 1) : 'Week 6: Review'}</h1>
+    <div class="grid g2">
+      <div class="card">
+        <span class="tag">SPELLING</span>
+        <h2 style="margin-top:8px">${esc(sp.title)}</h2>
+        <div class="tip s"><div class="row"><b style="flex:1">Pattern tip</b><button class="speak" data-act="say" data-text="${esc(sp.tip)}">🔊</button></div>${esc(sp.tip)}</div>
+        ${words.length ? `<p class="small muted" style="margin-bottom:6px">Tap a word to hear it:</p>
+          <div class="wordlist" style="margin-bottom:16px">${words.map(wd => `<button class="wl" data-act="say" data-text="${esc(wd.word)}">${wordHTML(wd)}</button>`).join('')}</div>` : ''}
+        ${SPELL_ACTS.map((a, i) => `<button class="act" data-act="startSpell" data-w="${w}" data-a="${i}">
+          <span class="ic">${a.icon}</span><span style="flex:1"><div class="t">${a.name}</div><div class="small muted">${a.desc}</div></span>${starsHTML(S.prog[spellSlot(w, i)])}</button>`).join('')}
+      </div>
+      <div class="card">
+        <span class="tag g">GRAMMAR</span>
+        <h2 style="margin-top:8px">${esc(gr.title)}</h2>
+        <div class="tip"><div class="row"><b style="flex:1">Quick lesson</b><button class="speak" data-act="say" data-text="${esc(gr.tip)}">🔊</button></div>${esc(gr.tip)}
+          ${gr.ex.map(e => `<div class="ex">${esc(e)}</div>`).join('')}</div>
+        ${GRAM_ACTS.map((a, i) => `<button class="act" data-act="startGram" data-w="${w}" data-a="${i}">
+          <span class="ic">${a.icon}</span><span style="flex:1"><div class="t">${a.name}</div><div class="small muted">${a.desc}</div></span>${starsHTML(S.prog[gramSlot(w, i)])}</button>`).join('')}
+      </div>
+    </div>`);
+}
+
+/* ---------------- ACTIVITY SHELL ---------------- */
+function actHeader() {
+  const n = ACT.items.length, i = Math.min(ACT.idx, n);
+  return `<div class="row" style="margin-bottom:8px"><button class="btn ghost small" data-act="quitAct">← Week ${ACT.w + 1}</button>
+    <span class="spacer"></span><b>${ACT.icon} ${ACT.name}</b></div>
+    <div class="progress"><div class="meter"><div style="width:${Math.round(i / n * 100)}%"></div></div><span class="small">${i} / ${n}</span></div>`;
+}
+function finishActivity(pct) {
+  const stars = pct >= 0.9 ? 3 : pct >= 0.7 ? 2 : 1;
+  const slot = ACT.kind === 'spell' ? spellSlot(ACT.w, ACT.a) : gramSlot(ACT.w, ACT.a);
+  const before = S.prog[slot];
+  const improved = stars > before;
+  if (improved) { S.prog[slot] = stars; persist(); }
+  renderTop();
+  const msg = stars === 3 ? 'Summit level work! 🏔️' : stars === 2 ? 'Strong climb! Go again for 3 stars.' : 'You finished! Practice again to earn more stars.';
+  render(`
+    <div class="card result" style="max-width:620px;margin:20px auto">
+      <h1>${ACT.icon} ${ACT.name}</h1>
+      <div class="bigstars">${[0, 1, 2].map(i => i < stars ? '★' : '<span class="off">★</span>').join('')}</div>
+      <p style="font-size:1.2rem"><b>${Math.round(pct * 100)}%</b> right on the first try. ${msg}</p>
+      ${improved ? `<div class="codebox"><div class="small">✨ NEW STARS SAVED! YOUR NEW CODE:</div><div class="code">${esc(encodeCode(S))}</div>
+        <button class="btn sun" data-act="copyCode">📋 Copy my code</button></div>`
+        : `<p class="muted">Your best is still ${before} star${before === 1 ? '' : 's'}, so your code did not change.</p>`}
+      <div class="row" style="justify-content:center">
+        <button class="btn ghost" data-act="retryAct">↻ Try again</button>
+        <button class="btn teal" data-act="openWeek" data-w="${ACT.w}">Back to Week ${ACT.w + 1}</button>
+      </div>
+    </div>`);
+}
+
+/* ---------------- SPELLING ACTIVITIES ---------------- */
+function startSpell(w, a) {
+  const meta = SPELL_ACTS[a];
+  ACT = { kind: 'spell', w, a, name: meta.name, icon: meta.icon, items: weekWords(w), idx: 0, score: 0, tries: 0, revealed: false, mistakes: 0, sel: null };
+  if (meta.id === 'sort') { ACT.placed = {}; ACT.items.forEach((_, i) => ACT.placed[i] = false); }
+  renderSpell();
+}
+function renderSpell() {
+  const id = SPELL_ACTS[ACT.a].id;
+  if (id === 'listen') return renderListen();
+  if (id === 'sort') return renderSort();
+  return renderChunk();
+}
+
+/* Listen & Spell */
+function renderListen() {
+  if (ACT.idx >= ACT.items.length) return finishActivity(ACT.score / ACT.items.length);
+  const wd = ACT.items[ACT.idx];
+  render(`${actHeader()}
+    <div class="card" style="text-align:center">
+      <p class="big-q">Listen, then spell the word.</p>
+      <div class="row" style="justify-content:center;margin-bottom:16px">
+        <button class="btn teal" data-act="sayWord">🔊 Hear word</button>
+        <button class="btn ghost" data-act="sayWordSlow">🐢 Slow</button>
+        <button class="btn ghost" data-act="saySentence">📖 In a sentence</button>
+      </div>
+      <div id="hint" style="min-height:3rem">${ACT.tries === 1 ? hintHTML(wd) : ''}${ACT.revealed ? `<div class="hint-word">${wordHTML(wd)}</div><p class="muted">Type it once to lock it in.</p>` : ''}</div>
+      <input id="spellIn" class="field" style="max-width:420px;text-align:center;font-size:1.5rem" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="type here" />
+      <div class="feedback" id="fb"></div>
+      <button class="btn sun" data-act="checkSpell">Check ✓</button>
+    </div>`);
+  const inp = $('#spellIn'); inp.focus();
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') ACTIONS.checkSpell(); });
+  if (ACT.tries === 0 && !ACT.revealed) setTimeout(() => speak(wd.word), 250);
+}
+function hintHTML(wd) {
+  return `<div class="hint-word">${wd.parts.map(p => p.b ? `<b>${esc(p.b)}</b>` : p.t.split('').map(() => '_').join('')).join('')}</div><p class="muted small">Hint: the pattern letters are showing.</p>`;
+}
+function checkSpell() {
+  const inp = $('#spellIn'), fb = $('#fb');
+  const val = inp.value.trim().toLowerCase();
+  if (!val) return;
+  const wd = ACT.items[ACT.idx];
+  if (val === wd.word.toLowerCase()) {
+    if (!ACT.revealed) ACT.score += ACT.tries === 0 ? 1 : 0.5;
+    fb.className = 'feedback good'; fb.textContent = ['Nailed it! ✓', 'Yes! ✓', 'Perfect! ✓'][Math.floor(Math.random() * 3)];
+    inp.disabled = true;
+    setTimeout(() => { ACT.idx++; ACT.tries = 0; ACT.revealed = false; renderListen(); }, 800);
+  } else if (ACT.revealed) {
+    fb.className = 'feedback bad'; fb.textContent = 'Almost. Copy the word shown above.'; inp.select();
+  } else if (ACT.tries === 0) {
+    ACT.tries = 1; renderListen(); $('#fb').className = 'feedback bad'; $('#fb').textContent = 'Not quite. Here is a hint. Try again!';
+  } else {
+    ACT.revealed = true; renderListen(); $('#fb').className = 'feedback bad'; $('#fb').textContent = 'Here is the word. You got this.'; speak(wd.word);
+  }
+}
+
+/* Pattern Sort */
+function sortBuckets() {
+  if (ACT.w < 5) return SPELL[ACT.w].cats.map((c, i) => ({ id: i, label: c.label }));
+  return SPELL.map((s, i) => ({ id: i, label: s.short }));
+}
+const bucketOf = wd => ACT.w < 5 ? wd.cat : wd.wk;
+function renderSort() {
+  const left = ACT.items.filter((_, i) => !ACT.placed[i]).length;
+  ACT.idx = ACT.items.length - left;
+  if (left === 0) return finishActivity(Math.max(0, (ACT.items.length - ACT.mistakes) / ACT.items.length));
+  const B = sortBuckets();
+  render(`${actHeader()}
+    <div class="card">
+      <p class="big-q">Tap a word to hear it, then tap the bucket where it belongs.</p>
+      <div class="buckets">${B.map(b => `<button class="bucket ${ACT.sel !== null ? 'ready' : ''}" data-act="dropWord" data-b="${b.id}">
+        <h4>${esc(b.label)}</h4><div class="in">${ACT.items.map((wd, i) => ACT.placed[i] && bucketOf(wd) === b.id ? `<span>${esc(wd.word)}</span>` : '').join('')}</div></button>`).join('')}</div>
+      <div class="pool">${ACT.items.map((wd, i) => ACT.placed[i] ? '' : `<button class="chip ${ACT.sel === i ? 'sel' : ''}" data-act="pickWord" data-i="${i}">${esc(wd.word)}</button>`).join('')}</div>
+      <div class="feedback" id="fb" style="text-align:center"></div>
+    </div>`);
+}
+function dropWord(b, el) {
+  if (ACT.sel === null) { toast('Tap a word first!'); return; }
+  const wd = ACT.items[ACT.sel];
+  if (bucketOf(wd) === b) { ACT.placed[ACT.sel] = true; ACT.sel = null; renderSort(); }
+  else {
+    ACT.mistakes++; el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
+    const fb = $('#fb'); fb.className = 'feedback bad'; fb.textContent = 'Not that one. Listen to the sound again.';
+    speak(wd.word, 0.75);
+  }
+}
+
+/* Missing Piece */
+function chunkOptions(wd) {
+  const wk = SPELL[wd.wk];
+  const same = wk.cats[wd.cat].chunks.filter(c => c !== wd.chunk);
+  const all = [...new Set(wk.cats.flatMap(c => c.chunks))].filter(c => c !== wd.chunk && !same.includes(c));
+  const pool = [...new Set([...shuffle(same), ...shuffle(all)])].slice(0, 3);
+  return shuffle([wd.chunk, ...pool]);
+}
+function renderChunk() {
+  if (ACT.idx >= ACT.items.length) return finishActivity(ACT.score / ACT.items.length);
+  const wd = ACT.items[ACT.idx];
+  if (!ACT.opts) { ACT.opts = chunkOptions(wd); ACT.wrong = []; ACT.solved = false; }
+  render(`${actHeader()}
+    <div class="card" style="text-align:center">
+      <p class="big-q">Which letters finish the word?</p>
+      <div class="row" style="justify-content:center"><button class="btn teal" data-act="sayWord">🔊 Hear word</button><button class="btn ghost" data-act="saySentence">📖 In a sentence</button></div>
+      <div class="chunkword">${wd.parts.map(p => p.b ? `<span class="blank">${ACT.solved ? esc(p.b) : '?'}</span>` : esc(p.t)).join('')}</div>
+      <div class="pool">${ACT.opts.map(o => `<button class="chip ${ACT.wrong.includes(o) ? 'shake' : ''}" style="font-size:1.4rem;min-width:80px;${ACT.wrong.includes(o) ? 'opacity:.35' : ''}" data-act="pickChunk" data-o="${esc(o)}" ${ACT.wrong.includes(o) || ACT.solved ? 'disabled' : ''}>${esc(o)}</button>`).join('')}</div>
+      <div class="feedback ${ACT.solved ? 'good' : ''}" id="fb">${ACT.solved ? 'Yes! ✓' : ACT.wrong.length ? '<span style="color:var(--red)">Try another one.</span>' : ''}</div>
+    </div>`);
+  if (!ACT.solved && ACT.wrong.length === 0) setTimeout(() => speak(wd.word), 250);
+}
+function pickChunk(o) {
+  const wd = ACT.items[ACT.idx];
+  if (o === wd.chunk) {
+    if (ACT.wrong.length === 0) ACT.score++;
+    ACT.solved = true; renderChunk(); speak(wd.word);
+    setTimeout(() => { ACT.idx++; ACT.opts = null; renderChunk(); }, 1100);
+  } else { ACT.wrong.push(o); renderChunk(); }
+}
+
+/* ---------------- GRAMMAR ACTIVITIES ---------------- */
+function makeQs(w, a, lvl) {
+  const G = GRAMMAR[w], part = a === 0 ? G.spot : G.fix;
+  return part.items[lvl].map(str => {
+    if (part.kind === 'mc') { const [text, ans] = str.split('|'); return { kind: 'mc', prompt: part.prompt, text, options: part.options, answer: part.options[+ans] }; }
+    if (part.kind === 'split') { const [subj, pred] = str.split('|').map(s => s.trim()); const sw = subj.split(/\s+/), pw = pred.split(/\s+/); return { kind: 'split', prompt: part.prompt, words: sw.concat(pw), answerIndex: sw.length }; }
+    if (part.kind === 'punct') { const [text, ans] = str.split('|'); return { kind: 'mc', prompt: part.prompt, text: text + ' ___', options: ['. (period)', '? (question mark)', '! (exclamation point)'], answers: ans.split('').map(c => ({ '.': 0, '?': 1, '!': 2 }[c])) }; }
+    const [text, right, ...wrong] = str.split('|');
+    return { kind: 'mc', prompt: part.prompt, text, options: shuffle([right, ...wrong]), answer: right };
+  });
+}
+function startGram(w, a) {
+  const meta = GRAM_ACTS[a];
+  let items;
+  if (w < 5) items = shuffle(makeQs(w, a, S.level));
+  else { items = []; for (let k = 0; k < 5; k++) items = items.concat(shuffle(makeQs(k, a, S.level)).slice(0, 2)); items = shuffle(items); }
+  ACT = { kind: 'gram', w, a, name: meta.name, icon: meta.icon, items, idx: 0, score: 0, wrong: [], solved: false };
+  renderGram();
+}
+function isRight(q, i) { return q.answers ? q.answers.includes(i) : q.options[i] === q.answer; }
+function renderGram() {
+  if (ACT.idx >= ACT.items.length) return finishActivity(ACT.score / ACT.items.length);
+  const q = ACT.items[ACT.idx];
+  const fresh = !ACT.solved && ACT.wrong.length === 0;
+  let body;
+  if (q.kind === 'split') {
+    body = `<div class="split">${q.words.map((wd, i) => {
+      let c = '';
+      if (ACT.solved) c = i < q.answerIndex ? 'subj' : 'pred';
+      else if (ACT.wrong.includes(i)) c = 'wrong';
+      return `<button class="w ${c}" data-act="pickSplit" data-i="${i}" ${ACT.solved ? 'disabled' : ''}>${esc(wd)}</button>`;
+    }).join('')}</div>
+    ${ACT.solved ? '<p><span class="tag" style="background:#dbe7fb;color:#2f4d86">SUBJECT</span> ➜ <span class="tag">PREDICATE</span></p>' : ''}`;
+  } else {
+    body = `<div class="sentence-card"><span class="txt">${esc(q.text)}</span><button class="speak" data-act="say" data-text="${esc(q.text)}">🔊</button></div>
+    <div class="opts">${q.options.map((o, i) => {
+      let c = ''; if (ACT.wrong.includes(i)) c = 'wrong'; if (ACT.solved && isRight(q, i)) c = 'right';
+      return `<div class="opt-row"><button class="opt ${c}" data-act="pickOpt" data-i="${i}" ${ACT.solved || ACT.wrong.includes(i) ? 'disabled' : ''}>${esc(o)}</button><button class="speak" data-act="say" data-text="${esc(o)}">🔊</button></div>`;
+    }).join('')}</div>`;
+  }
+  render(`${actHeader()}
+    <div class="card">
+      <div class="row"><p class="big-q" style="flex:1">${esc(q.prompt)}</p><button class="speak" data-act="say" data-text="${esc(q.prompt)}">🔊</button></div>
+      ${body}
+      <div class="feedback ${ACT.solved ? 'good' : 'bad'}" id="fb">${ACT.solved ? (ACT.wrong.length ? 'You got it! ✓' : 'Correct on the first try! ✓') : ACT.wrong.length ? 'Not quite. Try again!' : ''}</div>
+      ${ACT.solved ? '<button class="btn sun" data-act="nextQ" id="nextBtn">Next ➜</button>' : ''}
+    </div>`);
+  if (ACT.solved) $('#nextBtn').focus();
+  if (fresh && settings.read) setTimeout(() => speak(q.prompt + '. ' + (q.text || q.words.join(' '))), 250);
+}
+function answerGram(correct, i) {
+  if (correct) { if (ACT.wrong.length === 0) ACT.score++; ACT.solved = true; }
+  else ACT.wrong.push(i);
+  renderGram();
+}
+
+/* ---------------- WRITING ---------------- */
+function renderWritingTopic(t) {
+  renderTop();
+  const T = WRITING[t];
+  WS = { t, topic: null, side: null, step: null, vals: {}, active: null };
+  render(`
+    <button class="btn ghost small" data-act="goHome">← Trail</button>
+    <h1 style="margin-top:12px">${T.icon} ${T.name} Writing</h1>
+    <p class="muted">${T.blurb} Pick a topic to start.</p>
+    <div class="grid g3">${T.topics.map((tp, i) => `<button class="week" data-act="pickTopic" data-i="${i}"><h3>${esc(tp.title)}</h3>${tp.sides ? '<div class="small muted">You will pick a side.</div>' : ''}</button>`).join('')}</div>`);
+}
+function renderSidePick() {
+  const tp = WRITING[WS.t].topics[WS.topic];
+  render(`
+    <button class="btn ghost small" data-act="openWriting" data-t="${WS.t}">← Topics</button>
+    <h1 style="margin-top:12px">${esc(tp.title)}</h1>
+    <p class="big-q">Which side are you on?</p>
+    <div class="grid g2">${tp.sides.map((sd, i) => `<button class="week" data-act="pickSide" data-i="${i}"><h3>${esc(sd.label)}</h3></button>`).join('')}</div>`);
+}
+function renderStepPick() {
+  const T = WRITING[WS.t], tp = T.topics[WS.topic], done = S.prog[writeSlot(WS.t)];
+  render(`
+    <button class="btn ghost small" data-act="openWriting" data-t="${WS.t}">← Topics</button>
+    <h1 style="margin-top:12px">${T.icon} ${esc(tp.title)}</h1>
+    ${tp.sides ? `<p class="muted">Your side: <b>${esc(tp.sides[WS.side].label)}</b></p>` : ''}
+    <p class="muted">Each step gives you less help. Finish a step to unlock the next one.</p>
+    ${WRITE_STEPS.map((s, i) => {
+      const locked = i > done;
+      return `<button class="act" data-act="pickStep" data-i="${i}" ${locked ? 'disabled style="opacity:.5"' : ''}>
+        <span class="ic">${locked ? '🔒' : s.icon}</span><span style="flex:1"><div class="t">Step ${i + 1}: ${s.name}</div><div class="small muted">${s.desc}</div></span>
+        ${i < done ? '<span class="tag w">DONE ✓</span>' : ''}</button>`;
+    }).join('')}`);
+}
+
+const wFrames = () => WRITING[WS.t].frames[S.level];
+function tokenize(frame) {
+  const out = [], re = /\{(=?)(\w+)\}/g; let last = 0, m;
+  while ((m = re.exec(frame))) {
+    if (m.index > last) out.push({ t: frame.slice(last, m.index) });
+    out.push({ key: m[2], ref: !!m[1] }); last = re.lastIndex;
+  }
+  if (last < frame.length) out.push({ t: frame.slice(last) });
+  return out;
+}
+function chipsFor(key) {
+  const tp = WRITING[WS.t].topics[WS.topic];
+  const ideas = Object.assign({}, tp.ideas, tp.sides ? tp.sides[WS.side].ideas : {});
+  const base = key.replace(/\d+$/, '');
+  if (ideas[key]) return ideas[key];
+  if (ideas[base]) return ideas[base];
+  const b = BANKS[key] || BANKS[base];
+  if (!b) return [];
+  return b[S.level] || b[2] || b[3] || b[1] || [];
+}
+const labelFor = key => LABELS[key.replace(/\d+$/, '')] || key;
+function blankKeys() {
+  const keys = [];
+  wFrames().forEach(f => tokenize(f).forEach(tk => { if (tk.key && !tk.ref && !keys.includes(tk.key)) keys.push(tk.key); }));
+  return keys;
+}
+function cleanVal(v, bare) {
+  v = String(v || '').trim();
+  if (!bare) v = v.replace(/[.!?]+$/, '');
+  else if (v && !/[.!?]$/.test(v)) v += '.';
+  return v;
+}
+function sentenceOf(f, forPreview) {
+  const toks = tokenize(f), bare = toks.length === 1;
+  const s = toks.map(tk => {
+    if (tk.t !== undefined) return forPreview ? esc(tk.t) : tk.t;
+    const v = cleanVal(WS.vals[tk.key], bare);
+    if (!v) return forPreview ? '<span class="gap">____</span>' : '____';
+    return forPreview ? esc(v) : v;
+  }).join('');
+  return s.replace(/^(<span class="gap">)?([a-z])/, (m, g, c) => (g || '') + c.toUpperCase());
+}
+const paragraphText = () => wFrames().map(f => sentenceOf(f, false)).join(' ');
+const allFilled = () => blankKeys().every(k => cleanVal(WS.vals[k], false));
+
+function startBuilder() {
+  WS.vals = {}; WS.active = null;
+  blankKeys().forEach(k => { const c = chipsFor(k); if (c.length === 1) WS.vals[k] = c[0]; });
+  WS.active = blankKeys().find(k => !WS.vals[k]) || null;
+  renderBuilder();
+}
+function renderBuilder() {
+  const typed = WS.step === 1, frames = wFrames();
+  let trayShown = false;
+  const framesHTML = frames.map((f, fi) => {
+    const toks = tokenize(f);
+    const hasActive = !trayShown && toks.some(tk => tk.key === WS.active && !tk.ref);
+    if (hasActive) trayShown = true;
+    const inner = toks.map(tk => {
+      if (tk.t !== undefined) return esc(tk.t);
+      if (tk.ref) return `<span class="ref">${esc(cleanVal(WS.vals[tk.key], false) || '(your claim)')}</span>`;
+      const v = WS.vals[tk.key] || '';
+      if (typed) return `<input class="blank-in" data-key="${tk.key}" value="${esc(v)}" placeholder="${esc(labelFor(tk.key))}" size="${Math.max(10, v.length + 2)}" autocomplete="off" />`
+        + `<button class="chip" style="padding:0 8px;font-size:.9rem;margin-left:4px" data-act="ideaTray" data-k="${tk.key}" title="Ideas">💡</button>`;
+      return `<button class="blank-btn ${v ? 'filled' : ''} ${WS.active === tk.key ? 'on' : ''}" data-act="openBlank" data-k="${tk.key}">${esc(v || labelFor(tk.key))}</button>`;
+    }).join('');
+    return `<div class="frame ${hasActive ? 'active' : ''}"><span class="n">${fi + 1}</span>${inner}
+      <button class="speak" style="min-height:36px;min-width:36px;font-size:1rem;margin-left:6px;vertical-align:middle" data-act="sayFrame" data-f="${fi}">🔊</button>
+      ${hasActive ? trayHTML(WS.active, typed) : ''}</div>`;
+  }).join('');
+  const T = WRITING[WS.t], tp = T.topics[WS.topic];
+  render(`
+    <div class="row" style="margin-bottom:8px"><button class="btn ghost small" data-act="backSteps">← Steps</button><span class="spacer"></span><b>${WRITE_STEPS[WS.step].icon} Step ${WS.step + 1}: ${WRITE_STEPS[WS.step].name}</b></div>
+    <h2>${T.icon} ${esc(tp.title)}</h2>
+    <p class="muted">${typed ? 'Type your own words in each blank. Tap 💡 if you need an idea.' : 'Tap a blank, then tap a word card to fill it in.'}</p>
+    ${framesHTML}
+    <h3 style="margin-top:20px">Your paragraph</h3>
+    <div class="preview" id="preview">${frames.map(f => sentenceOf(f, true)).join(' ')}</div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn ghost" data-act="sayPara">🔊 Read it to me</button><span class="spacer"></span>
+      <button class="btn sun" id="finishBtn" data-act="finishWrite" ${allFilled() ? '' : 'disabled'}>Finish ✓</button>
+    </div>`);
+  if (typed) {
+    app.querySelectorAll('.blank-in').forEach(inp => inp.addEventListener('input', () => {
+      WS.vals[inp.dataset.key] = inp.value;
+      inp.size = Math.max(10, inp.value.length + 2);
+      app.querySelectorAll(`.blank-in[data-key="${inp.dataset.key}"]`).forEach(o => { if (o !== inp) o.value = inp.value; });
+      updatePreview();
+    }));
+  }
+  const on = $('.frame.active'); if (on && !typed) on.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+function trayHTML(key, typed) {
+  const chips = chipsFor(key);
+  const usedElsewhere = Object.keys(WS.vals).filter(k => k !== key).map(k => WS.vals[k]);
+  return `<div class="tray">
+    <div class="small muted" style="margin-bottom:6px">${typed ? 'Ideas (tap one to use it, then make it your own):' : 'Pick one:'}</div>
+    <div class="pool">${chips.map((c, i) => usedElsewhere.includes(c) ? '' : `<button class="chip ${WS.vals[key] === c ? 'sel' : ''}" data-act="pickChip" data-k="${key}" data-i="${i}">${esc(c)}</button>`).join('')}</div>
+    ${typed ? '' : `<div class="row" style="margin-top:10px"><input id="ownIn" class="field" style="flex:1;min-width:180px;padding:8px 12px;font-size:1rem" placeholder="✏️ or type your own words" autocomplete="off" /><button class="btn small teal" data-act="useOwn" data-k="${key}">Use it</button></div>`}
+  </div>`;
+}
+function updatePreview() {
+  const p = $('#preview'); if (p) p.innerHTML = wFrames().map(f => sentenceOf(f, true)).join(' ');
+  const b = $('#finishBtn'); if (b) b.disabled = !allFilled();
+}
+function nextEmpty(after) {
+  const keys = blankKeys(), i = keys.indexOf(after);
+  return keys.slice(i + 1).concat(keys.slice(0, i)).find(k => !WS.vals[k]) || null;
+}
+
+/* Step 3: free write */
+function starters() {
+  return wFrames().map(f => {
+    const toks = tokenize(f); let out = '';
+    for (let i = 0; i < toks.length; i++) {
+      const tk = toks[i];
+      if (tk.t !== undefined) { out += tk.t; continue; }
+      if (i === 0 && !tk.ref) { const c = chipsFor(tk.key); if (c.length && c.length < 6 && BANKS[tk.key.replace(/\d+$/, '')]) { out += c[0]; continue; } }
+      break;
+    }
+    return out.trim();
+  }).filter(s => s && s.split(' ').length > 0);
+}
+function freeStats(text) {
+  const words = (text.trim().match(/\S+/g) || []).length;
+  const sentences = text.split(/[.!?]+/).filter(s => (s.trim().match(/\S+/g) || []).length >= 3).length;
+  return { words, sentences };
+}
+function renderFree() {
+  const T = WRITING[WS.t], tp = T.topics[WS.topic];
+  const needS = wFrames().length - 1, needW = FREE_WORDS[S.level];
+  const banks = Object.keys(BANKS).map(k => ({ k, list: BANKS[k][S.level] })).filter(b => b.list && b.list.length);
+  const ideaKeys = Object.keys(Object.assign({}, tp.ideas, tp.sides ? tp.sides[WS.side].ideas : {})).filter(k => !['topic', 'issue'].includes(k));
+  render(`
+    <div class="row" style="margin-bottom:8px"><button class="btn ghost small" data-act="backSteps">← Steps</button><span class="spacer"></span><b>✍️ Step 3: Write It</b></div>
+    <h2>${T.icon} ${esc(tp.title)}</h2>
+    ${tp.sides ? `<p class="muted">Your side: <b>${esc(tp.sides[WS.side].label)}</b></p>` : ''}
+    <div class="grid g2">
+      <div>
+        <textarea class="write" id="freeTa" placeholder="Start writing here. Tap a sentence starter to drop it in.">${esc(WS.free || '')}</textarea>
+        <ul class="check" id="checklist" style="margin-top:10px"></ul>
+        <div class="row" style="margin-top:10px"><button class="btn ghost" data-act="sayFree">🔊 Read it to me</button><span class="spacer"></span>
+          <button class="btn sun" id="finishFree" data-act="finishFree" disabled>Finish ✓</button></div>
+      </div>
+      <div>
+        <div class="card" style="padding:14px"><h3>Sentence starters</h3>
+          <div class="pool" style="justify-content:flex-start">${starters().map(s => `<button class="chip" style="font-size:.95rem" data-act="insertText" data-text="${esc(s + ' ')}">${esc(s)}…</button>`).join('')}</div></div>
+        <div class="card" style="padding:14px"><h3>Idea bank</h3>
+          ${ideaKeys.map(k => `<details><summary><b>${esc(cap(labelFor(k)))}</b></summary><div class="pool" style="justify-content:flex-start;margin:6px 0">${chipsFor(k).map(c => `<button class="chip" style="font-size:.9rem" data-act="insertText" data-text="${esc(c + ' ')}">${esc(c)}</button>`).join('')}</div></details>`).join('')}
+          ${banks.map(b => `<details><summary><b>${esc(cap(labelFor(b.k)))} words</b></summary><div class="pool" style="justify-content:flex-start;margin:6px 0">${b.list.map(c => `<button class="chip" style="font-size:.9rem" data-act="insertText" data-text="${esc(c + ' ')}">${esc(c)}</button>`).join('')}</div></details>`).join('')}
+        </div>
+      </div>
+    </div>`);
+  const ta = $('#freeTa');
+  const upd = () => {
+    WS.free = ta.value;
+    const st = freeStats(ta.value);
+    $('#checklist').innerHTML = `<li>${st.sentences >= needS ? '✅' : '⬜'} At least ${needS} sentences (you have ${st.sentences})</li>
+      <li>${st.words >= needW ? '✅' : '⬜'} At least ${needW} words (you have ${st.words})</li>
+      <li>${/[.!?]["']?\s*$/.test(ta.value.trim()) ? '✅' : '⬜'} Ends with punctuation</li>`;
+    $('#finishFree').disabled = !(st.sentences >= needS && st.words >= needW);
+  };
+  ta.addEventListener('input', upd); upd();
+}
+
+function finishWriting(text) {
+  const slot = writeSlot(WS.t), step = WS.step + 1;
+  const improved = step > S.prog[slot];
+  if (improved) { S.prog[slot] = step; persist(); }
+  renderTop();
+  $('#printArea').innerHTML = `<h2>${esc(cap(S.name.toLowerCase()))}: ${esc(WRITING[WS.t].name)} Paragraph</h2><p>${esc(text)}</p>`;
+  WS.finalText = text;
+  render(`
+    <div class="card result" style="max-width:720px;margin:20px auto">
+      <h1>🎉 Paragraph complete!</h1>
+      <div class="preview" style="text-align:left;margin:16px 0">${esc(text)}</div>
+      <div class="row" style="justify-content:center;margin-bottom:10px">
+        <button class="btn ghost" data-act="sayFinal">🔊 Read it to me</button>
+        <button class="btn teal" data-act="copyPara">📋 Copy paragraph</button>
+        <button class="btn ghost" data-act="printPara">🖨️ Print</button>
+      </div>
+      <p class="small muted">Your paragraph is not saved in your code, so paste it into Google Classroom or a Doc to keep it!</p>
+      ${improved ? `<div class="codebox"><div class="small">✨ STEP ${step} UNLOCKED! YOUR NEW CODE:</div><div class="code">${esc(encodeCode(S))}</div>
+        <button class="btn sun" data-act="copyCode">📋 Copy my code</button></div>` : ''}
+      <div class="row" style="justify-content:center">
+        <button class="btn ghost" data-act="backSteps">Back to steps</button>
+        <button class="btn sun" data-act="goHome">Trail home</button>
+      </div>
+    </div>`);
+}
+
+/* ---------------- TEACHER VIEW ---------------- */
+function renderTeacher() {
+  S = null; renderTop();
+  render(`
+    <button class="btn ghost small" data-act="goStart">← Back</button>
+    <h1 style="margin-top:12px">👩‍🏫 Teacher View</h1>
+    <p class="muted">Paste student codes below, one per line (or separated by spaces or commas). You will see each student's progress. Nothing is sent anywhere.</p>
+    <textarea class="write" id="tcodes" style="min-height:140px" placeholder="MARIA-7K2P-Q9XM&#10;JAYDEN-4MRT-..."></textarea>
+    <div class="row" style="margin:10px 0 18px"><button class="btn sun" data-act="teacherRun">Show progress</button><button class="btn ghost" data-act="teacherCSV" id="csvBtn" disabled>📋 Copy as spreadsheet</button></div>
+    <div id="tout"></div>
+    <div class="card" style="margin-top:20px"><h3>How the stars work</h3>
+      <p class="small">Each activity earns 1 to 3 stars: 1 for finishing, 2 for 70% or better on the first try, 3 for 90% or better. Each week has 15 stars (3 spelling activities and 2 grammar activities). Writing shows steps completed (Build It, Boost It, Write It) for each type.</p>
+      <p class="small">Codes are checked, so a student who changes a letter will get an error instead of fake stars. Codes are not a password though, so a determined kid could share one.</p></div>`);
+}
+let teacherRows = [];
+function teacherRun() {
+  const raw = $('#tcodes').value.split(/[\n,;]+|\s{2,}|\s(?=[A-Za-z]+-)/).map(s => s.trim()).filter(Boolean);
+  teacherRows = raw.map(c => { try { return Object.assign({ ok: true, code: c }, decodeCode(c)); } catch (e) { return { ok: false, code: c, err: e.message }; } });
+  const wk = st => Array.from({ length: WEEKS }, (_, w) => {
+    let s = 0, g = 0; for (let a = 0; a < 3; a++) s += st.prog[spellSlot(w, a)]; for (let a = 0; a < 2; a++) g += st.prog[gramSlot(w, a)];
+    return { s, g };
+  });
+  $('#tout').innerHTML = teacherRows.length ? `<div class="scroll-x"><table class="t"><thead><tr><th>Student</th><th>Trail</th>
+    ${Array.from({ length: WEEKS }, (_, w) => `<th>Wk ${w + 1}<br><span class="small">Spell / Gram</span></th>`).join('')}
+    ${WRITING.map(t => `<th>${t.name}</th>`).join('')}<th>Total ★</th></tr></thead><tbody>
+    ${teacherRows.map(r => r.ok ? `<tr><td>${esc(r.name)}</td><td>${LEVELS[r.level].name}</td>
+      ${wk(r).map(x => `<td>${x.s}/9 · ${x.g}/6</td>`).join('')}
+      ${WRITING.map((_, t) => `<td>${r.prog[writeSlot(t)]}/3</td>`).join('')}<td><b>${totalStars(r)}</b></td></tr>`
+      : `<tr><td colspan="${3 + WEEKS + WRITING.length}" style="text-align:left;color:var(--red)">${esc(r.code)}: ${esc(r.err)}</td></tr>`).join('')}
+    </tbody></table></div>` : '<p class="muted">No codes found.</p>';
+  $('#csvBtn').disabled = !teacherRows.some(r => r.ok);
+}
+function teacherCSV() {
+  const head = ['Student', 'Trail'];
+  for (let w = 0; w < WEEKS; w++) head.push(`Wk${w + 1} Spelling`, `Wk${w + 1} Grammar`);
+  WRITING.forEach(t => head.push(t.name)); head.push('Total Stars');
+  const lines = [head.join('\t')];
+  teacherRows.filter(r => r.ok).forEach(r => {
+    const row = [r.name, LEVELS[r.level].name];
+    for (let w = 0; w < WEEKS; w++) {
+      let s = 0, g = 0; for (let a = 0; a < 3; a++) s += r.prog[spellSlot(w, a)]; for (let a = 0; a < 2; a++) g += r.prog[gramSlot(w, a)];
+      row.push(s, g);
+    }
+    WRITING.forEach((_, t) => row.push(r.prog[writeSlot(t)])); row.push(totalStars(r));
+    lines.push(row.join('\t'));
+  });
+  copyText(lines.join('\n')).then(ok => toast(ok ? 'Copied! Paste into Google Sheets.' : 'Copy failed. Try again.'));
+}
+
+/* ---------------- ACTIONS (click router) ---------------- */
+const ACTIONS = {
+  goStart: () => { if (S && !codeCopied && !confirm('Did you copy your newest code? Your new stars are only saved in the code.')) return; try { sessionStorage.removeItem('wc_session'); } catch (e) {} renderStart(); },
+  goHome: () => S ? renderHome() : renderStart(),
+  startTab: d => { startTab = d.t; renderStart(); },
+  pickNewLevel: d => { newLevel = +d.l; const nm = $('#nm').value; renderStart(); $('#nm').value = nm; },
+  startNew: () => {
+    const name = ($('#nm').value || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 12);
+    if (name.length < 2) { $('#err').textContent = 'Type your first name (letters only).'; return; }
+    S = { name, level: newLevel, prog: new Array(SLOTS).fill(0) };
+    persist(); renderHome(); codeModal(true);
+  },
+  loadCode: () => {
+    try { S = decodeCode($('#cd').value); codeCopied = true; try { sessionStorage.setItem('wc_session', encodeCode(S)); } catch (e) {} renderHome(); toast('Welcome back, ' + cap(S.name.toLowerCase()) + '!'); }
+    catch (e) { $('#err').textContent = e.message; }
+  },
+  teacher: () => renderTeacher(),
+  teacherRun: () => teacherRun(),
+  teacherCSV: () => teacherCSV(),
+  codeModal: () => codeModal(false),
+  levelModal: () => levelModal(),
+  closeModal: () => closeModal(),
+  setLevel: d => { const l = +d.l; closeModal(); if (l !== S.level) { S.level = l; persist(); toast('Trail switched to ' + LEVELS[l].name + '. Your code changed!'); } renderHome(); },
+  copyCode: () => copyText(encodeCode(S)).then(ok => { if (ok) { codeCopied = true; toast('Code copied! Paste it somewhere safe.'); } else toast('Could not copy. Write it down instead.'); }),
+  logout: () => {
+    if (!codeCopied && !confirm('Did you save your newest code? Click OK if you have it.')) return;
+    closeModal(); try { sessionStorage.removeItem('wc_session'); } catch (e) {} codeCopied = true; startTab = 'code'; renderStart('See you next time! 👋');
+    $('#err').style.color = 'var(--teal)';
+  },
+  toggleRead: () => { settings.read = !settings.read; saveSettings(); renderTop(); toast(settings.read ? 'Read to me is ON' : 'Read to me is OFF'); },
+  toggleSlow: () => { settings.slow = !settings.slow; saveSettings(); renderTop(); speak(settings.slow ? 'Slow voice on.' : 'Normal voice.'); },
+  say: d => speak(d.text),
+  openWeek: d => renderWeek(+d.w),
+  startSpell: d => startSpell(+d.w, +d.a),
+  startGram: d => startGram(+d.w, +d.a),
+  quitAct: () => renderWeek(ACT.w),
+  retryAct: () => ACT.kind === 'spell' ? startSpell(ACT.w, ACT.a) : startGram(ACT.w, ACT.a),
+  sayWord: () => speak(ACT.items[ACT.idx].word),
+  sayWordSlow: () => speak(ACT.items[ACT.idx].word, 0.5),
+  saySentence: () => { const wd = ACT.items[ACT.idx]; speak(`${wd.word}. ${wd.sentence} ${wd.word}.`); },
+  checkSpell: () => checkSpell(),
+  pickWord: d => { ACT.sel = +d.i; renderSort(); speak(ACT.items[ACT.sel].word); },
+  dropWord: (d, el) => dropWord(+d.b, el),
+  pickChunk: d => pickChunk(d.o),
+  pickOpt: d => { const i = +d.i, q = ACT.items[ACT.idx]; if (settings.read) speak(q.options[i]); answerGram(isRight(q, i), i); },
+  pickSplit: d => { const i = +d.i, q = ACT.items[ACT.idx]; answerGram(i === q.answerIndex, i); },
+  nextQ: () => { ACT.idx++; ACT.wrong = []; ACT.solved = false; renderGram(); },
+  openWriting: d => renderWritingTopic(+d.t),
+  pickTopic: d => { WS.topic = +d.i; if (WRITING[WS.t].topics[WS.topic].sides) renderSidePick(); else renderStepPick(); },
+  pickSide: d => { WS.side = +d.i; renderStepPick(); },
+  pickStep: d => { WS.step = +d.i; if (WS.step === 2) { WS.free = ''; renderFree(); } else startBuilder(); },
+  backSteps: () => renderStepPick(),
+  openBlank: d => { WS.active = WS.active === d.k ? null : d.k; renderBuilder(); },
+  ideaTray: d => { WS.active = WS.active === d.k ? null : d.k; renderBuilder(); },
+  pickChip: d => {
+    const c = chipsFor(d.k)[+d.i]; WS.vals[d.k] = c;
+    if (settings.read) speak(c);
+    WS.active = WS.step === 0 ? nextEmpty(d.k) : null;
+    renderBuilder();
+  },
+  useOwn: d => { const v = ($('#ownIn').value || '').trim(); if (!v) return; WS.vals[d.k] = v; WS.active = nextEmpty(d.k); renderBuilder(); },
+  sayFrame: d => speak(sentenceOf(wFrames()[+d.f], false)),
+  sayPara: () => speak(paragraphText()),
+  finishWrite: () => { if (allFilled()) finishWriting(paragraphText()); },
+  insertText: d => {
+    const ta = $('#freeTa'); const s = ta.selectionStart ?? ta.value.length, e = ta.selectionEnd ?? ta.value.length;
+    let txt = d.text; const before = ta.value.slice(0, s);
+    if (before && !/\s$/.test(before)) txt = ' ' + txt;
+    ta.value = before + txt + ta.value.slice(e); ta.focus();
+    ta.selectionStart = ta.selectionEnd = s + txt.length;
+    ta.dispatchEvent(new Event('input'));
+    if (settings.read) speak(d.text);
+  },
+  sayFree: () => speak($('#freeTa').value),
+  finishFree: () => finishWriting($('#freeTa').value.trim()),
+  sayFinal: () => speak(WS.finalText),
+  copyPara: () => copyText(WS.finalText).then(ok => toast(ok ? 'Paragraph copied!' : 'Could not copy.')),
+  printPara: () => window.print()
+};
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el || el.disabled) return;
+  const fn = ACTIONS[el.dataset.act];
+  if (fn) { e.preventDefault(); fn(el.dataset, el); }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+window.addEventListener('beforeunload', e => {
+  if (S && !codeCopied) { e.preventDefault(); e.returnValue = ''; }
+});
+
+/* ---------------- BOOT ---------------- */
+(function boot() {
+  let saved = null;
+  try { saved = sessionStorage.getItem('wc_session'); } catch (e) {}
+  if (saved) { try { S = decodeCode(saved); codeCopied = true; return renderHome(); } catch (e) {} }
+  renderStart();
+})();
+</script>
+</body>
+</html>
