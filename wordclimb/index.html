@@ -744,6 +744,508 @@ const GRAM_ACTS = [
   { id: 'fix',  name: 'Fix It',  icon: '🔧', desc: 'Pick the version that works.' }
 ];
 
+/* ================= UNIT 2: Excursions Across Time ================= */
+const U2_SPELL = [
+  {
+    title: 'Irregular Plurals', short: 'Irregular plurals',
+    tip: 'Some plurals break the rules. Many words ending in o add -es (echoes) but some just add -s (photos). Many words ending in f or fe change to -ves (wolves), but some just add -s (cuffs). A few science words come from Latin (data, bacteria).',
+    cats: [
+      { label: 'o + es (echoes)', chunks: [] }, { label: 'o + s (photos)', chunks: [] }, { label: 'f/fe to ves (wolves)', chunks: [] },
+      { label: 'f + s (cuffs)', chunks: [] }, { label: 'Latin plurals (data)', chunks: [] }
+    ],
+    words: {
+      1: [`lea[ves]|2|The leaves turned orange in the fall.|fs,fes`, `kni[ves]|2|Be careful with sharp knives.|fes,fs`,
+          `hal[ves]|2|Cut the sandwich into halves.|fs,fes`, `potat[oes]|0|We had mashed potatoes for dinner.|ows,oe`,
+          `her[oes]|0|Firefighters are real heroes.|ows,oe`, `pian[os]|1|The music room has two pianos.|oes,ows`,
+          `radi[os]|1|The radios played the game live.|oes,ows`, `roo[fs]|3|Snow covered the roofs of the houses.|ves,fes`,
+          `che[fs]|3|The chefs cooked a huge meal.|ves,fes`, `tomat[oes]|0|We grew tomatoes in the garden.|ows,oe`],
+      2: [`ech[oes]|0|Our voices made echoes in the empty gym.|os,ows`, `phot[os]|1|We took photos on the field trip.|oes,ows`,
+          `dat[a]|4|The scientists collected data from the experiment.|ums,as`, `scar[ves]|2|She knitted scarves for the whole family.|fs,fes`,
+          `volcan[oes]|0|Some volcanoes are still active today.|ows,oe`, `shel[ves]|2|The library shelves were full of books.|fs,fes`,
+          `medi[a]|4|News media covered the big storm.|ums,as`, `bacteri[a]|4|Wash your hands to get rid of bacteria.|ums,as`,
+          `wol[ves]|2|A pack of wolves howled at night.|fs,fes`, `domin[oes]|0|We lined up dominoes and knocked them down.|ows,oe`,
+          `sol[os]|1|The band let each player perform solos.|oes,ows`, `thie[ves]|2|The thieves were caught on camera.|fs,fes`,
+          `wi[ves]|2|The farmers and their wives came to the fair.|fes,fs`, `cu[ffs]|3|He rolled up the cuffs of his sleeves.|ves,ffes`,
+          `sta[ffs]|3|The hikers leaned on their wooden staffs.|ves,ffes`, `buffal[oes]|0|Herds of buffaloes once roamed the plains.|ows,oe`,
+          `sheri[ffs]|3|Two sheriffs led the parade.|ves,ffes`, `tornad[oes]|0|Tornadoes can form during strong storms.|ows,oe`,
+          `sopran[os]|1|The sopranos sang the highest notes.|oes,ows`, `loa[ves]|2|Mom baked three loaves of bread.|fs,fes`],
+      3: [`criteri[a]|4|The judges explained the criteria for winning.|ons,ums`, `phenomen[a]|4|Rainbows and lightning are natural phenomena.|ons,ums`,
+          `curricul[a]|4|Schools update their curricula every few years.|ums,as`, `cact[i]|4|Cacti store water in their thick stems.|uses,es`,
+          `mosquit[oes]|0|Mosquitoes buzzed around the campfire.|ows,oe`, `vet[oes]|0|The president issued two vetoes this year.|ows,oe`,
+          `embarg[oes]|0|Countries sometimes place embargoes on trade.|ows,oe`, `tuxed[os]|1|The groomsmen wore black tuxedos.|oes,ows`,
+          `belie[fs]|3|People have different beliefs about the world.|ves,fes`, `themsel[ves]|2|The kids cleaned up the mess by themselves.|fs,fes`]
+    }
+  },
+  {
+    title: 'Inflectional Endings', short: '-ed and -ing',
+    tip: 'Adding -ed or -ing? If the word ends in a silent e, drop the e (hope, hoped). If it ends in one vowel and one consonant and the last part is stressed, double the consonant (stop, stopped; refer, referred). Otherwise, just add the ending (orbit, orbiting).',
+    cats: [{ label: 'Drop the e', chunks: [] }, { label: 'Double the last letter', chunks: [] }, { label: 'Just add the ending', chunks: [] }],
+    words: {
+      1: [`ho[ped]|0|I hoped it would snow.|pped,peed`, `ho[pped]|1|The frog hopped onto a rock.|ped,peed`,
+          `ma[king]|0|We are making cookies.|kking,keing`, `ru[nning]|1|The dog is running in circles.|ning,neing`,
+          `jum[ped]|2|The cat jumped onto the table.|pped,peed`, `smi[led]|0|She smiled at the baby.|lled,leed`,
+          `pla[nned]|1|We planned a surprise party.|ned,need`, `ri[ding]|0|I am riding my bike to the park.|dding,deing`,
+          `sto[pped]|1|The bus stopped at the corner.|ped,peed`, `hel[ping]|2|He is helping his dad cook.|pping,peing`],
+      2: [`slo[ped]|0|The roof sloped down toward the yard.|pped,peed`, `stif[ling]|0|The heat in the attic was stifling.|leing,lling`,
+          `marve[led]|2|We marveled at the fireworks.|leed,ld`, `si[pped]|1|She sipped her hot cocoa slowly.|ped,peed`,
+          `encoura[ged]|0|My coach encouraged me to keep trying.|geed,gged`, `permi[tting]|1|Weather permitting, we will eat outside.|ting,teing`,
+          `orbi[ting]|2|The moon is orbiting Earth right now.|tting,teing`, `credi[ted]|2|The team credited the coach for their win.|tted,teed`,
+          `labo[red]|2|The workers labored all day in the sun.|rred,reed`, `patro[lling]|1|Guards were patrolling the gate.|ling,leing`,
+          `refe[rred]|1|My doctor referred me to a specialist.|red,reed`, `regre[tting]|1|I am regretting that second slice of pizza.|ting,teing`,
+          `tota[led]|2|Our class donations totaled two hundred dollars.|leed,ld`, `unrave[ling]|2|My old sweater is unraveling at the sleeve.|leing,lin`,
+          `utte[red]|2|He never uttered a single word.|rred,reed`, `revi[ving]|0|The rain is reviving the dry plants.|veing,vving`,
+          `surroun[ding]|2|Trees are surrounding the lake.|dding,deing`, `accu[sed]|0|She was accused of breaking the window.|ssed,seed`,
+          `confi[ding]|0|I am confiding in my best friend.|dding,deing`, `hove[red]|2|A hummingbird hovered near the flower.|rred,reed`],
+      3: [`occu[rred]|1|The accident occurred late at night.|red,reed`, `prefe[rring]|1|Preferring quiet, she studied in the library.|ring,reing`,
+          `commi[tted]|1|The volunteers committed to helping every weekend.|ted,teed`, `benefi[ted]|2|The whole town benefited from the new park.|teed,tid`,
+          `develo[ping]|2|Scientists are developing a new vaccine.|pping,peing`, `schedu[led]|0|The meeting is scheduled for Monday.|lled,leed`,
+          `investiga[ting]|0|Detectives are investigating the robbery.|tting,teing`, `rebe[lled]|1|The colonists rebelled against unfair taxes.|led,leed`,
+          `analy[zing]|0|We spent class analyzing the poem.|zzing,zeing`, `transmi[tted]|1|The signal was transmitted from space.|ted,teed`]
+    }
+  },
+  {
+    title: 'Closed Syllables', short: 'Closed syllables', mode: 'syll',
+    tip: 'A closed syllable ends with a consonant, so the vowel is short (fac in factor). When two consonants sit in the middle of a word, split between them: fac·tor, ban·ner.',
+    cats: [{ label: 'Different consonants (fac·tor)', chunks: [] }, { label: 'Double consonants (ban·ner)', chunks: [] }],
+    words: {
+      1: [`rab·bit|1|The rabbit hopped away.`, `nap·kin|0|Put a napkin on your lap.`, `bas·ket|0|The basket was full of apples.`,
+          `mit·ten|1|I lost my mitten in the snow.`, `hel·met|0|Always wear a helmet.`, `pup·pet|1|The puppet show was funny.`,
+          `sun·set|0|The sunset was bright orange.`, `ten·nis|1|We played tennis after school.`, `gob·lin|0|The goblin in the story was sneaky.`,
+          `ham·mer|1|Hand me the hammer.`],
+      2: [`fac·tor|0|Hard work is a big factor in success.`, `ban·ner|1|We hung a banner for the team.`, `vic·tim|0|The victim of the prank was not amused.`,
+          `men·tal|0|Mental health is just as important as physical health.`, `for·mal|0|The dance had a formal dress code.`, `pan·try|0|The pantry is full of snacks.`,
+          `bal·lot|1|Each student filled out a ballot for class president.`, `pros·per|0|Small businesses prosper when people shop locally.`, `pump·kin|0|We carved a giant pumpkin.`,
+          `muf·fler|1|The muffler on the old car was very loud.`, `rag·ged|1|His jeans were ragged at the knees.`, `king·dom|0|The king ruled a huge kingdom.`,
+          `bar·ren|1|Nothing grew in the barren desert.`, `neck·lace|0|She wore a silver necklace.`, `wal·let|1|I left my wallet at home.`,
+          `pon·der|0|Take a moment to ponder the question.`, `fun·nel|1|Use a funnel to pour the water.`, `dwel·ling|1|A cave was their only dwelling.`,
+          `snap·shot|0|Dad took a snapshot of us on the beach.`, `fab·ric|0|This fabric feels soft.`],
+      3: [`con·quest|0|The army planned its conquest.`, `frag·ment|0|A fragment of pottery was found in the dirt.`, `ver·dict|0|The jury reached a verdict.`,
+          `lan·tern|0|We lit a lantern in the tent.`, `sym·bol|0|A dove is a symbol of peace.`, `cul·prit|0|Police caught the culprit.`,
+          `gos·sip|1|Spreading gossip can hurt people.`, `ac·cent|1|She speaks with a Southern accent.`, `ad·dress|1|Write your address on the envelope.`,
+          `an·nex|1|The school built an annex for new classrooms.`]
+    }
+  },
+  {
+    title: 'Open Syllables', short: 'Open syllables', mode: 'syll',
+    tip: 'An open syllable ends with a vowel, so the vowel says its name (bru in brutal, fo in focus). Try splitting after the vowel first: bru·tal. If that does not sound right, split after the consonant: pan·ic.',
+    cats: [{ label: 'Open: long vowel (bru·tal)', chunks: [] }, { label: 'Closed: short vowel (pan·ic)', chunks: [] }],
+    words: {
+      1: [`ti·ger|0|The tiger has orange stripes.`, `ba·by|0|The baby is sleeping.`, `ro·bot|0|The robot can sweep the floor.`,
+          `mu·sic|0|I listen to music on the bus.`, `pa·per|0|Fold the paper in half.`, `wag·on|1|Pull the wagon up the hill.`,
+          `lem·on|1|I like lemon in my tea.`, `rob·in|1|A robin built a nest.`, `sev·en|1|I have seven pencils.`, `ze·ro|0|Five minus five is zero.`],
+      2: [`bru·tal|0|The winter cold was brutal.`, `se·cure|0|Make sure the lid is secure.`, `pan·ic|1|Do not panic during a fire drill.`,
+          `cab·in|1|We stayed in a log cabin.`, `fe·ver|0|She stayed home with a fever.`, `vo·ter|0|Every voter got a sticker.`,
+          `van·ish|1|The magician made the coin vanish.`, `ny·lon|0|The tent is made of nylon.`, `de·tect|0|Dogs can detect smells we cannot.`,
+          `re·sist|0|I cannot resist fresh cookies.`, `la·bor|0|Building the barn took a lot of labor.`, `fo·cus|0|Focus on one problem at a time.`,
+          `ri·val|0|Our biggest rival won last year.`, `re·cite|0|Can you recite the poem by heart?`, `top·ic|1|Pick a topic for your report.`,
+          `a·mid|0|We found our seats amid the crowd.`, `u·nit|0|This is the last unit of the year.`, `ro·tate|0|Players rotate positions in volleyball.`,
+          `vi·tal|0|Water is vital for all living things.`, `la·ment|0|Many people lament the end of summer.`],
+      3: [`so·lar|0|Solar panels turn sunlight into power.`, `pi·lot|0|The pilot landed the plane safely.`, `cli·mate|0|The climate here is warm and dry.`,
+          `pre·dict|0|Can you predict what happens next?`, `hu·mid|0|The air felt hot and humid.`, `fra·grant|0|The roses smelled fragrant.`,
+          `lim·it|1|The speed limit is thirty miles per hour.`, `hab·it|1|Reading every night is a good habit.`, `prop·er|1|Use the proper tools for the job.`,
+          `vis·it|1|We visit our grandparents every summer.`]
+    }
+  },
+  {
+    title: 'Consonant + le', short: '-le, -al, -able',
+    tip: 'Many words end with a consonant + le (sim·ple, noo·dle). Listen for the ending: -le (whistle), -al (royal), or -able (durable). Watch for silent letters: the c in muscle and the t in whistle.',
+    cats: [{ label: '-le ending', chunks: [] }, { label: '-al ending', chunks: [] }, { label: '-able ending', chunks: [] }],
+    words: {
+      1: [`ta[ble]|0|Set the table for dinner.|bel,bal`, `app[le]|0|I ate a red apple.|el,al`, `tur[tle]|0|The turtle hid in its shell.|tel,tal`,
+          `can[dle]|0|Blow out the candle.|del,dal`, `pur[ple]|0|Purple is my favorite color.|pel,pal`, `anim[al]|1|A cat is my favorite animal.|le,el`,
+          `pet[al]|1|A petal fell from the flower.|le,el`, `jun[gle]|0|Monkeys swing through the jungle.|gel,gal`, `puz[zle]|0|We finished the puzzle together.|zel,zal`,
+          `lov[able]|2|The puppy is so lovable.|ible,abel`],
+      2: [`simp[le]|0|The directions were simple to follow.|el,al`, `roy[al]|1|The royal family waved from the balcony.|le,el`,
+          `nation[al]|1|We sang the national anthem.|le,el`, `valu[able]|2|Old coins can be very valuable.|ible,abel`,
+          `surviv[al]|1|Water is key to survival in the desert.|le,el`, `mu[scle]|0|I pulled a muscle in my leg.|sle,ssel`,
+          `whi[stle]|0|The coach blew the whistle.|sle,ssel`, `squab[ble]|0|My brothers squabble over the remote.|bel,bal`,
+          `dur[able]|2|These boots are durable enough for hiking.|ible,abel`, `incur[able]|2|Some diseases are still incurable.|ible,abel`,
+          `scram[ble]|0|We had to scramble to catch the bus.|bel,bal`, `scru[ple]|0|A person with strong scruples will not cheat to win.|pel,pal`,
+          `quadru[ple]|0|The price might quadruple next year.|pel,pal`, `noo[dle]|0|A long noodle slipped off my fork.|del,dal`,
+          `squig[gle]|0|Draw a squiggle at the top of the page.|gel,gal`, `thro[ttle]|0|The pilot pushed the throttle forward.|tel,ttal`,
+          `secur[able]|2|Make sure the gate is securable with a lock.|ible,abel`, `bea[gle]|0|Our beagle loves to sniff everything.|gel,gal`,
+          `dim[ple]|0|She has a dimple when she smiles.|pel,pal`, `bicy[cle]|0|I ride my bicycle to school.|kel,cal`],
+      3: [`vehic[le]|0|The vehicle stopped at the light.|el,al`, `artic[le]|0|I read an article about space.|el,al`,
+          `obsta[cle]|0|The fallen tree was an obstacle on the trail.|kel,cal`, `spectac[le]|0|The fireworks were quite a spectacle.|el,al`,
+          `parti[cle]|0|A particle of dust floated in the light.|kel,cal`, `ration[al]|1|Let us make a rational decision.|le,el`,
+          `emotion[al]|1|The movie ending was very emotional.|le,el`, `sustain[able]|2|Solar power is a sustainable energy source.|ible,abel`,
+          `inevit[able]|2|Change is inevitable.|ible,abel`, `dispos[able]|2|Use reusable cups instead of disposable ones.|ible,abel`]
+    }
+  }
+];
+
+const U2_GRAM = [
+  {
+    title: 'Kinds of Nouns',
+    tip: 'A common noun names any person, place, or thing (city). A proper noun names a specific one and starts with a capital letter (Chicago). A concrete noun is something you can see, hear, touch, taste, or smell (pizza). An abstract noun is an idea or feeling (courage).',
+    ex: ['Common: river · Proper: Mississippi River', 'Concrete: guitar · Abstract: friendship', 'Business letters: Dear Ms. Brown: … Sincerely,'],
+    spot: [
+      { kind: 'mc', prompt: 'Is this noun common or proper?', options: ['Common noun', 'Proper noun'],
+        items: { 1: [`dog|0`, `Texas|1`, `school|0`, `Monday|1`, `Mrs. Garcia|1`, `city|0`],
+                 2: [`Lake Michigan|1`, `ocean|0`, `Thanksgiving|1`, `senator|0`, `Golden Gate Bridge|1`, `museum|0`],
+                 3: [`Declaration of Independence|1`, `document|0`, `Amazon River|1`, `continent|0`, `Supreme Court|1`, `government|0`] } },
+      { kind: 'mc', prompt: 'Is this noun concrete or abstract?', options: ['Concrete (you can sense it)', 'Abstract (an idea or feeling)'],
+        items: { 1: [`apple|0`, `love|1`, `chair|0`, `fear|1`, `shoe|0`, `fun|1`],
+                 2: [`courage|1`, `backpack|0`, `friendship|1`, `thunder|0`, `honesty|1`, `pencil|0`],
+                 3: [`justice|1`, `skyscraper|0`, `curiosity|1`, `aroma|0`, `freedom|1`, `telescope|0`] } }
+    ],
+    fix: [
+      { kind: 'choice', prompt: 'Which sentence uses capital letters correctly?',
+        items: { 1: [`we went to disney world in june.|We went to Disney World in June.|We went to disney world in June.|We Went To Disney World In June.`,
+                     `my dog max likes the park.|My dog Max likes the park.|My Dog Max likes the Park.|My dog max likes the park.`,
+                     `i was born in ohio.|I was born in Ohio.|I was born in ohio.|i was born in Ohio.`],
+                 2: [`we visited the grand canyon in july.|We visited the Grand Canyon in July.|We visited the grand canyon in July.|We Visited The Grand Canyon In July.`,
+                     `dr. lee works at mercy hospital.|Dr. Lee works at Mercy Hospital.|Dr. Lee works at mercy hospital.|Dr. lee Works at Mercy Hospital.`,
+                     `my aunt lives in new york city.|My aunt lives in New York City.|My Aunt lives in New York city.|My aunt lives in new York City.`],
+                 3: [`the declaration of independence was signed in philadelphia.|The Declaration of Independence was signed in Philadelphia.|The declaration of independence was signed in Philadelphia.|The Declaration Of Independence Was Signed In Philadelphia.`,
+                     `senator ramirez spoke at lincoln middle school.|Senator Ramirez spoke at Lincoln Middle School.|senator Ramirez spoke at Lincoln middle school.|Senator Ramirez Spoke at Lincoln Middle school.`,
+                     `we crossed the rocky mountains last summer.|We crossed the Rocky Mountains last summer.|We crossed the Rocky Mountains last Summer.|We crossed the rocky mountains last summer.`] } },
+      { kind: 'choice', prompt: 'Business letter check: which one is written correctly?',
+        items: { 1: [`Greeting|Dear Ms. Brown:|dear ms. brown:|Dear Ms. Brown;`, `Closing|Sincerely,|sincerely,|Sincerely:`, `Date line|May 4, 2026|may 4, 2026|May 4 2026`],
+                 2: [`Greeting|Dear Mr. Okafor:|Dear mr. Okafor,|Dear Mr. Okafor;`, `Closing|Yours truly,|Yours Truly,|yours truly:`, `Date line|March 15, 2026|March 15 2026|march 15, 2026`],
+                 3: [`Greeting|Dear Customer Service Manager:|Dear customer service manager,|dear Customer Service Manager:`, `Closing|Respectfully yours,|Respectfully Yours,|respectfully yours:`, `Date line|December 1, 2026|December 1 2026|december, 1 2026`] } }
+    ]
+  },
+  {
+    title: 'Singular & Plural Nouns',
+    tip: 'Most nouns add -s to show more than one. Add -es to words ending in s, x, ch, sh, or z (boxes). If a word ends in consonant + y, change y to i and add -es (babies). If it ends in vowel + y, just add -s (toys). Use commas to separate three or more items in a series.',
+    ex: ['box ➜ boxes · baby ➜ babies · toy ➜ toys', 'We packed snacks, water, and a map.'],
+    spot: [
+      { kind: 'choice', prompt: 'What is the plural?',
+        items: { 1: [`box|boxes|boxs|boxies`, `bus|buses|buss|busies`, `baby|babies|babys|babyes`, `lunch|lunches|lunchs|lunchies`, `toy|toys|toies|toyes`, `dish|dishes|dishs|dishies`],
+                 2: [`city|cities|citys|cityes`, `monkey|monkeys|monkies|monkeyes`, `wish|wishes|wishs|wishies`, `fox|foxes|foxs|foxies`, `party|parties|partys|partyes`, `brush|brushes|brushs|brushies`],
+                 3: [`activity|activities|activitys|activityes`, `journey|journeys|journies|journeyes`, `address|addresses|addreses|addresss`, `compass|compasses|compasss|compassies`, `strategy|strategies|strategys|strategyes`, `attorney|attorneys|attornies|attorneyes`] } },
+      { kind: 'mc', prompt: 'Is this noun singular or plural?', options: ['Singular (one)', 'Plural (more than one)'],
+        items: { 1: [`cats|1`, `tree|0`, `benches|1`, `bench|0`, `berries|1`, `kite|0`],
+                 2: [`classes|1`, `journey|0`, `pennies|1`, `address|0`, `valleys|1`, `hero|0`],
+                 3: [`analysis|0`, `responsibilities|1`, `process|0`, `processes|1`, `bypass|0`, `alleys|1`] } }
+    ],
+    fix: [
+      { kind: 'choice', prompt: 'Which sentence uses commas in a series correctly?',
+        items: { 1: [`I like apples pears and grapes.|I like apples, pears, and grapes.|I like apples pears, and grapes.|I like, apples, pears, and grapes.`,
+                     `We need pens paper and glue.|We need pens, paper, and glue.|We need pens, paper and, glue.|We, need pens paper and glue.`,
+                     `Red blue and green are colors.|Red, blue, and green are colors.|Red blue, and green are colors.|Red, blue, and, green are colors.`],
+                 2: [`Bring a towel sunscreen and a hat to the beach.|Bring a towel, sunscreen, and a hat to the beach.|Bring a towel sunscreen, and a hat to the beach.|Bring, a towel, sunscreen, and a hat to the beach.`,
+                     `The farm had cows goats chickens and pigs.|The farm had cows, goats, chickens, and pigs.|The farm had cows goats, chickens and pigs.|The farm had, cows, goats, chickens, and pigs.`,
+                     `Maya ran jumped and cheered.|Maya ran, jumped, and cheered.|Maya ran jumped, and cheered.|Maya, ran, jumped, and cheered.`],
+                 3: [`The recipe calls for flour sugar eggs and butter.|The recipe calls for flour, sugar, eggs, and butter.|The recipe calls for flour sugar, eggs and butter.|The recipe calls for, flour, sugar, eggs, and butter.`,
+                     `Scientists observed measured and recorded the results.|Scientists observed, measured, and recorded the results.|Scientists observed measured, and recorded the results.|Scientists, observed, measured, and recorded the results.`,
+                     `We visited Boston Chicago and Denver on our trip.|We visited Boston, Chicago, and Denver on our trip.|We visited Boston Chicago, and Denver on our trip.|We visited, Boston, Chicago, and Denver on our trip.`] } },
+      { kind: 'choice', prompt: 'Friendly letter check: which one is punctuated correctly?',
+        items: { 1: [`Greeting|Dear Grandma,|Dear Grandma.|dear Grandma,`, `Closing|Love,|love,|Love.`],
+                 2: [`Greeting|Dear Coach Kim,|Dear Coach Kim.|Dear coach kim,`, `Closing|Your friend,|Your Friend,|your friend.`],
+                 3: [`Heading|Austin, Texas 78701|Austin Texas, 78701|Austin, texas 78701`, `Closing|With gratitude,|With Gratitude,|with gratitude.`] } }
+    ]
+  },
+  {
+    title: 'More Plural Nouns',
+    tip: 'Irregular plurals do not follow the rules: child ➜ children, mouse ➜ mice, tooth ➜ teeth. Some stay the same: sheep, deer, moose. A collective noun names a group as one thing: team, family, flock, jury.',
+    ex: ['foot ➜ feet · goose ➜ geese · deer ➜ deer', 'Collective nouns: class, band, crew, audience'],
+    spot: [
+      { kind: 'choice', prompt: 'What is the plural?',
+        items: { 1: [`child|children|childs|childrens`, `mouse|mice|mouses|mices`, `foot|feet|foots|feets`, `tooth|teeth|tooths|teeths`, `man|men|mans|mens`, `sheep|sheep|sheeps|sheepes`],
+                 2: [`goose|geese|gooses|geeses`, `woman|women|womans|womens`, `deer|deer|deers|deeres`, `ox|oxen|oxes|oxs`, `louse|lice|louses|lices`, `moose|moose|mooses|meese`],
+                 3: [`crisis|crises|crisises|crisis`, `thesis|theses|thesises|thesis`, `analysis|analyses|analysises|analysis`, `phenomenon|phenomena|phenomenons|phenomenas`, `alumnus|alumni|alumnuses|alumnis`, `criterion|criteria|criterions|criterias`] } },
+      { kind: 'choice', prompt: 'Find the collective noun (a word that names a group).',
+        items: { 1: [`The team won the game.|team|game|won`, `Our class sang a song.|class|song|sang`, `A flock of birds flew by.|flock|birds|flew`, `My family went to the zoo.|family|zoo|went`],
+                 2: [`The band played until midnight.|band|midnight|played`, `A herd of cows crossed the road.|herd|cows|road`, `The audience clapped loudly.|audience|clapped|loudly`, `The crew fixed the ship.|crew|ship|fixed`],
+                 3: [`The committee approved the budget.|committee|budget|approved`, `The jury reached its verdict.|jury|verdict|reached`, `A swarm of bees surrounded the hive.|swarm|bees|hive`, `The orchestra tuned its instruments.|orchestra|instruments|tuned`] } }
+    ],
+    fix: { kind: 'choice', prompt: 'Which sentence uses the correct plural?',
+      items: { 1: [`Three mouses ran under the bed.|Three mice ran under the bed.|Three mices ran under the bed.|Three mouse ran under the bed.`,
+                   `I brushed my tooths.|I brushed my teeth.|I brushed my teeths.|I brushed my tooth.`,
+                   `The mans fixed the roof.|The men fixed the roof.|The mens fixed the roof.|The man's fixed the roof.`,
+                   `The childs played tag.|The children played tag.|The childrens played tag.|The childs' played tag.`],
+               2: [`Two gooses walked by the pond.|Two geese walked by the pond.|Two geeses walked by the pond.|Two goose walked by the pond.`,
+                   `The womans led the meeting.|The women led the meeting.|The womens led the meeting.|The woman's led the meeting.`,
+                   `We saw three deers.|We saw three deer.|We saw three deeres.|We saw three deer's.`,
+                   `The farmer has two oxes.|The farmer has two oxen.|The farmer has two oxens.|The farmer has two ox's.`],
+               3: [`The scientists studied several phenomenons.|The scientists studied several phenomena.|The scientists studied several phenomenas.|The scientists studied several phenomenon's.`,
+                   `Both crisises were handled quickly.|Both crises were handled quickly.|Both crisis were handled quickly.|Both crisis's were handled quickly.`,
+                   `The judges listed three criterias.|The judges listed three criteria.|The judges listed three criterions.|The judges listed three criteria's.`,
+                   `Many alumnuses attended the reunion.|Many alumni attended the reunion.|Many alumnis attended the reunion.|Many alumnus attended the reunion.`] } }
+  },
+  {
+    title: 'Possessive Nouns',
+    tip: 'A possessive noun shows ownership. One owner: add \'s (the dog\'s bone). Many owners ending in s: add just an apostrophe (the dogs\' bones). Plural nouns not ending in s: add \'s (the children\'s books). Do not use an apostrophe to make a plain plural!',
+    ex: ['one cat: the cat\'s toy', 'two cats: the cats\' toys', 'children: the children\'s room'],
+    spot: { kind: 'mc', prompt: 'What kind of noun is this?', options: ['Plural (more than one)', 'Singular possessive (one owner)', 'Plural possessive (many owners)'],
+      items: { 1: [`dog's|1`, `dogs|0`, `dogs'|2`, `cat's|1`, `cats|0`, `cats'|2`],
+               2: [`teacher's|1`, `teachers'|2`, `teachers|0`, `children's|2`, `girl's|1`, `girls|0`],
+               3: [`women's|2`, `senator's|1`, `senators|0`, `families'|2`, `family's|1`, `countries|0`] } },
+    fix: { kind: 'choice', prompt: 'Which possessive is correct?',
+      items: { 1: [`the bone that belongs to one dog|the dog's bone|the dogs bone|the dogs' bone`, `the toys that belong to two cats|the cats' toys|the cat's toys|the cats toys`,
+                   `the hat that belongs to Sam|Sam's hat|Sams hat|Sams' hat`, `the bikes that belong to the boys|the boys' bikes|the boy's bikes|the boys bikes`],
+               2: [`the lockers that belong to the students|the students' lockers|the student's lockers|the students lockers`, `the books that belong to the children|the children's books|the childrens' books|the childrens books`,
+                   `the desk that belongs to the teacher|the teacher's desk|the teachers' desk|the teachers desk`, `the jerseys that belong to the team|the team's jerseys|the teams' jerseys|the teams jerseys`],
+               3: [`the votes that belong to the citizens|the citizens' votes|the citizen's votes|the citizens votes`, `the rights that belong to women|women's rights|womens' rights|womens rights`,
+                   `the decision that belongs to the jury|the jury's decision|the juries' decision|the jurys decision`, `the history shared by many countries|the countries' history|the countrie's history|the countrys' history`] } }
+  },
+  {
+    title: 'Appositives',
+    tip: 'An appositive is a noun phrase that renames the noun right before it: Rex, my dog, loves bones. If the sentence still makes sense without it (nonessential), set it off with commas, dashes, or parentheses. If you need it to know who or what (essential), skip the commas: The movie Frozen is my favorite.',
+    ex: ['Nonessential: Mrs. Lee, my teacher, is funny.', 'Essential: The singer Taylor Swift sold out the show.', 'Dashes: The prize—a trip to Paris—shocked everyone.'],
+    spot: [
+      { kind: 'choice', prompt: 'Which words are the appositive?',
+        items: { 1: [`My dog, Rex, loves bones.|Rex|My dog|loves bones`, `Mrs. Lee, my teacher, is funny.|my teacher|Mrs. Lee|is funny`, `Our town, Maple Grove, is small.|Maple Grove|Our town|is small`],
+                 2: [`Jupiter, the largest planet, has many moons.|the largest planet|Jupiter|has many moons`, `My best friend, Aisha, plays the drums.|Aisha|My best friend|plays the drums`, `Mr. Ortiz, our principal, gave a speech.|our principal|Mr. Ortiz|gave a speech`],
+                 3: [`The Nile, the longest river in Africa, flows north.|the longest river in Africa|The Nile|flows north`, `Marie Curie, a brilliant scientist, won two Nobel Prizes.|a brilliant scientist|Marie Curie|won two Nobel Prizes`, `Our captain, a senior named Lucia, scored twice.|a senior named Lucia|Our captain|scored twice`] } },
+      { kind: 'mc', prompt: 'Is the appositive essential or nonessential?', options: ['Essential (no commas)', 'Nonessential (commas)'],
+        items: { 1: [`My mom, Anna, made dinner.|1`, `The movie Frozen is my favorite.|0`, `Our dog, Biscuit, is sleeping.|1`, `The singer Taylor Swift sold out the show.|0`],
+                 2: [`My oldest brother, Marcus, drives a truck.|1`, `The book Hatchet is about survival.|0`, `Lake Superior, the largest of the Great Lakes, is very cold.|1`, `The painter Frida Kahlo was born in Mexico.|0`],
+                 3: [`The poet Langston Hughes wrote about Harlem.|0`, `Abraham Lincoln, the sixteenth president, gave the Gettysburg Address.|1`, `The word "ubiquitous" means found everywhere.|0`, `Mount Everest, the tallest mountain on Earth, is in Asia.|1`] } }
+    ],
+    fix: { kind: 'choice', prompt: 'Which sentence punctuates the appositive correctly?',
+      items: { 1: [`Ms. Diaz our coach blew the whistle.|Ms. Diaz, our coach, blew the whistle.|Ms. Diaz our coach, blew the whistle.|Ms. Diaz, our coach blew the whistle.`,
+                   `Pizza my favorite food is for dinner.|Pizza, my favorite food, is for dinner.|Pizza my favorite food, is for dinner.|Pizza, my favorite food is for dinner.`,
+                   `Max the class hamster escaped.|Max, the class hamster, escaped.|Max the class hamster, escaped.|Max, the class hamster escaped.`, `Spot our puppy loves to dig.|Spot, our puppy, loves to dig.|Spot our puppy, loves to dig.|Spot, our puppy loves to dig.`, `Mr. Hill the mail carrier waved at us.|Mr. Hill, the mail carrier, waved at us.|Mr. Hill the mail carrier, waved at us.|Mr. Hill, the mail carrier waved at us.`],
+               2: [`Denver the capital of Colorado is called the Mile High City.|Denver, the capital of Colorado, is called the Mile High City.|Denver the capital of Colorado, is called the Mile High City.|Denver, the capital of Colorado is called the Mile High City.`,
+                   `Our neighbor a retired pilot tells great stories.|Our neighbor, a retired pilot, tells great stories.|Our neighbor a retired pilot, tells great stories.|Our neighbor, a retired pilot tells great stories.`,
+                   `The giraffe the tallest land animal eats leaves.|The giraffe, the tallest land animal, eats leaves.|The giraffe the tallest land animal, eats leaves.|The giraffe, the tallest land animal eats leaves.`, `Tokyo the capital of Japan is a huge city.|Tokyo, the capital of Japan, is a huge city.|Tokyo the capital of Japan, is a huge city.|Tokyo, the capital of Japan is a huge city.`, `Ms. Chen my science teacher loves bugs.|Ms. Chen, my science teacher, loves bugs.|Ms. Chen my science teacher, loves bugs.|Ms. Chen, my science teacher loves bugs.`],
+               3: [`Use dashes: The prize a trip to Paris shocked everyone.|The prize—a trip to Paris—shocked everyone.|The prize—a trip to Paris shocked everyone.|The—prize a trip to Paris—shocked everyone.`,
+                   `Use parentheses: My aunt a nurse in Chicago is visiting.|My aunt (a nurse in Chicago) is visiting.|My aunt (a nurse) in Chicago is visiting.|(My aunt a nurse in Chicago) is visiting.`,
+                   `Use commas: Saturn the ringed planet is huge.|Saturn, the ringed planet, is huge.|Saturn the ringed planet, is huge.|Saturn, the ringed planet is huge.`, `Use dashes: Our goal a perfect season seemed possible.|Our goal—a perfect season—seemed possible.|Our goal—a perfect season seemed possible.|Our—goal a perfect season—seemed possible.`, `Use commas: Venus the hottest planet is covered in clouds.|Venus, the hottest planet, is covered in clouds.|Venus the hottest planet, is covered in clouds.|Venus, the hottest planet is covered in clouds.`] } }
+  }
+];
+
+/* ================= UNIT 3: Accomplishments ================= */
+const U3_SPELL = [
+  {
+    title: 'Vowel Team Syllables', short: 'Vowel teams',
+    tip: 'A vowel team is two or more letters that work together to make one vowel sound: ea (creature), ou (shoulder), oi (moisten), ee (volunteer). Vowel teams stay together in the same syllable.',
+    cats: [
+      { label: 'ea team', chunks: ['ea', 'ee', 'e'] }, { label: 'ou team', chunks: ['ou', 'ow', 'u'] }, { label: 'oi team', chunks: ['oi', 'oy'] },
+      { label: 'ee team', chunks: ['ee', 'ea', 'e'] }, { label: 'other teams (ei, ai, ua)', chunks: [] }
+    ],
+    words: {
+      1: [`b[ea]ch|0|We built sandcastles at the beach.`, `t[ea]cher|0|My teacher read us a story.`, `m[ou]ntain|1|We hiked up the mountain.`,
+          `cl[ou]dy|1|It was a cloudy day.`, `c[oi]n|2|I found a coin on the sidewalk.`, `b[oi]l|2|Wait for the water to boil.`,
+          `f[ee]ling|3|I have a good feeling about today.`, `gr[ee]dy|3|The greedy dog ate both treats.`, `r[ai]nbow|4|A rainbow stretched across the sky.|ay,a`,
+          `p[ai]nting|4|Her painting won first prize.|ay,a`],
+      2: [`w[ea]lthy|0|The wealthy man donated to the library.`, `h[ea]lthy|0|Eating vegetables keeps you healthy.`, `sh[ou]lder|1|I carried my bag on one shoulder.`,
+          `t[ou]ghest|1|This is the toughest level of the game.`, `expl[oi]t|2|Hackers try to exploit weak passwords.`, `pedigr[ee]|3|The champion dog had a long pedigree.`,
+          `volunt[ee]r|3|I volunteer at the animal shelter.`, `imp[ea]ch|0|Congress has the power to impeach a president.`, `sp[oi]lage|2|Keep food cold to prevent spoilage.`,
+          `p[oi]sonous|2|Some mushrooms are poisonous.`, `app[oi]ntment|2|I have a dentist appointment at noon.`, `m[oi]sten|2|Moisten the sponge before you clean.`,
+          `eq[ua]lity|4|People marched for equality.|wa,oo`, `str[ea]mline|0|The new app will streamline the sign-up process.`, `guarant[ee]d|3|Success is never guaranteed.`,
+          `cr[ea]tures|0|Strange creatures live in the deep sea.`, `tr[ea]sures|0|The museum holds ancient treasures.`, `str[aigh]ten|4|Please straighten your desk before you leave.|ait,ate`,
+          `[ea]rthbound|0|The baby bird was still earthbound.`, `c[ei]ling|4|A spider hung from the ceiling.|ie,ee`],
+      3: [`tr[ea]cherous|0|The icy road was treacherous.`, `end[ea]vor|0|She will endeavor to finish the race.`, `ab[ou]nd|1|Fish abound in this lake.`,
+          `c[ou]nterfeit|1|The store would not accept the counterfeit bill.`, `turm[oi]l|2|The country was in turmoil after the storm.`, `b[oi]sterous|2|The boisterous crowd cheered loudly.`,
+          `refug[ee]|3|The refugee family found a new home.`, `nomin[ee]|3|Each nominee gave a short speech.`, `dec[ei]t|4|The villain's deceit was finally exposed.|ie,ee`,
+          `rec[ei]pt|4|Keep the receipt in case you return it.|ie,ee`]
+    }
+  },
+  {
+    title: 'r-Controlled Syllables', short: '-er, -or, -ar',
+    tip: 'At the end of a word, er, or, and ar can all sound the same (actor, waiter, calendar). Your ears cannot tell them apart, so learn which spelling each word uses. Hint: people who do a job often end in -or (actor, janitor) or -er (waiter).',
+    cats: [{ label: '-er (waiter)', chunks: ['er', 'or', 'ar'] }, { label: '-or (actor)', chunks: ['or', 'er', 'ar'] }, { label: '-ar (calendar)', chunks: ['ar', 'er', 'or'] }],
+    words: {
+      1: [`farm[er]|0|The farmer fed the cows.`, `teach[er]|0|My teacher gave us extra time.`, `sist[er]|0|My sister borrowed my jacket.`,
+          `doct[or]|1|The doctor checked my ears.`, `col[or]|1|What color is your backpack?`, `tract[or]|1|The tractor plowed the field.`,
+          `doll[ar]|2|I found a dollar on the ground.`, `coll[ar]|2|The dog wore a red collar.`, `sug[ar]|2|Do not add too much sugar.`,
+          `wint[er]|0|It snows a lot in the winter.`],
+      2: [`act[or]|1|The actor forgot his lines.`, `stroll[er]|0|Mom pushed the baby in a stroller.`, `scatt[er]|0|The pigeons scatter when the dog runs by.`,
+          `daught[er]|0|She is the daughter of a famous chef.`, `platt[er]|0|The waiter brought a platter of tacos.`, `custom[er]|0|The customer asked for a refund.`,
+          `ancest[or]|1|My ancestor sailed here from Italy.`, `flav[or]|1|What flavor of ice cream do you want?`, `mirr[or]|1|I checked my hair in the mirror.`,
+          `vineg[ar]|2|Mix oil and vinegar for the salad.`, `bachel[or]|1|My uncle is a bachelor who lives alone.`, `behavi[or]|1|Good behavior earns extra recess.`,
+          `calend[ar]|2|Mark the date on your calendar.`, `wait[er]|0|The waiter took our order.`, `singul[ar]|2|Cat is singular, and cats is plural.`,
+          `maneuv[er]|0|The driver had to maneuver around the cones.`, `observ[er]|0|The observer wrote down everything she saw.`, `wand[er]|0|Do not wander off at the fair.`,
+          `trait[or]|1|The traitor gave away the secret plans.`, `janit[or]|1|The janitor fixed the leaky sink.`],
+      3: [`ambassad[or]|1|The ambassador met with world leaders.`, `competit[or]|1|Each competitor shook hands before the match.`, `profess[or]|1|The professor explained the experiment.`,
+          `spectat[or]|1|The spectator cheered from the stands.`, `particul[ar]|2|Do you have a particular color in mind?`, `spectacul[ar]|2|The view from the top was spectacular.`,
+          `regul[ar]|2|Regular exercise keeps you healthy.`, `messeng[er]|0|The messenger delivered the letter.`, `foreign[er]|0|The foreigner asked for directions.`,
+          `philosoph[er]|0|The philosopher asked big questions about life.`]
+    }
+  },
+  {
+    title: 'Frequently Misspelled Words', short: 'Tricky words',
+    tip: 'These everyday words trip people up. Watch for double letters (address), vowel pairs (people, believe), gh and silent letters (brought, answer), and words that do not sound like they look (cousin, woman).',
+    cats: [{ label: 'Double letters', chunks: [] }, { label: 'Vowel pairs', chunks: [] }, { label: 'gh and silent letters', chunks: [] }, { label: 'Sound tricksters', chunks: [] }],
+    words: {
+      1: [`pre[tt]y|0|That is a pretty dress.|t,d`, `ha[pp]y|0|The happy puppy wagged its tail.|p,pe`, `p[ie]ce|1|Can I have a piece of cake?|ee,ea`,
+          `gr[ea]t|1|We had a great time at the park.|ate,ait`, `[kn]ow|2|Do you know the answer?|n,gn`, `lau[gh]|2|That joke made me laugh.|f,ff`,
+          `[o]nce|3|I have been to the beach once.|wo,wu`, `[s]ure|3|Are you sure you locked the door?|sh,ch`, `ev[er]y|3|I read every night before bed.|r,ry`,
+          `go[es]|3|The bus goes past my house.|s,ez`],
+      2: [`a[dd]re[ss]|0|Write your address on the form.|d_ss,dd_s,d_s`, `ag[ai]nst|1|We played against the best team in the league.|e,ia`,
+          `[al]ways|3|I always brush my teeth before bed.|all,ol`, `ans[w]er|2|Raise your hand to answer the question.|u,wh`,
+          `bec[au]se|3|We left early because of the snow.|o,aw`, `bel[ie]ve|1|I believe you can do it.|ei,ee`,
+          `br[ough]t|2|She brought snacks for everyone.|ot,aught`, `child[ren]|3|The children played on the swings.|ern,rin`,
+          `c[ou]sin|3|My cousin is visiting this weekend.|u,o`, `does[n't]|3|He doesn't like spicy food.|nt,'nt`,
+          `do[ll]ar|0|The pencil costs one dollar.|l,le`, `en[ough]|2|Do we have enough chairs?|uf,uff`,
+          `gue[ss]|0|Can you guess the secret number?|s,se`, `inst[ea]d|1|Let's walk instead of driving.|e,ae`,
+          `p[eo]ple|1|Many people came to the game.|e,ee`, `rec[ei]ve|1|Did you receive my message?|ie,ee`,
+          `str[aigh]t|2|Walk straight down the hall.|ait,ate`, `unti[l]|3|Wait here until I get back.|ll,le`,
+          `usua[ll]y|0|I usually eat cereal for breakfast.|l,el`, `wom[a]n|3|The woman at the desk helped us.|e,o`],
+      3: [`co[mm]i[tt]ee|0|The committee voted on the new rules.|m_t,mm_t,m_tt`, `po[ss]e[ss]ion|0|The ring was her most prized possession.|s_ss,ss_s,s_s`,
+          `mi[ll]e[nn]ium|0|A millennium is one thousand years.|l_nn,ll_n,l_n`, `for[ei]gn|1|She is learning a foreign language.|ie,ia`,
+          `h[ei]ght|1|What is the height of the tower?|ie,i`, `dou[bt]|2|There is no doubt we will win.|t,pt`,
+          `su[bt]le|2|The change was so subtle that nobody noticed.|tt,t`, `thor[ough]|2|Do a thorough job cleaning your room.|o,ow`,
+          `We[dn]esday|3|We have a quiz on Wednesday.|n,nd`, `arg[u]ment|3|The two friends had an argument about the game.|ue,ew`]
+    }
+  },
+  {
+    title: 'Prefixes', short: 'Prefixes',
+    tip: 'A prefix is added to the front of a word and changes its meaning. un- and in- mean "not" (unknown, incomplete). en- means "make" (enlarge). out- means "more than" or "outside" (outrun, outfield). super- means "above" (superhuman). pro- means "forward" (proclaim).',
+    cats: [
+      { label: 'un- (not)', chunks: ['un'] }, { label: 'in- (not)', chunks: ['in'] }, { label: 'en- (make)', chunks: ['en'] },
+      { label: 'out- (beyond)', chunks: ['out'] }, { label: 'super- (above)', chunks: ['super'] }, { label: 'pro- (forward)', chunks: ['pro'] }
+    ],
+    words: {
+      1: [`[un]happy|0|I feel unhappy when it rains all weekend.`, `[un]lock|0|Use the key to unlock the door.`, `[un]fair|0|It is unfair to cut in line.`,
+          `[in]active|1|The volcano has been inactive for years.`, `[en]joy|2|I enjoy reading comics.`, `[en]able|2|Glasses enable me to see clearly.`,
+          `[out]side|3|Let's play outside.`, `[out]run|3|The rabbit tried to outrun the fox.`, `[super]hero|4|My favorite superhero can fly.`,
+          `[super]power|4|If you had a superpower, what would it be?`],
+      2: [`[un]known|0|The cause of the fire is still unknown.`, `[pro]long|5|Ice can prolong the life of fresh fish.`, `[in]complete|1|My homework was incomplete.`,
+          `[en]large|2|Can you enlarge the photo?`, `[out]field|3|She plays in the outfield.`, `[out]cry|3|The new rule caused a huge outcry.`,
+          `[un]tangle|0|It took forever to untangle my headphones.`, `[in]credible|1|The view from the top was incredible.`, `[out]post|3|Soldiers guarded the outpost.`,
+          `[en]list|2|My brother wants to enlist in the Navy.`, `[super]star|4|The singer became a superstar overnight.`, `[out]law|3|The outlaw robbed the stagecoach.`,
+          `[pro]claim|5|The king will proclaim a holiday.`, `[un]sightly|0|The trash pile was unsightly.`, `[super]human|4|The hero had superhuman strength.`,
+          `[in]dependent|1|She is an independent thinker.`, `[super]market|4|We bought groceries at the supermarket.`, `[out]standing|3|You did an outstanding job.`,
+          `[un]common|0|Snow is uncommon in Florida.`, `[en]rich|2|Reading can enrich your life.`],
+      3: [`[un]precedented|0|The flood caused unprecedented damage.`, `[un]foreseen|0|An unforeseen problem delayed the launch.`, `[in]adequate|1|The food supply was inadequate for the long trip.`,
+          `[in]audible|1|Her whisper was nearly inaudible.`, `[en]danger|2|Pollution can endanger wildlife.`, `[en]compass|2|The park will encompass the entire valley.`,
+          `[out]weigh|3|The benefits outweigh the risks.`, `[super]vise|4|A lifeguard will supervise the pool.`, `[super]ficial|4|The scratch was only superficial.`,
+          `[pro]trude|5|A nail began to protrude from the board.`]
+    }
+  },
+  {
+    title: 'Suffixes -ion, -tion', short: '-ion, -tion',
+    tip: 'Add -ion or -ation to turn an action (verb) into a thing (noun). Sometimes you just add it (connect, connection). Sometimes you drop the e first (separate, separation). Sometimes you add -ation (consult, consultation). Read the sentence to tell which form you need!',
+    cats: [{ label: 'Verb (action)', chunks: [] }, { label: 'Noun: just add -ion', chunks: [] }, { label: 'Noun: drop e, add -ion', chunks: [] }, { label: 'Noun: add -ation', chunks: [] }],
+    words: {
+      1: [`ac[t]|0|Actors act out scenes on stage.|tion,tation`, `act[ion]|1|The movie was full of action.|ation,ian`,
+          `protec[t]|0|Sunscreen will protect your skin.|tion,tation`, `protect[ion]|1|Helmets give your head protection.|ation,ian`,
+          `creat[e]|0|Let's create a comic book.|ion,ation`, `creat[ion]|2|The robot is my newest creation.|ation,eion`,
+          `infor[m]|0|Please inform the office if you are sick.|mation,mion`, `inform[ation]|3|The website has information about the zoo.|ion,ition`,
+          `direc[t]|0|Can you direct me to the gym?|tion,tation`, `direct[ion]|1|Which direction is north?|ation,ian`],
+      2: [`inspir[e]|0|Great teachers inspire their students.|ation,ion`, `inspir[ation]|3|The ocean was her inspiration for the painting.|ion,eation`,
+          `consul[t]|0|Consult a map before the hike.|tation,tion`, `consult[ation]|3|The doctor offered a free consultation.|ion,ition`,
+          `illustrat[e]|0|She will illustrate the children's book.|ion,ation`, `illustrat[ion]|2|The illustration showed a giant dragon.|ation,eion`,
+          `instruc[t]|0|The lifeguard will instruct us on safety.|tion,tation`, `instruct[ion]|1|Read each instruction carefully.|ation,ian`,
+          `connec[t]|0|Connect the cable to the computer.|tion,tation`, `connect[ion]|1|The Wi-Fi connection is slow today.|ation,ian`,
+          `represen[t]|0|Two students will represent our school.|tation,tion`, `represent[ation]|3|Every state has representation in Congress.|ion,ition`,
+          `separat[e]|0|Separate the white clothes from the dark ones.|ion,ation`, `separat[ion]|2|There is a clear separation between the two groups.|ation,eion`,
+          `observ[e]|0|Scientists observe animals in the wild.|ation,ion`, `observ[ation]|3|Write down each observation in your notebook.|ion,ition`,
+          `reac[t]|0|How did your friend react to the news?|tion,tation`, `react[ion]|1|Her reaction to the surprise was priceless.|ation,ian`,
+          `hesitat[e]|0|Do not hesitate to ask for help.|ion,ation`, `hesitat[ion]|2|He answered without hesitation.|ation,eion`],
+      3: [`communicat[e]|0|Dolphins communicate with clicks and whistles.|ion,ation`, `communicat[ion]|2|Good communication helps teams work well.|ation,eion`,
+          `demonstrat[e]|0|The scientist will demonstrate the experiment.|ion,ation`, `demonstrat[ion]|2|We watched a demonstration of how robots work.|ation,eion`,
+          `interpre[t]|0|How do you interpret the ending of the story?|tation,tion`, `interpret[ation]|3|Her interpretation of the poem was unique.|ion,ition`,
+          `concentrat[e]|0|It is hard to concentrate when it is noisy.|ion,ation`, `concentrat[ion]|2|Chess takes a lot of concentration.|ation,eion`,
+          `evaluat[e]|0|The teacher will evaluate our projects.|ion,ation`, `evaluat[ion]|2|We filled out an evaluation of the field trip.|ation,eion`]
+    }
+  }
+];
+
+const U3_GRAM = [
+  {
+    title: 'Action Verbs & Objects',
+    tip: 'An action verb shows what the subject does (kicked, baked). A direct object receives the action: answer "what?" after the verb (Sam threw the BALL). An indirect object tells to whom or for whom: Dad made US pancakes. Dialogue goes inside quotation marks, and the end punctuation goes inside too.',
+    ex: ['Maria kicked the ball. (verb: kicked · direct object: ball)', 'Dad made us pancakes. (indirect object: us)', '"Let\'s go," said Mia.'],
+    spot: [
+      { kind: 'choice', prompt: 'Which word is the action verb?',
+        items: { 1: [`The dog chased the ball.|chased|dog|ball`, `Maria kicked the ball.|kicked|Maria|ball`, `We baked cookies.|baked|We|cookies`],
+                 2: [`The chef sliced the onions quickly.|sliced|chef|quickly`, `Our class planted a garden.|planted|class|garden`, `The wind scattered the leaves.|scattered|wind|leaves`],
+                 3: [`The committee approved the new schedule.|approved|committee|schedule`, `Engineers designed a stronger bridge.|designed|Engineers|stronger`, `The author revised her final chapter.|revised|author|final`] } },
+      { kind: 'choice', prompt: 'Which word is the direct object (what receives the action)?',
+        items: { 1: [`Sam threw the ball.|ball|Sam|threw`, `I ate an apple.|apple|I|ate`, `Mom read a book.|book|Mom|read`],
+                 2: [`Lena wrote a letter.|letter|Lena|wrote`, `The storm knocked down the fence.|fence|storm|knocked`, `The coach gave the team a pep talk.|pep talk|team|coach`],
+                 3: [`The museum offered visitors a free tour.|tour|visitors|museum`, `Researchers collected samples from the reef.|samples|Researchers|reef`, `The judge handed the winner a trophy.|trophy|winner|judge`] } },
+      { kind: 'choice', prompt: 'Which word is the indirect object (who gets the direct object)?',
+        items: { 1: [`I gave my mom a hug.|mom|hug|gave`, `Dad made us pancakes.|us|pancakes|made`],
+                 2: [`The coach gave the team a pep talk.|team|pep talk|coach`, `Grandma sent me a postcard.|me|postcard|Grandma`],
+                 3: [`The museum offered visitors a free tour.|visitors|tour|museum`, `The judge handed the winner a trophy.|winner|trophy|judge`] } }
+    ],
+    fix: { kind: 'choice', prompt: 'Which sentence punctuates the dialogue correctly?',
+      items: { 1: [`Let's go said Mia|"Let's go," said Mia.|"Let's go" said Mia.|"Let's go, said Mia."`, `Ben asked are you ready|Ben asked, "Are you ready?"|Ben asked "are you ready?"|Ben asked, "Are you ready"?`,
+                   `I love tacos said Leo|"I love tacos," said Leo.|"I love tacos" said Leo.|"I love tacos," said Leo`, `Stop yelled Dad|"Stop!" yelled Dad.|"Stop"! yelled Dad.|"Stop," yelled Dad!`, `Mom said time for bed|Mom said, "Time for bed."|Mom said "time for bed."|Mom said, "Time for bed".`],
+               2: [`Watch out yelled the lifeguard|"Watch out!" yelled the lifeguard.|"Watch out"! yelled the lifeguard.|"Watch out," yelled the lifeguard!`, `Where is the library asked Jada|"Where is the library?" asked Jada.|"Where is the library"? asked Jada.|"Where is the library," asked Jada?`,
+                   `The coach said practice starts at four|The coach said, "Practice starts at four."|The coach said "practice starts at four."|The coach said, "Practice starts at four".`, `I finished my project said Ana|"I finished my project," said Ana.|"I finished my project" said Ana.|"I finished my project," said Ana`, `Can I borrow a pencil asked Theo|"Can I borrow a pencil?" asked Theo.|"Can I borrow a pencil"? asked Theo.|"Can I borrow a pencil," asked Theo?`],
+               3: [`If we leave now said Ms. Park we will make the bus|"If we leave now," said Ms. Park, "we will make the bus."|"If we leave now," said Ms. Park, "We will make the bus."|"If we leave now" said Ms. Park "we will make the bus."`,
+                   `Did you finish the essay asked the teacher|"Did you finish the essay?" asked the teacher.|"Did you finish the essay"? asked the teacher.|"Did you finish the essay," asked the teacher?`,
+                   `I can't believe it whispered Omar we won|"I can't believe it," whispered Omar. "We won!"|"I can't believe it" whispered Omar "we won!"|"I can't believe it," whispered Omar, "We won!"`, `The results are in announced the principal and we won|"The results are in," announced the principal, "and we won!"|"The results are in," announced the principal, "And we won!"|"The results are in" announced the principal "and we won!"`, `Who left the door open asked Grandpa I can feel the cold|"Who left the door open?" asked Grandpa. "I can feel the cold."|"Who left the door open?" asked Grandpa, "I can feel the cold."|"Who left the door open" asked Grandpa. "I can feel the cold."`] } }
+  },
+  {
+    title: 'Verb Tenses',
+    tip: 'Verb tense tells when something happens. Past already happened (walked). Present is happening now or usually (walks). Future will happen (will walk). The verb must also agree with the subject: one dog barks, two dogs bark.',
+    ex: ['Past: I walked. · Present: I walk. · Future: I will walk.', 'The cat drinks. · The cats drink.'],
+    spot: { kind: 'mc', prompt: 'What tense is the verb?', options: ['Past', 'Present', 'Future'],
+      items: { 1: [`I walked to school.|0`, `She sings in the choir.|1`, `We will visit Grandma.|2`, `The dog barked.|0`, `He plays soccer.|1`, `They will eat soon.|2`],
+               2: [`The team practiced for hours.|0`, `My brother studies every night.|1`, `The store will close at nine.|2`, `We celebrated her birthday.|0`, `The river flows to the sea.|1`, `You will need a jacket.|2`],
+               3: [`The settlers built cabins near the river.|0`, `Scientists predict a mild winter.|1`, `The council will vote on the proposal.|2`, `The volcano erupted without warning.|0`, `Earth orbits the sun.|1`, `Robots will explore distant planets.|2`] } },
+    fix: [
+      { kind: 'choice', prompt: 'Which verb agrees with the subject?',
+        items: { 1: [`The cat ___ milk.|drinks|drink|drinking`, `They ___ to music.|listen|listens|listening`, `My friends ___ funny.|are|is|be`],
+                 2: [`Each of the students ___ a laptop.|has|have|having`, `The dogs in the yard ___ loudly.|bark|barks|barking`, `Neither Sam nor Leo ___ the answer.|knows|know|knowing`],
+                 3: [`The list of supplies ___ on the board.|is|are|be`, `Everyone in the stands ___ cheering.|is|are|were`, `The team of scientists ___ ready to present.|is|are|be`] } },
+      { kind: 'choice', prompt: 'Which verb is in the correct tense?',
+        items: { 1: [`Yesterday, I ___ my room.|cleaned|clean|will clean`, `Tomorrow, we ___ to the beach.|will go|went|go`],
+                 2: [`Last week, the class ___ a play.|performed|performs|will perform`, `Next year, my sister ___ college.|will start|started|starts`],
+                 3: [`In 1969, astronauts ___ on the moon.|landed|land|will land`, `In the future, cars ___ themselves.|will drive|drove|drive`] } }
+    ]
+  },
+  {
+    title: 'Main & Helping Verbs',
+    tip: 'A helping verb works with the main verb: am, is, are, was, were, has, have, had, will. The main verb shows the action (She HAS EATEN). Keep your tense steady: do not switch from past to present in the middle of a sentence.',
+    ex: ['We were laughing. (helping: were · main: laughing)', '❌ I ran to the bus and miss it.', '✅ I ran to the bus and missed it.'],
+    spot: [
+      { kind: 'choice', prompt: 'Which word is the helping verb?',
+        items: { 1: [`I am running.|am|running|I`, `She has eaten.|has|eaten|She`, `We were laughing.|were|laughing|We`],
+                 2: [`The bus has arrived.|has|arrived|bus`, `They will finish soon.|will|finish|soon`, `The kids were playing outside.|were|playing|outside`],
+                 3: [`The scientists had tested the samples twice.|had|tested|samples`, `The mayor is considering the plan.|is|considering|plan`, `We have been waiting for an hour.|have been|waiting|hour`] } },
+      { kind: 'choice', prompt: 'Which word is the main verb?',
+        items: { 1: [`He is jumping.|jumping|is|He`, `They have finished.|finished|have|They`, `I will help.|help|will|I`],
+                 2: [`The baby was sleeping.|sleeping|was|baby`, `We have visited Chicago.|visited|have|Chicago`, `She will call later.|call|will|later`],
+                 3: [`The team had practiced all week.|practiced|had|week`, `Volunteers are building a new playground.|building|are|playground`, `The museum has displayed the fossils since May.|displayed|has|fossils`] } }
+    ],
+    fix: [
+      { kind: 'choice', prompt: 'Which sentence keeps the verb tense consistent?',
+        items: { 1: [`I ran to the bus and miss it.|I ran to the bus and missed it.|I run to the bus and missed it.|I ran to the bus and will miss it.`, `She opens the box and found a puppy.|She opened the box and found a puppy.|She opens the box and found puppies.|She opened the box and finds a puppy.`],
+                 2: [`We hiked up the hill and see a deer.|We hiked up the hill and saw a deer.|We hike up the hill and saw a deer.|We hiked up the hill and will see a deer.`, `The crowd cheers when the team scored.|The crowd cheered when the team scored.|The crowd cheers when the team scored a goal.|The crowd will cheer when the team scored.`],
+                 3: [`The explorers crossed the desert and search for water.|The explorers crossed the desert and searched for water.|The explorers cross the desert and searched for water.|The explorers crossed the desert and will search for water.`, `By noon, she had finished the test and leaves early.|By noon, she had finished the test and left early.|By noon, she has finished the test and left early.|By noon, she had finished the test and leaving early.`] } },
+      { kind: 'choice', prompt: 'Which helping verb fits best?',
+        items: { 1: [`I ___ eating lunch right now.|am|was|have`, `She ___ watching TV last night.|was|is|has`],
+                 2: [`They ___ lived here for five years.|have|are|will`, `By tomorrow, I ___ have finished my project.|will|had|am`],
+                 3: [`Before the storm hit, we ___ boarded up the windows.|had|have|are`, `Right now, the band ___ practicing in the gym.|is|has|had`] } }
+    ]
+  },
+  {
+    title: 'Linking Verbs',
+    tip: 'A linking verb connects the subject to a word that describes or renames it. It does not show action. Common linking verbs: am, is, are, was, were, seem, become, feel, taste, smell, look, sound, grow. Tip: if you can swap in "is" and it still makes sense, it is probably linking.',
+    ex: ['The soup is hot. (hot describes soup)', 'My cousin became a nurse. (nurse renames cousin)', 'Titles: books get capitals (Charlotte\'s Web), short works go in quotes ("Happy Birthday").'],
+    spot: [
+      { kind: 'mc', prompt: 'Is the verb an action verb or a linking verb?', options: ['Action verb', 'Linking verb'],
+        items: { 1: [`The soup is hot.|1`, `The dog ran fast.|0`, `I am happy.|1`, `We jumped high.|0`, `The flowers smell sweet.|1`, `She smelled the flowers.|0`],
+                 2: [`The test seemed easy.|1`, `The pitcher threw the ball.|0`, `My cousin became a nurse.|1`, `The music sounds loud.|1`, `Jamal tasted the soup.|0`, `The soup tasted salty.|1`],
+                 3: [`The crowd grew restless.|1`, `The farmer grew corn.|0`, `The plan appears risky.|1`, `The magician appeared suddenly.|0`, `The leaves turned orange.|1`, `She turned the page.|0`] } },
+      { kind: 'choice', prompt: 'Find the word after the linking verb that describes or renames the subject.',
+        items: { 1: [`The sky is blue.|blue|sky|is`, `My dad is a chef.|chef|dad|is`, `The puppy seems tired.|tired|puppy|seems`],
+                 2: [`Ms. Ruiz became our coach.|coach|Ms. Ruiz|became`, `The lemonade tastes sour.|sour|lemonade|tastes`, `The hike was exhausting.|exhausting|hike|was`],
+                 3: [`The volcano remained dormant for centuries.|dormant|volcano|centuries`, `Her argument sounded convincing.|convincing|argument|sounded`, `Lincoln was the sixteenth president.|president|Lincoln|sixteenth`] } }
+    ],
+    fix: { kind: 'choice', prompt: 'Which title is written correctly?',
+      items: { 1: [`Book: charlotte's web|Charlotte's Web|Charlotte's web|charlotte's Web`, `Song: happy birthday|"Happy Birthday"|"happy birthday"|"Happy birthday"`, `Movie: the lion king|The Lion King|The lion king|the Lion King`, `TV show: the magic school bus|The Magic School Bus|The magic school bus|the Magic School Bus`, `Book: green eggs and ham|Green Eggs and Ham|Green Eggs And Ham|Green eggs and ham`],
+               2: [`Book: the secret garden|The Secret Garden|The secret garden|The Secret garden`, `Poem: the road not taken|"The Road Not Taken"|"The road not taken"|The Road Not Taken"`, `Magazine: national geographic|National Geographic|National geographic|national Geographic`, `Song: take me out to the ball game|"Take Me Out to the Ball Game"|"Take Me Out To The Ball Game"|"take me out to the ball game"`, `Book: the war of the worlds|The War of the Worlds|The War Of The Worlds|The war of the worlds`],
+               3: [`Book: a wrinkle in time|A Wrinkle in Time|A Wrinkle In Time|a Wrinkle in Time`, `Short story: the tell-tale heart|"The Tell-Tale Heart"|"The tell-tale heart"|The Tell-Tale Heart`, `Article: scientists discover new species|"Scientists Discover New Species"|"Scientists discover new species"|Scientists Discover New Species`, `Poem: stopping by woods on a snowy evening|"Stopping by Woods on a Snowy Evening"|"Stopping By Woods On A Snowy Evening"|Stopping by Woods on a Snowy Evening"`, `Book: island of the blue dolphins|Island of the Blue Dolphins|Island Of The Blue Dolphins|Island of the blue dolphins`] } }
+  },
+  {
+    title: 'Irregular Verbs',
+    tip: 'Most verbs add -ed for the past (walk, walked). Irregular verbs change in their own way: go, went, gone. With has, have, or had, use the special form: I have SEEN it (not "I have saw it").',
+    ex: ['go ➜ went ➜ (have) gone', 'eat ➜ ate ➜ (have) eaten', 'bring ➜ brought ➜ (have) brought'],
+    spot: { kind: 'choice', prompt: 'What is the past tense?',
+      items: { 1: [`go|went|goed|gone`, `eat|ate|eated|eaten`, `see|saw|seed|seen`, `run|ran|runned|runs`, `give|gave|gived|given`, `take|took|taked|taken`],
+               2: [`bring|brought|bringed|brang`, `think|thought|thinked|thunk`, `catch|caught|catched|caughted`, `swim|swam|swimmed|swum`, `freeze|froze|freezed|frozen`, `write|wrote|writed|written`],
+               3: [`seek|sought|seeked|seeken`, `forbid|forbade|forbidded|forbidden`, `tread|trod|treaded|trodded`, `arise|arose|arised|arisen`, `cling|clung|clinged|clang`, `undertake|undertook|undertaked|undertaken`] } },
+    fix: { kind: 'choice', prompt: 'Which verb form is correct?',
+      items: { 1: [`I have ___ that movie.|seen|saw|seed`, `She has ___ home.|gone|went|goed`, `We have ___ lunch.|eaten|ate|eated`, `He has ___ the ball.|thrown|threw|throwed`, `I have ___ my homework.|done|did|doed`],
+               2: [`The lake has ___ solid.|frozen|froze|freezed`, `He has ___ three stories.|written|wrote|writed`, `They had ___ snacks.|brought|brang|brung`, `The bell has ___.|rung|rang|ringed`, `We have ___ this song before.|sung|sang|singed`],
+               3: [`The problem had ___ before.|arisen|arose|arised`, `The town has ___ fireworks this year.|forbidden|forbade|forbidded`, `The team has ___ a huge project.|undertaken|undertook|undertaked`, `The ship had ___ by morning.|sunk|sank|sinked`, `The price has ___ again.|risen|rose|rised`] } }
+  }
+];
+
+UNITS[1].spell = U2_SPELL; UNITS[1].gram = U2_GRAM;
+UNITS[2].spell = U3_SPELL; UNITS[2].gram = U3_GRAM;
+
 /* ---------------- WRITING ----------------
    Frames use {key} blanks. {=key} repeats an earlier answer.
    Keys ending in a number (fact1, reason2) share the list for the base key.
@@ -1483,6 +1985,14 @@ function parseWord(str, wk) {
     return { word: raw.replace(/\+/g, ''), parts: [{ t: raw.replace(/\+/g, '') }], join: true, segs,
       chunk: JOIN_OPTS[+cat], cat: +cat, sentence, wk };
   }
+  if (USP()[wk].mode === 'syll') {
+    // "fac·tor": kids pick where the syllables split. Wrong choices shift the first split by one letter.
+    const syls = raw.split('·'), word = syls.join(''), cut = syls[0].length;
+    const at = c => word.slice(0, c) + '·' + word.slice(c);
+    const alts = [cut - 1, cut + 1, cut + 2, cut - 2].filter(c => c > 0 && c < word.length).slice(0, 2).map(at);
+    const parts = []; syls.forEach((sy, i) => { if (i) parts.push({ b: '·' }); parts.push({ t: sy }); });
+    return { word, parts, syll: true, chunk: syls.join('·'), cat: +cat, sentence, wk, alts };
+  }
   const parts = [], chunks = [];
   const re = /\[([^\]]+)\]/g; let last = 0, m;
   while ((m = re.exec(raw))) {
@@ -1691,7 +2201,7 @@ function dropWord(b, el) {
 /* Missing Piece */
 function chunkOptions(wd) {
   if (wd.join) return JOIN_OPTS.slice();
-  if (wd.alts) return shuffle([wd.chunk, ...wd.alts]);
+  if (wd.alts) return shuffle([wd.chunk, ...wd.alts]);  // also covers syllable splits
   const wk = USP()[wd.wk];
   const same = wk.cats[wd.cat].chunks.filter(c => c !== wd.chunk);
   const all = [...new Set(wk.cats.flatMap(c => c.chunks))].filter(c => c !== wd.chunk && !same.includes(c));
@@ -1703,12 +2213,12 @@ function renderChunk() {
   if (ACT.idx >= ACT.items.length) return finishActivity(ACT.score / ACT.items.length);
   const wd = ACT.items[ACT.idx];
   if (!ACT.opts) { ACT.opts = chunkOptions(wd); ACT.wrong = []; ACT.solved = false; }
-  const shown = wd.join
+  const shown = wd.syll ? esc(ACT.solved ? wd.chunk : wd.word) : wd.join
     ? (ACT.solved ? esc(wd.word) : wd.segs.map(esc).join('<span class="blank">?</span>'))
     : wd.parts.map(p => p.b ? `<span class="blank">${ACT.solved ? esc(p.b) : '?'}</span>` : esc(p.t)).join('');
   render(`${actHeader()}
     <div class="card" style="text-align:center">
-      <p class="big-q">${wd.join ? 'How do these parts join together?' : 'Which letters finish the word?'}</p>
+      <p class="big-q">${wd.syll ? 'Where do the syllables split?' : wd.join ? 'How do these parts join together?' : 'Which letters finish the word?'}</p>
       <div class="row" style="justify-content:center"><button class="btn teal" data-act="sayWord">🔊 Hear word</button><button class="btn ghost" data-act="saySentence">📖 In a sentence</button></div>
       <div class="chunkword">${shown}</div>
       <div class="pool">${ACT.opts.map((o, i) => `<button class="chip chunkchip ${ACT.wrong.includes(o) ? 'shake' : ''}" style="font-size:1.4rem;min-width:80px;${ACT.wrong.includes(o) ? 'opacity:.35' : ''}" data-act="pickChunk" data-i="${i}" ${ACT.wrong.includes(o) || ACT.solved ? 'disabled' : ''}>${esc(chunkLabel(o))}</button>`).join('')}</div>
