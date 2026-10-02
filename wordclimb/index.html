@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!--
+  WordClimb
+  © 2026 Brazen Learning. All rights reserved. WordClimb and all of its content, including word lists, sentences, questions, writing prompts, artwork, and code, are the property of Brazen Learning. No part of this app may be copied, reproduced, distributed, sold, or modified without written permission from Brazen Learning. Using this app does not grant any ownership or license rights. WordClimb is an independent product and is not affiliated with or endorsed by any publisher or curriculum company.
+-->
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -317,11 +321,13 @@
   body.calm .map-card { background: #e9eef1; }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 
+  .legal { max-width: 980px; margin: 0 auto; padding: 0 16px 28px; font-size: .72rem; line-height: 1.5; color: var(--muted); text-align: center; }
   .print-area { display: none; }
   @media print {
     body * { visibility: hidden; }
     .print-area, .print-area * { visibility: visible; }
     .print-area { display: block; position: absolute; left: 0; top: 0; width: 100%; padding: 24px; font-size: 14pt; line-height: 2; }
+    .print-area .legal-print { display: block; font-size: 7.5pt; line-height: 1.3; color: #444; border-top: .75pt solid #999; margin-top: 14pt; padding-top: 4pt; }
     .print-area.doc { font-size: 11pt; line-height: 1.45; padding: 0; color: #000; }
     .pdoc h1 { font-size: 18pt; margin: 0 0 4pt; } .pdoc h2 { font-size: 14pt; margin: 14pt 0 6pt; border-bottom: 1.5pt solid #000; }
     .pdoc .sub { font-size: 10pt; margin-bottom: 8pt; }
@@ -345,6 +351,7 @@
 <body>
 <header id="top"></header>
 <main id="app"></main>
+<footer id="legal" class="legal">© 2026 Brazen Learning. All rights reserved. WordClimb and all of its content, including word lists, sentences, questions, writing prompts, artwork, and code, are the property of Brazen Learning. No part of this app may be copied, reproduced, distributed, sold, or modified without written permission from Brazen Learning. Using this app does not grant any ownership or license rights. WordClimb is an independent product and is not affiliated with or endorsed by any publisher or curriculum company.</footer>
 <div id="toast"></div>
 <div class="print-area" id="printArea"></div>
 
@@ -354,6 +361,8 @@
    Progress is saved in a "save code" so it works on shared
    devices with no server, no login, and no API.
    ========================================================= */
+
+const LEGAL = "© 2026 Brazen Learning. All rights reserved. WordClimb and all of its content, including word lists, sentences, questions, writing prompts, artwork, and code, are the property of Brazen Learning. No part of this app may be copied, reproduced, distributed, sold, or modified without written permission from Brazen Learning. Using this app does not grant any ownership or license rights. WordClimb is an independent product and is not affiliated with or endorsed by any publisher or curriculum company.";
 
 /* ---------------- LEVELS ---------------- */
 const LEVELS = {
@@ -365,7 +374,7 @@ const LEVELS = {
 /* ---------------- SPELLING ----------------
    Word format: "w[o]rd|categoryIndex|sentence|optional,custom,distractors"
    Brackets mark the spelling pattern. Two brackets = split pattern like c[a]k[e] (shown as a … e).
-   Ridge (level 2) uses the class's real Wonders weekly list. Base Camp and Summit use original words.
+   All three trails (Base Camp, Ridge, Summit) use original word lists and sentences.
    mode 'join' (compound words): use + where two words join closed, a space for open, a hyphen for hyphenated.
 */
 const U1_SPELL = [
@@ -565,9 +574,9 @@ const G_OLD = [
   },
   {
     title: 'Subjects & Predicates',
-    tip: 'The complete subject is who or what the sentence is about. The complete predicate tells what the subject does or is. The predicate starts with the verb.',
+    tip: 'The complete subject is who or what the sentence is about. The complete predicate is everything else: the verb and the words that go with it.',
     ex: ['[The tall girl] [kicked the ball.]', 'subject ➜ predicate'],
-    spot: { kind: 'split', prompt: 'Tap the FIRST word of the predicate (the part that tells what the subject does or is).',
+    spot: { kind: 'split', prompt: 'Tap the FIRST word of the predicate (the part with the verb).',
       items: {
         1: ['The cat | slept on my bed.', 'My mom | made tacos.', 'The bus | was late today.', 'Tom and Ana | played soccer.', 'A big dog | barked at me.'],
         2: ['The students in Room 12 | finished their project early.', 'My older sister | works at the mall.', 'The old wooden bridge | creaked under our feet.', 'Every player on the team | needs a water bottle.', 'The loud thunder | scared my little brother.'],
@@ -656,7 +665,7 @@ const G_OLD = [
       } }
   }
 ];
-/* Unit 1 grammar, in the book's order: Sentence Types, Subjects & Predicates, Sentence Combining, Complex Sentences, Run-ons.
+/* Unit 1 grammar, in teaching order: Sentence Types, Subjects & Predicates, Sentence Combining, Complex Sentences, Run-ons.
    spot/fix can be one part or a list of parts; a round pulls a random mix of up to 8 questions. */
 const U1_GRAM = [
   {
@@ -723,30 +732,30 @@ const REVIEW_GRAM = { title: 'Unit Review', tip: 'A mix of everything from this 
 /* ---------------- UNITS (mountains) ----------------
    All six are open from day one. Units without content yet show as "trail being built". */
 const UNITS = [
-  { name: 'Changes', mtn: 'Mount Shift', icon: '🏔️',
+  { name: 'Finding Your Path', mtn: 'Mount Shift', icon: '🏔️',
     scene: { sky1: '#7fcbff', sky2: '#c7ecff', back: '#9fc5d8', main: '#5f8f6e', front: '#4c7a5a', cap: '#ffffff' },
     spell: U1_SPELL, gram: U1_GRAM,
-    eq: ['How do new experiences offer new perspectives?', 'Why do people form alliances?', 'How do life forms vary in different environments?', 'How do natural forces affect Earth?', 'What factors influence how people use money?'] },
-  { name: 'Excursions Across Time', mtn: 'Canyon of Ages', icon: '🏜️',
+    eq: ["How can trying something new change the way you see things?", "Why do people team up?", "How do plants and animals survive in such different places?", "What powerful forces shape our planet?", "What affects the choices people make about money?"] },
+  { name: 'Echoes of the Past', mtn: 'Canyon of Ages', icon: '🏜️',
     scene: { sky1: '#ffb36b', sky2: '#ffe2b8', back: '#e8a774', main: '#c96b3c', front: '#a5532c', cap: '#f6d2a2' },
     plan: { spell: ['Irregular Plurals', 'Inflectional Endings', 'Closed Syllables', 'Open Syllables', 'Consonant + le'], gram: ['Kinds of Nouns', 'Singular & Plural Nouns', 'More Plural Nouns', 'Possessive Nouns', 'Appositives'] },
-    eq: ['What contributions were made by early civilizations?', 'How did democracy develop?', 'What was life like for people in ancient cultures?', 'What influences the development of a culture?', 'What can the past teach us?'] },
-  { name: 'Accomplishments', mtn: 'Ember Peak', icon: '🌋',
+    eq: ["What did early civilizations give the world?", "How did people first start voting and making laws together?", "What was daily life like long ago?", "What shapes the way a group of people lives?", "What lessons can history teach us?"] },
+  { name: 'Making It Happen', mtn: 'Ember Peak', icon: '🌋',
     scene: { sky1: '#ff8a7a', sky2: '#ffd0b5', back: '#a77b86', main: '#5c4450', front: '#43303a', cap: '#ff7a1a' },
     plan: { spell: ['Vowel Team Syllables', 'r-Controlled Syllables', 'Frequently Misspelled Words', 'Prefixes', 'Suffixes -ion, -tion'], gram: ['Action Verbs & Objects', 'Verb Tenses', 'Main & Helping Verbs', 'Linking Verbs', 'Irregular Verbs'] },
-    eq: ['What happens when people share ideas?', 'What kinds of challenges transform people?', 'What can people accomplish by working together?', 'How can one person affect the opinions of others?', 'What steps can people take to promote a healthier environment?'] },
-  { name: 'Challenges', mtn: 'Glacier Ridge', icon: '🧊',
+    eq: ["What can happen when people share their ideas?", "How can hard times change a person?", "What can a team do that one person cannot?", "How can one voice change what others think?", "How can we take better care of our environment?"] },
+  { name: 'Rising Up', mtn: 'Glacier Ridge', icon: '🧊',
     scene: { sky1: '#a9d8ff', sky2: '#eaf6ff', back: '#c4dcef', main: '#7fa7c9', front: '#5d87ab', cap: '#ffffff' },
     plan: { spell: ['More Words with -ion', 'Vowel Alternation', 'Prefixes & Suffixes', 'Greek & Latin Prefixes', 'Consonant Alternation'], gram: ['Pronouns & Antecedents', 'Kinds of Pronouns', 'Possessive Pronouns', 'Pronoun-Verb Agreement', 'More Pronouns'] },
-    eq: ['How do people meet environmental challenges?', 'How do people meet personal challenges?', 'When are decisions hard to make?', 'How do people uncover what they have in common?', 'How can we take responsibility?'] },
-  { name: 'Discoveries', mtn: 'Jungle Summit', icon: '🌴',
+    eq: ["How do people deal with big changes in nature?", "How do people push through hard times?", "What makes a decision hard?", "How do people find out what they have in common?", "What does it mean to be responsible?"] },
+  { name: 'Explorers and Inventors', mtn: 'Jungle Summit', icon: '🌴',
     scene: { sky1: '#8fe3d0', sky2: '#e0fff4', back: '#5cb08f', main: '#2f7d55', front: '#1f5e3e', cap: '#9be36b' },
     plan: { spell: ['Homophones', 'Words from Around the World', 'Latin Roots', 'Greek Roots', 'Suffixes -ive, -age, -ize'], gram: ['Adjectives', 'Articles & Demonstratives', 'Adjectives That Compare', 'Comparing with More & Most', 'Comparing with Good & Bad'] },
-    eq: ['Why do people tell and retell myths?', 'How do people show inner strength?', 'How do people benefit from innovation?', 'How does technology lead to discoveries?', 'How have tools used for exploration evolved over time?'] },
-  { name: 'Taking Action', mtn: 'Aurora Heights', icon: '🌌',
+    eq: ["Why do people keep telling old stories?", "Where does inner strength come from?", "How do new inventions help people?", "How does technology help us discover new things?", "How have explorers' tools changed over time?"] },
+  { name: 'Making a Difference', mtn: 'Aurora Heights', icon: '🌌',
     scene: { sky1: '#2b2a6b', sky2: '#6a5acd', back: '#4b4f8f', main: '#2f3566', front: '#22264d', cap: '#b9f6ff' },
     plan: { spell: ['Suffixes -ible, -able', 'Suffixes -ance, -ence, -ant, -ent', 'Greek Suffixes', 'Absorbed Prefixes', 'Words from Mythology'], gram: ['Adverbs', 'Adverbs That Compare', 'Negatives', 'Prepositions', 'Sentence Combining'] },
-    eq: ['How have people used natural resources?', 'How do we learn about historical events?', 'How can a scientific investigation be an adventure?', 'What can scientists reveal about ancient civilizations?', 'Why is taking a break important?'] }
+    eq: ["How do people use what nature gives us?", "How do we find out what really happened in the past?", "What makes science an adventure?", "What clues do scientists find about ancient people?", "Why does everyone need a break sometimes?"] }
 ];
 const unitReady = u => !!UNITS[u].spell;
 const GRAM_ACTS = [
@@ -754,11 +763,11 @@ const GRAM_ACTS = [
   { id: 'fix',  name: 'Fix It',  icon: '🔧', desc: 'Pick the version that works.' }
 ];
 
-/* ================= UNIT 2: Excursions Across Time ================= */
+/* ================= UNIT 2: Echoes of the Past ================= */
 const U2_SPELL = [
   {
     title: 'Irregular Plurals', short: 'Irregular plurals',
-    tip: "Some plurals break the rules. A few words ending in o add -es (torpedoes), but many just add -s (videos, tacos). Many words ending in f or fe change to -ves (calves, lives), but some just add -s (chiefs, cliffs). A few science words come from Latin (algae, fungi).",
+    tip: "Some plurals break the rules. A few words ending in o add -es (torpedoes), but many just add -s (videos, tacos). Many words that end in f or fe switch to -ves (calves, lives), but some just add -s (chiefs, cliffs). A few science words come from Latin (algae, fungi).",
     cats: [
       { label: 'o + es (torpedoes)', chunks: [] }, { label: 'o + s (videos)', chunks: [] }, { label: 'f/fe to ves (calves)', chunks: [] },
       { label: 'f + s (chiefs)', chunks: [] }, { label: 'Latin plurals (algae)', chunks: [] }
@@ -788,7 +797,7 @@ const U2_SPELL = [
   },
   {
     title: 'Inflectional Endings', short: '-ed and -ing',
-    tip: "Adding -ed or -ing? If the word ends in a silent e, drop the e (shape, shaping). If it ends in one vowel and one consonant and the last part is stressed, double the consonant (step, stepped; control, controlled). Otherwise, just add the ending (visit, visited).",
+    tip: "Adding -ed or -ing? Does the word end in a silent e? Drop the e (shape, shaping). If it ends in one vowel and one consonant and the last part is stressed, double the consonant (step, stepped; control, controlled). Otherwise, just add the ending (visit, visited).",
     cats: [{ label: 'Drop the e', chunks: [] }, { label: 'Double the last letter', chunks: [] }, { label: 'Just add the ending', chunks: [] }],
     words: {
       1: [`ho[ped]|0|I hoped it would snow.|pped,peed`, `ho[pped]|1|The frog hopped onto a rock.|ped,peed`,
@@ -893,7 +902,7 @@ const U2_SPELL = [
 const U2_GRAM = [
   {
     title: 'Kinds of Nouns',
-    tip: 'A common noun names any person, place, or thing (city). A proper noun names a specific one and starts with a capital letter (Chicago). A concrete noun is something you can see, hear, touch, taste, or smell (pizza). An abstract noun is an idea or feeling (courage).',
+    tip: 'A common noun is a general word for a person, place, or thing (city). A proper noun is the name of one particular person, place, or thing, and it starts with a capital letter (Chicago). A concrete noun is something you can see, hear, touch, taste, or smell (pizza). An abstract noun is an idea or feeling (courage).',
     ex: ['Common: river · Proper: Mississippi River', 'Concrete: guitar · Abstract: friendship', 'Business letters: Dear Ms. Brown: … Sincerely,'],
     spot: [
       { kind: 'mc', prompt: 'Is this noun common or proper?', options: ['Common noun', 'Proper noun'],
@@ -924,7 +933,7 @@ const U2_GRAM = [
   },
   {
     title: 'Singular & Plural Nouns',
-    tip: 'Most nouns add -s to show more than one. Add -es to words ending in s, x, ch, sh, or z (boxes). If a word ends in consonant + y, change y to i and add -es (babies). If it ends in vowel + y, just add -s (toys). Use commas to separate three or more items in a series.',
+    tip: 'Most nouns add -s to show more than one. Add -es to words ending in s, x, ch, sh, or z (boxes). If a word ends in consonant + y, change y to i and add -es (babies). If it ends in vowel + y, just add -s (toys). When you list three or more things, put a comma after each one except the last.',
     ex: ['box ➜ boxes · baby ➜ babies · toy ➜ toys', 'We packed snacks, water, and a map.'],
     spot: [
       { kind: 'choice', prompt: 'What is the plural?',
@@ -955,7 +964,7 @@ const U2_GRAM = [
   },
   {
     title: 'More Plural Nouns',
-    tip: 'Irregular plurals do not follow the rules: child ➜ children, mouse ➜ mice, tooth ➜ teeth. Some stay the same: sheep, deer, moose. A collective noun names a group as one thing: team, family, flock, jury.',
+    tip: 'Irregular plurals do not follow the rules: child ➜ children, mouse ➜ mice, tooth ➜ teeth. Some stay the same: sheep, deer, moose. A collective noun is one word for a whole group: team, family, flock, jury.',
     ex: ['foot ➜ feet · goose ➜ geese · deer ➜ deer', 'Collective nouns: class, band, crew, audience'],
     spot: [
       { kind: 'choice', prompt: 'What is the plural?',
@@ -1024,7 +1033,7 @@ const U2_GRAM = [
   }
 ];
 
-/* ================= UNIT 3: Accomplishments ================= */
+/* ================= UNIT 3: Making It Happen ================= */
 const U3_SPELL = [
   {
     title: 'Vowel Team Syllables', short: 'Vowel teams',
@@ -1165,7 +1174,7 @@ const U3_SPELL = [
 const U3_GRAM = [
   {
     title: 'Action Verbs & Objects',
-    tip: 'An action verb shows what the subject does (kicked, baked). A direct object receives the action: answer "what?" after the verb (Sam threw the BALL). An indirect object tells to whom or for whom: Dad made US pancakes. Dialogue goes inside quotation marks, and the end punctuation goes inside too.',
+    tip: 'An action verb shows what the subject does (kicked, baked). The direct object is the person or thing that gets the action: answer "what?" after the verb (Sam threw the BALL). An indirect object is the person who gets the direct object: Dad made US pancakes. Dialogue goes inside quotation marks, and the end punctuation goes inside too.',
     ex: ['Maria kicked the ball. (verb: kicked · direct object: ball)', 'Dad made us pancakes. (indirect object: us)', '"Let\'s go," said Mia.'],
     spot: [
       { kind: 'choice', prompt: 'Which word is the action verb?',
@@ -1271,7 +1280,7 @@ const U3_GRAM = [
 UNITS[1].spell = U2_SPELL; UNITS[1].gram = U2_GRAM;
 UNITS[2].spell = U3_SPELL; UNITS[2].gram = U3_GRAM;
 
-/* ================= UNIT 4: Challenges ================= */
+/* ================= UNIT 4: Rising Up ================= */
 const U4_SPELL = [
   {
     title: 'More Words with -ion', short: 'More -ion',
@@ -1488,7 +1497,7 @@ const U4_GRAM = [
   }
 ];
 
-/* ================= UNIT 5: Discoveries ================= */
+/* ================= UNIT 5: Explorers and Inventors ================= */
 const U5_SPELL = [
   {
     title: 'Homophones', short: 'Homophones', mode: 'homo',
@@ -1709,7 +1718,7 @@ const U5_GRAM = [
   }
 ];
 
-/* ================= UNIT 6: Taking Action ================= */
+/* ================= UNIT 6: Making a Difference ================= */
 const U6_SPELL = [
   {
     title: 'Suffixes -ible, -able', short: '-able, -ible',
@@ -3472,7 +3481,7 @@ function finishWriting(text) {
   const gearHTML = gearUnlockHTML(totalBefore, totalStars());
   sfx('finish'); bigConfetti();
   $('#printArea').className = 'print-area';
-  $('#printArea').innerHTML = `<h2>${esc(cap(S.name.toLowerCase()))}: ${esc(WRITING[WS.t].name)} Paragraph</h2><p>${esc(text)}</p>`;
+  $('#printArea').innerHTML = `<h2>${esc(cap(S.name.toLowerCase()))}: ${esc(WRITING[WS.t].name)} Paragraph</h2><p>${esc(text)}</p><div class="legal-print">${esc(LEGAL)}</div>`;
   WS.finalText = text;
   render(`
     <div class="card result" style="max-width:720px;margin:20px auto">
@@ -3507,7 +3516,8 @@ function renderTeacher() {
     ${printablesHTML()}
     <div class="card" style="margin-top:20px"><h3>How the stars work</h3>
       <p class="small">Each activity earns 1 to 3 stars: 1 for finishing, 2 for 70% or better on the first try, 3 for 90% or better. Each week has 15 stars (3 spelling activities and 2 grammar activities), so each unit has 90. Pick "Unit N weeks" to see week-by-week detail. Writing shows steps completed (Build It, Boost It, Write It) for each type.</p>
-      <p class="small">Codes are checked, so a student who changes a letter will get an error instead of fake stars. Codes are not a password though, so a determined kid could share one.</p></div>`);
+      <p class="small">Codes are checked, so a student who changes a letter will get an error instead of fake stars. Codes are not a password though, so a determined kid could share one.</p></div>
+    <div class="card"><h3>© Copyright</h3><p class="small">${esc(LEGAL)}</p></div>`);
 }
 /* ---------------- SPELLING BEE ----------------
    No timer. Practice Bee keeps going forever; Challenge Bee ends after 3 misses.
@@ -3779,7 +3789,9 @@ function printKey() {
 function printDoc(kind) {
   readPrintChoices();
   const parts = { lists: printLists, dict: printDictation, sheet: printSheet, key: printKey };
-  const html = kind === 'all' ? ['lists', 'dict', 'sheet', 'key'].map(k => parts[k]()).join('') : parts[kind]();
+  // Every printed page ends with the copyright notice.
+  const withLegal = h => h.replace(/<\/div>$/, `<div class="legal-print">${esc(LEGAL)}</div></div>`);
+  const html = (kind === 'all' ? ['lists', 'dict', 'sheet', 'key'] : [kind]).map(k => withLegal(parts[k]())).join('');
   const pa = $('#printArea');
   pa.className = 'print-area doc';
   pa.innerHTML = `<div class="pdoc">${html}</div>`;
