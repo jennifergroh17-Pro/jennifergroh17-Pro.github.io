@@ -363,6 +363,14 @@
    ========================================================= */
 
 const LEGAL = "© 2026 Brazen Learning. All rights reserved. WordClimb and all of its content, including word lists, sentences, questions, writing prompts, artwork, and code, are the property of Brazen Learning. No part of this app may be copied, reproduced, distributed, sold, or modified without written permission from Brazen Learning. Using this app does not grant any ownership or license rights. WordClimb is an independent product and is not affiliated with or endorsed by any publisher or curriculum company.";
+/* ---------------- TURN IN MY CODE ----------------
+   FORM: the teacher's Google Form. The button copies the code and opens this form.
+   PREFILL (optional): a Google Forms "pre-filled link" made with WCNAME and WCCODE typed into the answers.
+   When set, the form opens with the student's name and code already filled in. */
+const TURN_IN = {
+  FORM: 'https://forms.gle/hmjAUVt8g39BVeT68',
+  PREFILL: ''
+};
 
 /* ---------------- LEVELS ---------------- */
 const LEVELS = {
@@ -2641,7 +2649,7 @@ function codeModal(first) {
     <h2>${first ? '🎉 Here is your save code!' : '🔑 Your save code'}</h2>
     <p>This code IS your progress. Copy it into your notes or write it down. Next time, paste it in to pick up right where you left off.</p>
     <div class="codebox"><div class="small">YOUR CODE</div><div class="code">${esc(code)}</div>
-      <button class="btn sun" data-act="copyCode">📋 Copy my code</button></div>
+      <button class="btn sun" data-act="copyCode">📋 Copy my code</button> <button class="btn teal" data-act="turnIn">📤 Turn in my code</button></div>
     <p class="small muted">Your code changes every time you earn stars, so grab the newest one before you leave.</p>
     <div class="row"><button class="btn ghost" data-act="closeModal">Got it</button><span class="spacer"></span><button class="btn ghost small" data-act="logout">Done for today</button></div>`);
 }
@@ -2969,7 +2977,7 @@ function finishActivity(pct) {
       ${ACT.best >= 3 ? `<p><span class="streak hot">🔥 Best streak: ${ACT.best} in a row</span></p>` : ''}
       ${gearHTML}
       ${improved ? `<div class="codebox"><div class="small">✨ NEW STARS SAVED! YOUR NEW CODE:</div><div class="code">${esc(encodeCode(S))}</div>
-        <button class="btn sun" data-act="copyCode">📋 Copy my code</button></div>`
+        <button class="btn sun" data-act="copyCode">📋 Copy my code</button> <button class="btn teal" data-act="turnIn">📤 Turn in my code</button></div>`
         : `<p class="muted">Your best is still ${before} star${before === 1 ? '' : 's'}, so your code did not change.</p>`}
       <div class="row" style="justify-content:center">
         <button class="btn ghost" data-act="retryAct">↻ Try again</button>
@@ -3495,7 +3503,7 @@ function finishWriting(text) {
       </div>
       <p class="small muted">Your paragraph is not saved in your code, so paste it into Google Classroom or a Doc to keep it!</p>
       ${improved ? `<div class="codebox"><div class="small">✨ STEP ${step} UNLOCKED! YOUR NEW CODE:</div><div class="code">${esc(encodeCode(S))}</div>
-        <button class="btn sun" data-act="copyCode">📋 Copy my code</button></div>` : ''}
+        <button class="btn sun" data-act="copyCode">📋 Copy my code</button> <button class="btn teal" data-act="turnIn">📤 Turn in my code</button></div>` : ''}
       <div class="row" style="justify-content:center">
         <button class="btn ghost" data-act="backSteps">Back to steps</button>
         <button class="btn sun" data-act="goHome">Home</button>
@@ -3626,7 +3634,7 @@ function beeEnd() {
       ${newBadges.map(b => `<div class="unlock"><span class="e">${b.e}</span>New Bee badge: ${b.n}!</div>`).join('')}
       ${improved ? `<p><span class="streak hot">🏆 New personal best: ${best} in a row!</span></p>
         <div class="codebox"><div class="small">✨ NEW BEST SAVED! YOUR NEW CODE:</div><div class="code">${esc(encodeCode(S))}</div>
-        <button class="btn sun" data-act="copyCode">📋 Copy my code</button></div>`
+        <button class="btn sun" data-act="copyCode">📋 Copy my code</button> <button class="btn teal" data-act="turnIn">📤 Turn in my code</button></div>`
         : `<p class="muted">Your best ever is ${best} in a row. Can you beat it?</p>`}
       <div class="row" style="justify-content:center">
         <button class="btn ghost" data-act="openBee">Change settings</button>
@@ -3843,6 +3851,18 @@ function teacherCSV() {
   copyText(lines.join('\n')).then(ok => toast(ok ? 'Copied! Paste into Google Sheets.' : 'Copy failed. Try again.'));
 }
 
+function turnInCode() {
+  const code = encodeCode(S);
+  const url = TURN_IN.PREFILL
+    ? TURN_IN.PREFILL.replace('WCNAME', encodeURIComponent(cap(S.name.toLowerCase()))).replace('WCCODE', encodeURIComponent(code))
+    : TURN_IN.FORM;
+  copyText(code).then(ok => {
+    codeCopied = true;
+    window.open(url, '_blank', 'noopener');
+    toast(TURN_IN.PREFILL ? '📤 Your code is filled in. Just press Submit!' : (ok ? '📤 Code copied! Paste it into the form, then press Submit.' : '📤 Type your code into the form, then press Submit.'));
+  });
+}
+
 /* ---------------- ACTIONS (click router) ---------------- */
 const ACTIONS = {
   goStart: () => { if (S && !codeCopied && !confirm('Did you copy your newest code? Your new stars are only saved in the code.')) return; try { sessionStorage.removeItem('wc_session'); } catch (e) {} renderStart(); },
@@ -3899,6 +3919,7 @@ const ACTIONS = {
   pickNewAvatar: d => { newAvatar = +d.i; const nm = $('#nm').value; renderStart(); $('#nm').value = nm; },
   closeModal: () => closeModal(),
   setLevel: d => { const l = +d.l; closeModal(); if (l !== S.level) { S.level = l; persist(); toast('Trail switched to ' + LEVELS[l].name + '. Your code changed!'); } renderHome(); },
+  turnIn: () => turnInCode(),
   copyCode: () => copyText(encodeCode(S)).then(ok => { if (ok) { codeCopied = true; toast('Code copied! Paste it somewhere safe.'); } else toast('Could not copy. Write it down instead.'); }),
   logout: () => {
     if (!codeCopied && !confirm('Did you save your newest code? Click OK if you have it.')) return;
