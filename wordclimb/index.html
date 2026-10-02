@@ -353,120 +353,160 @@ const LEVELS = {
 };
 
 /* ---------------- SPELLING ----------------
-   Word format: "w[o]rd|categoryIndex|sentence"
-   Brackets mark the spelling pattern. Two brackets = split pattern like c[a]k[e] (a_e).
+   Word format: "w[o]rd|categoryIndex|sentence|optional,custom,distractors"
+   Brackets mark the spelling pattern. Two brackets = split pattern like c[a]k[e] (shown as a … e).
+   Ridge (level 2) uses the class's real Wonders weekly list. Base Camp and Summit use original words.
+   mode 'join' (compound words): use + where two words join closed, a space for open, a hyphen for hyphenated.
 */
-const SPELL = [
+const U1_SPELL = [
   {
     title: 'Short Vowels', short: 'Short vowels',
-    tip: 'Short vowels make a quick sound: a in cat, e in bed, i in pig, o in hot, u in sun. They usually sit between two consonants.',
+    tip: 'Short vowels make a quick sound: a in cat, e in bed, i in pig, o in hot, u in sun. Watch for sneaky spellings: ea can say short e (bread), ai can say short a (plaid), and a can say short o (swan).',
     cats: [
-      { label: 'short a (cat)', chunks: ['a'] }, { label: 'short e (bed)', chunks: ['e'] },
-      { label: 'short i (pig)', chunks: ['i'] }, { label: 'short o (hot)', chunks: ['o'] },
+      { label: 'short a (cat)', chunks: ['a', 'ai'] }, { label: 'short e (bed)', chunks: ['e', 'ea'] },
+      { label: 'short i (pig)', chunks: ['i'] }, { label: 'short o (hot)', chunks: ['o', 'a'] },
       { label: 'short u (sun)', chunks: ['u'] }
     ],
     words: {
       1: ['c[a]mp|0|We will camp by the lake this weekend.', 'sl[e]d|1|She raced her sled down the hill.',
           'br[i]ck|2|The wall is made of red brick.', 'fr[o]g|3|A frog jumped into the pond.',
           'dr[u]m|4|He plays the drum in the band.', 'sn[a]ck|0|I packed a snack for the bus ride.',
-          'sp[e]nd|1|How much money did you spend?', 'bl[o]ck|3|We live on the same block.'],
-      2: ['pl[a]stic|0|Recycle the plastic bottles in the blue bin.', 'm[e]ssage|1|I sent my mom a message.',
-          'tr[i]ckle|2|Water began to trickle from the faucet.', 'c[o]mmon|3|It is common to feel nervous before a test.',
-          'b[u]cket|4|Fill the bucket with water.', 'tr[a]ffic|0|Traffic was slow after the game.',
-          'sk[e]tch|1|She drew a quick sketch of the dog.', 'cr[u]mble|4|The cookie began to crumble in my hand.'],
+          'sp[e]nd|1|How much money did you spend?', 'bl[o]ck|3|We live on the same block.',
+          'tw[i]n|2|My twin sister looks just like me.', 'gr[u]nt|4|The pig let out a loud grunt.'],
+      2: ['gr[a]m|0|A paper clip weighs about one gram.', 'cl[a]sh|0|The two teams will clash on Friday night.',
+          'd[e]nse|1|The fog was so dense we could not see the road.', 'pr[a]nk|0|My brother played a prank on me with a fake spider.',
+          'str[i]ct|2|Our coach is strict about being on time.', 'dr[i]ll|2|We practiced the fire drill this morning.',
+          'sw[a]n|3|A white swan glided across the pond.', 'pr[o]d|3|Do not prod the sleeping dog with a stick.',
+          'shr[u]nk|4|My favorite shirt shrunk in the dryer.', 'sc[u]ff|4|Try not to scuff your new shoes.',
+          'cl[u]tch|4|She made a clutch shot to win the game.', 'thr[ea]t|1|The storm was a threat to the small town.',
+          'dw[e]ll|1|Bats dwell in dark caves.', 'f[u]nd|4|Our class raised money for the trip fund.',
+          't[e]xt|1|Read the text carefully before you answer.', 'r[a]nk|0|What is your rank on the leaderboard?',
+          'br[i]nk|2|The team was on the brink of winning.', 'm[o]ck|3|It is not kind to mock other people.',
+          'pl[ai]d|0|He wore a red plaid jacket.', 'dr[ea]d|1|I dread waking up early on Mondays.'],
       3: ['tr[a]nsfer|0|I want to transfer to a new class.', '[e]ffort|1|Your effort shows in your work.',
           'l[i]mited|2|We have a limited amount of time.', 'c[o]nfident|3|She felt confident before the game.',
           'str[u]ggle|4|It is normal to struggle when learning something new.', 'st[a]mina|0|Running every day builds stamina.',
-          'd[e]licate|1|Handle the delicate glass with care.', 'cr[i]tical|2|Sleep is critical for your brain.']
+          'd[e]licate|1|Handle the delicate glass with care.', 'cr[i]tical|2|Sleep is critical for your brain.',
+          'm[o]dest|3|He stayed modest after winning the award.', 'pl[u]mmet|4|Temperatures can plummet after sunset.']
     }
   },
   {
     title: 'Long Vowels', short: 'Long vowels',
-    tip: 'Long vowels say their own name. Look for vowel teams: ai, ay, a_e for long a. ee, ea for long e. igh, i_e, y for long i. oa, ow, o_e for long o.',
+    tip: 'Long vowels say their own name. Look for the patterns: a_e, ai, ay for long a. ee, ea for long e. i_e, y_e, igh for long i. o_e, oa, oe, ow for long o. u_e, ue for long u.',
     cats: [
-      { label: 'long a (rain)', chunks: ['ai', 'ay', 'a_e'] }, { label: 'long e (seed)', chunks: ['ee', 'ea'] },
-      { label: 'long i (night)', chunks: ['igh', 'i_e', 'y'] }, { label: 'long o (boat)', chunks: ['oa', 'ow', 'o_e'] }
+      { label: 'long a (cake)', chunks: ['a_e', 'ai', 'ay'] }, { label: 'long e (seed)', chunks: ['ee', 'ea'] },
+      { label: 'long i (bike)', chunks: ['i_e', 'y_e', 'igh', 'y'] }, { label: 'long o (boat)', chunks: ['o_e', 'oa', 'oe', 'ow'] },
+      { label: 'long u (cute)', chunks: ['u_e', 'ue', 'ew'] }
     ],
     words: {
       1: ['tr[ai]n|0|The train was late today.', 'pl[ay]|0|Let us play outside after lunch.',
           'sh[ee]p|1|The sheep ate the green grass.', 'dr[ea]m|1|I had a strange dream last night.',
           'n[igh]t|2|The stars come out at night.', 'b[i]k[e]|2|I ride my bike to school.',
-          'b[oa]t|3|We rode a boat across the lake.', 'sn[ow]|3|Snow covered the whole yard.'],
-      2: ['expl[ai]n|0|Can you explain how you got that answer?', 'displ[ay]|0|The art is on display in the hall.',
-          'agr[ee]|1|I agree with your idea.', 'r[ea]son|1|Give one reason for your answer.',
-          'fr[igh]ten|2|Loud thunder can frighten the dog.', 'surv[i]v[e]|2|Plants need water to survive.',
-          'appr[oa]ch|3|The deer ran when we tried to approach.', 'foll[ow]|3|Follow the directions carefully.'],
+          'b[oa]t|3|We rode a boat across the lake.', 'sn[ow]|3|Snow covered the whole yard.',
+          'c[u]b[e]|4|An ice cube melted in my drink.', 'm[u]l[e]|4|The mule carried the heavy bags.'],
+      2: ['sl[o]p[e]|3|We sledded down the steep slope.', 'ac[u]t[e]|4|Owls have an acute sense of hearing.',
+          'rem[o]t[e]|3|Where is the TV remote?', 'b[a]th[e]|0|We had to bathe the muddy dog.',
+          'g[a]z[e]|0|We like to gaze at the stars at night.', 'rh[y]m[e]|2|Can you think of a word that will rhyme with cat?',
+          'k[ee]n|1|Dogs have a keen sense of smell.', 't[i]l[e]|2|A loose tile fell off the bathroom wall.',
+          'f[u]s[e]|4|The lights went out when we blew a fuse.', 'bl[ea]ch|1|Do not get bleach on your clothes.',
+          'l[oa]n|3|My aunt gave me a loan to buy a bike.', 't[o]t[e]|3|She packed her books in a canvas tote bag.',
+          'f[oa]l|3|A baby horse is called a foal.', 'f[oe]|3|The hero finally defeated her foe.',
+          'c[oa]x|3|We tried to coax the cat out from under the bed.', 'bl[ea]k|1|The sky looked gray and bleak.',
+          'contin[ue]|4|We will continue the game after lunch.', 'p[a]v[e]|0|The city plans to pave the dirt road.',
+          'm[ee]k|1|The meek puppy hid behind its mom.', 'shr[i]n[e]|2|People left flowers at the shrine.'],
       3: ['compl[ai]nt|0|The manager listened to the complaint.', 'portr[ay]|0|The actor will portray a famous scientist.',
           'proc[ee]d|1|Please proceed to the next question.', 'r[ea]listic|1|Make sure your goal is realistic.',
           'del[igh]tful|2|We had a delightful time at the fair.', 'recogn[i]z[e]|2|Did you recognize your old friend?',
-          'overfl[ow]|3|Heavy rain made the river overflow.', 'repr[oa]ch|3|Her honesty was beyond reproach.']
+          'overfl[ow]|3|Heavy rain made the river overflow.', 'repr[oa]ch|3|Her honesty was beyond reproach.',
+          'contrib[u]t[e]|4|Everyone can contribute an idea.', 'imm[u]n[e]|4|Some people are immune to poison ivy.']
     }
   },
   {
-    title: 'oo and u Sounds', short: 'oo and u sounds',
-    tip: 'Three sounds to listen for: oo like moon (oo, ew, ue, u_e), oo like book (oo, ou, u), and "you" like cute (u_e, ew, ue).',
+    title: 'Frequently Misspelled Words', short: 'Tricky words',
+    tip: 'These words trip up almost everyone. Some sound like other words (their, there, they\'re). Some have double letters (embarrass). Some have sneaky letters you cannot hear (bought, beautiful). Picture the word in your head!',
     cats: [
-      { label: 'oo like moon', chunks: ['oo', 'ew', 'ue', 'u_e'] },
-      { label: 'oo like book', chunks: ['oo', 'ou', 'u'] },
-      { label: '"you" like cute', chunks: ['u_e', 'ew', 'ue'] }
+      { label: 'Sound-alikes', chunks: [] }, { label: 'Double letters', chunks: [] }, { label: 'Sneaky letters', chunks: [] }
     ],
     words: {
-      1: ['sp[oo]n|0|Eat your soup with a spoon.', 'gr[ew]|0|The plant grew taller this week.',
-          'bl[ue]|0|The sky is bright blue.', 'b[oo]k|1|I left my book in my locker.',
-          'c[ou]ld|1|Could you help me with this?', 'f[oo]t|1|I hurt my foot in gym class.',
-          'c[u]t[e]|2|The puppy is so cute.', 'f[ew]|2|Only a few students were late.'],
-      2: ['ball[oo]n|0|The balloon floated away.', 'cr[ew]|0|The crew worked on the ship all night.',
-          'incl[u]d[e]|0|Please include your name on the paper.', 'underst[oo]d|1|I finally understood the lesson.',
-          'sh[ou]ld|1|You should drink more water.', 'p[u]sh|1|Push the door to open it.',
-          'ref[u]s[e]|2|Do not refuse help when you need it.', 'c[ue]|2|The actor waited for her cue.'],
-      3: ['purs[ue]|0|She will pursue her dream of being a nurse.', 'j[ew]elry|0|The store sells silver jewelry.',
-          'attit[u]d[e]|0|A positive attitude helps you learn.', 'f[oo]tprint|1|We found a footprint in the mud.',
-          'b[u]lletin|1|Check the bulletin board for updates.', 'neighborh[oo]d|1|Our neighborhood has a new park.',
-          'comp[u]t[e]|2|Use a calculator to compute the total.', 'contin[ue]|2|We will continue the story tomorrow.']
+      1: ['you[r]|0|Is this your pencil?|\'re', 'you[\'re]|0|You\'re my best friend.|r',
+          't[oo]|0|I want to come too.|o,wo', 'li[tt]le|1|The little kitten was asleep.|t,tl',
+          'rea[ll]y|1|That movie was really funny.|l,le', 'tomo[rr]ow|1|We have a test tomorrow.|r,w',
+          's[ai]d|2|She said hello to everyone.|e,ay', 'fr[ie]nd|2|My friend sits next to me.|e,ei',
+          'bec[au]se|2|I stayed home because I was sick.|o,aw', 'd[oe]s|2|Does your dog like to swim?|u,o'],
+      2: ['[a]ffect|0|Lack of sleep can affect your mood.|e,i', '[e]ffect|0|The medicine had a calming effect.|a,i',
+          '[ex]cept|0|Everyone came except my cousin.|ac,ax', 'th[eir]|0|The students forgot their homework.|ere,ey\'re',
+          'th[ere]|0|Put your bag over there.|eir,ey\'re', 'th[ey\'re]|0|They\'re going to the game tonight.|eir,ere',
+          'a[cc]use|1|Do not accuse someone without proof.|c,ck', 'emba[rr]a[ss]|1|Please do not embarrass me in front of my friends.|r_ss,rr_s,r_s',
+          'di[ff]erent|1|We each had a different answer.|f,ph', 'especia[ll]y|1|I love fruit, especially mangoes.|l,le',
+          'b[eau]tiful|2|The sunset was beautiful tonight.|eu,ue,ew', 'b[ough]t|2|I bought new shoes at the mall.|aught,ot,awt',
+          'c[augh]t|2|She caught the ball with one hand.|ought,ot,awt', 'b[u]sy|2|My mom is busy at work today.|i,e',
+          'd[o]ne|2|Are you done with your homework?|u,oa', 'min[u]te|2|Wait one minute, please.|i,e',
+          'nick[el]|2|A nickel is worth five cents.|le,al', 'li[br]ary|2|I checked out a book from the library.|b,ber',
+          'prob[ab]ly|2|It will probably rain tomorrow.|a,ib', 'e[x]cuse|2|What is your excuse for being late?|cks,ks'],
+      3: ['consc[ious]|0|He was not conscious of the time.|ience,ous', 'consc[ience]|0|My conscience told me to tell the truth.|ious,ence',
+          'compl[e]ment|0|The red scarf will complement your coat.|i', 'compl[i]ment|0|She gave me a nice compliment on my drawing.|e',
+          'ne[c]e[ss]ary|1|Water is necessary for life.|cc_s,c_s,ss_c', 'o[cc]a[s]ion|1|A wedding is a special occasion.|c_s,cc_ss,c_ss',
+          're[c]o[mm]end|1|I recommend this book to everyone.|cc_m,cc_mm,c_m', 'rh[yth]m|2|Clap along to the rhythm.|ith,ythe',
+          'gove[rn]ment|2|The government passed a new law.|r,rm', 'defin[i]tely|2|I will definitely be there.|a,e']
     }
   },
   {
-    title: 'ar, air, or', short: 'ar, air, or',
-    tip: 'When r comes after a vowel, it bosses the sound around. ar like car. air, are, ear like hair. or, ore, oar, our like storm.',
+    title: 'r-Controlled Vowels', short: 'r-controlled',
+    tip: 'When r comes after a vowel, it bosses the sound around. ar like car. or, our, and sometimes ar like storm (wharf). er, ir, ur, ear like her. ier, eir, eer like deer.',
     cats: [
-      { label: 'ar like car', chunks: ['ar'] },
-      { label: 'air like hair', chunks: ['air', 'are', 'ear'] },
-      { label: 'or like storm', chunks: ['or', 'ore', 'oar', 'our'] }
+      { label: 'ar like car', chunks: ['ar'] }, { label: 'or like storm', chunks: ['or', 'ore', 'oar', 'our', 'ar'] },
+      { label: 'er like her', chunks: ['er', 'ir', 'ur', 'ear', 'or'] }, { label: 'eer like deer', chunks: ['eer', 'ear', 'ier', 'eir'] }
     ],
     words: {
       1: ['f[ar]m|0|The farm has cows and pigs.', 'sh[ar]k|0|A shark swam near the boat.',
-          'h[air]|1|She put her hair in a ponytail.', 'c[are]|1|Take care of your new puppy.',
-          'p[ear]|1|I ate a pear at lunch.', 'st[or]m|2|The storm knocked out the power.',
-          'm[ore]|2|Can I have more time?', 'b[oar]d|2|Write your name on the board.'],
-      2: ['c[ar]toon|0|We watched a cartoon after school.', 'g[ar]den|0|We planted tomatoes in the garden.',
-          'rep[air]|1|Dad will repair the broken chair.', 'comp[are]|1|Compare the two stories.',
-          'aw[are]|1|Be aware of your surroundings.', 'imp[or]tant|2|This is an important test.',
-          'expl[ore]|2|Let us explore the old cave.', 's[oar]|2|Eagles soar high in the sky.'],
+          'st[or]m|1|The storm knocked out the power.', 'm[ore]|1|Can I have more time?',
+          'b[oar]d|1|Write your name on the board.', 'h[er]d|2|A herd of cows crossed the road.',
+          'g[ir]l|2|The girl won the race.', 't[ur]n|2|It is your turn to read.',
+          'd[eer]|3|A deer ran across the road.', 'n[ear]|3|Sit near the door.'],
+      2: ['s[ear]ch|2|I had to search for my lost keys.', 'st[ar]ve|0|Without food, the animals would starve.',
+          'rum[or]|2|Do not believe every rumor you hear.', 'sp[ar]kle|0|The snow seemed to sparkle in the sun.',
+          'b[ar]gain|0|These shoes were a bargain at half price.', 'p[ar]ched|0|After the long hike, my throat felt parched.',
+          'p[ur]sue|2|She plans to pursue a career in music.', 's[er]vant|2|The king\'s servant carried the tray.',
+          't[or]ch|1|The runner carried the Olympic torch.', '[ear]nest|2|He made an earnest promise to do better.',
+          'm[our]n|1|People gathered to mourn the loss of a hero.', 'f[ier]ce|3|The lion let out a fierce roar.',
+          'p[ier]ce|3|A thorn can pierce your skin.', '[ur]ge|2|I had an urge to eat something sweet.',
+          'wh[ar]f|1|Boats were tied up at the wharf.', 'c[our]t|1|The players ran onto the basketball court.',
+          'w[eir]d|3|I heard a weird noise in the attic.', 'fav[or]ite|2|Pizza is my favorite food.',
+          'b[ur]nt|2|The toast was burnt black.', 'rew[ar]d|1|The dog got a treat as a reward.'],
       3: ['h[ar]mony|0|The choir sang in perfect harmony.', 'rem[ar]kable|0|Her progress this year is remarkable.',
-          'd[air]y|1|Milk and cheese are dairy foods.', 'prep[are]|1|We will prepare for the big game.',
-          'nightm[are]|1|I woke up from a scary nightmare.', '[or]chestra|2|She plays violin in the orchestra.',
-          'ign[ore]|2|Try to ignore the noise and focus.', 'c[our]se|2|The race course was very muddy.']
+          '[or]chestra|1|She plays violin in the orchestra.', 'ign[ore]|1|Try to ignore the noise and focus.',
+          'c[our]se|1|The race course was very muddy.', 'int[er]pret|2|Can you interpret this graph?',
+          'c[ir]cumstance|2|Under no circumstance should you give up.', 'dist[ur]bance|2|The fire alarm caused a disturbance.',
+          's[ur]geon|2|The surgeon fixed his broken arm.', 'front[ier]|3|Pioneers moved west to the frontier.']
     }
   },
   {
-    title: 'er, ir, ur', short: 'er, ir, ur',
-    tip: 'er, ir, and ur all make the same sound, like in her, bird, and turn. Your ears cannot tell them apart, so your eyes have to remember which one a word uses.',
+    title: 'Compound Words', short: 'Compound words', mode: 'join',
+    tip: 'A compound word is two or more words put together. Closed compounds join into one word (seashell). Open compounds keep a space (ice cream). Hyphenated compounds use a hyphen (all-star).',
     cats: [
-      { label: 'er like her', chunks: ['er'] }, { label: 'ir like bird', chunks: ['ir'] }, { label: 'ur like turn', chunks: ['ur'] }
+      { label: 'Closed: one word', chunks: [] }, { label: 'Open: with a space', chunks: [] }, { label: 'Hyphen: with a dash', chunks: [] }
     ],
     words: {
-      1: ['h[er]d|0|A herd of cows crossed the road.', 'f[er]n|0|A fern grew in the shady spot.',
-          'g[ir]l|1|The girl won the race.', 'b[ir]d|1|A bird built a nest in the tree.',
-          'sh[ir]t|1|My shirt has a stain on it.', 'h[ur]t|2|Did you hurt your knee?',
-          't[ur]n|2|It is your turn to read.', 'c[ur]l|2|The cat likes to curl up and sleep.'],
-      2: ['p[er]fect|0|Nobody is perfect, and that is okay.', 's[er]vice|0|The service at the restaurant was fast.',
-          'th[ir]sty|1|Running makes me thirsty.', 'c[ir]cle|1|Draw a circle around the answer.',
-          'conf[ir]m|1|Text me to confirm the time.', 'p[ur]pose|2|What is the purpose of this tool?',
-          'ret[ur]n|2|Please return your books by Friday.', 'n[ur]se|2|The nurse checked my temperature.'],
-      3: ['int[er]pret|0|Can you interpret this graph?', 'c[er]tificate|0|She earned a certificate for perfect attendance.',
-          'c[ir]cumstance|1|Under no circumstance should you give up.', 'b[ir]thplace|1|This town is my grandmother\'s birthplace.',
-          'squ[ir]m|1|The puppy started to squirm in my arms.', 'dist[ur]bance|2|The fire alarm caused a disturbance.',
-          's[ur]geon|2|The surgeon fixed his broken arm.', 'p[ur]chase|2|Keep the receipt from your purchase.']
+      1: ['sun+set|0|We watched the sunset from the porch.', 'rain+bow|0|A rainbow appeared after the storm.',
+          'cup+cake|0|I had a chocolate cupcake for my birthday.', 'foot+ball|0|We played football at recess.',
+          'back+pack|0|My backpack is too heavy.', 'ice cream|1|Mint ice cream is my favorite.',
+          'bus stop|1|We waited at the bus stop.', 'living room|1|We watched a movie in the living room.',
+          'T-shirt|2|I wore my favorite T-shirt.', 'forty-two|2|There are forty-two cards left in the deck.'],
+      2: ['heart+beat|0|I could feel my heartbeat racing.', 'north+west|0|The storm is moving to the northwest.',
+          'sea+weed|0|Seaweed wrapped around my ankle.', 'eye+lid|0|A tiny bug landed on my eyelid.',
+          'sea+shell|0|I found a pink seashell on the beach.', 'twenty-five|2|There are twenty-five students in our class.',
+          'wading pool|1|The toddlers splashed in the wading pool.', 'near+sighted|0|I am nearsighted, so I wear glasses to see the board.',
+          'brother-in-law|2|My sister\'s husband is my brother-in-law.', 'old-fashioned|2|Grandpa likes old-fashioned music.',
+          'full-time|2|My dad works a full-time job.', 'wind+shield|0|Rain splattered on the windshield.',
+          'water+melon|0|We ate cold watermelon at the picnic.', 'science fiction|1|I love reading science fiction stories about space.',
+          'self-respect|2|Standing up for yourself shows self-respect.', 'all-star|2|She was picked for the all-star team.',
+          'after-school|2|I go to an after-school program.', 'teen+ager|0|My cousin just became a teenager.',
+          'finger+nail|0|I broke a fingernail opening the box.', 'question mark|1|End a question with a question mark.'],
+      3: ['break+through|0|Scientists made a breakthrough in cancer research.', 'over+whelm|0|Too much homework can overwhelm students.',
+          'counter+part|0|The mayor met with her counterpart from another city.', 'where+abouts|0|Nobody knows the whereabouts of the missing ship.',
+          'post office|1|I mailed the package at the post office.', 'vice president|1|The vice president gave a speech.',
+          'real estate|1|My aunt sells real estate.', 'well-being|2|Exercise improves your well-being.',
+          'editor-in-chief|2|The editor-in-chief approved the article.', 'self-esteem|2|Learning new skills can boost your self-esteem.']
     }
   }
 ];
@@ -474,15 +514,16 @@ const REVIEW_SPELL = { title: 'Unit Review', short: 'Review', tip: 'Mixed words 
 
 const SPELL_ACTS = [
   { id: 'listen', name: 'Listen & Spell', icon: '🎧', desc: 'Hear it, type it.' },
-  { id: 'sort',   name: 'Pattern Sort',   icon: '🧺', desc: 'Sort words by their sound.' },
+  { id: 'sort',   name: 'Pattern Sort',   icon: '🧺', desc: 'Sort words by their pattern.' },
   { id: 'chunk',  name: 'Missing Piece',  icon: '🧩', desc: 'Pick the letters that finish the word.' }
 ];
+const ROUND_SIZE = 10;
 
 /* ---------------- GRAMMAR ----------------
    spot items: mc "sentence|answerIndex"   split "subject | predicate"
    fix items:  choice "prompt|correct|wrong|wrong"   punct "sentence|mark(s)"
 */
-const GRAMMAR = [
+const G_OLD = [
   {
     title: 'Sentences & Fragments',
     tip: 'A complete sentence has a subject (who or what) and a predicate (what they do or are). It is a complete thought. A fragment is missing a piece or leaves you hanging.',
@@ -605,7 +646,99 @@ const GRAMMAR = [
       } }
   }
 ];
-const REVIEW_GRAM = { title: 'Unit Review', tip: 'A mix of everything: fragments, subjects and predicates, kinds of sentences, compound sentences, and run-ons.', ex: [] };
+/* Unit 1 grammar, in the book's order: Sentence Types, Subjects & Predicates, Sentence Combining, Complex Sentences, Run-ons.
+   spot/fix can be one part or a list of parts; a round pulls a random mix of up to 8 questions. */
+const U1_GRAM = [
+  {
+    title: 'Sentence Types & Fragments',
+    tip: 'A statement tells (.). A question asks (?). A command tells someone to do something (. or !). An exclamation shows strong feeling (!). Every sentence needs a subject and a predicate. If it is missing one, it is a fragment.',
+    ex: ['Statement: I like tacos.', 'Question: Do you like tacos?', 'Command: Pass the tacos.', 'Exclamation: These tacos are amazing!', '❌ Fragment: After the bus stopped.'],
+    spot: [G_OLD[2].spot, G_OLD[0].spot],
+    fix: [G_OLD[0].fix, G_OLD[2].fix]
+  },
+  G_OLD[1],
+  {
+    title: 'Sentence Combining',
+    tip: 'Combine short, choppy sentences. Join two sentences with a comma and a FANBOYS word (for, and, nor, but, or, yet, so) to make a compound sentence. Or join subjects (Mia and Jon ate) or predicates (The dog barked and ran).',
+    ex: ['I was tired, but I finished my work.', 'Mia ate. Jon ate. ➜ Mia and Jon ate.', 'Watch out: "Mia and Jon ate" is NOT compound. It has one subject part and one predicate part.'],
+    spot: G_OLD[3].spot,
+    fix: [G_OLD[3].fix, { kind: 'choice', prompt: 'Which choice correctly combines the two sentences?',
+      items: {
+        1: ['Mia ate lunch. Jon ate lunch.|Mia and Jon ate lunch.|Mia ate and Jon lunch.|Mia, Jon ate lunch.',
+            'The dog barked. The dog ran.|The dog barked and ran.|The dog barked, ran.|The dog and barked ran.',
+            'I like apples. I like pears.|I like apples and pears.|I like apples, pears.|I like apples and I pears.'],
+        2: ['The coach cheered. The fans cheered.|The coach and the fans cheered.|The coach cheered and the fans.|The coach, the fans cheered.',
+            'Lena washed the dishes. Lena dried them.|Lena washed the dishes and dried them.|Lena washed and the dishes dried them.|Lena washed the dishes, dried them.',
+            'We can walk to school. We can ride our bikes.|We can walk to school or ride our bikes.|We can walk or to school ride our bikes.|We can walk to school, ride our bikes.'],
+        3: ['The senators debated the bill. The senators voted on it.|The senators debated the bill and voted on it.|The senators debated and the bill voted on it.|The senators debated the bill, voted on it.',
+            'Heavy rain caused flooding. Strong winds caused flooding.|Heavy rain and strong winds caused flooding.|Heavy rain caused and strong winds flooding.|Heavy rain, strong winds caused flooding.',
+            'The scientist collected samples. The scientist did not analyze them.|The scientist collected samples but did not analyze them.|The scientist collected but samples did not analyze them.|The scientist collected samples, did not analyze them.']
+      } }]
+  },
+  {
+    title: 'Complex Sentences',
+    tip: 'A complex sentence has an independent clause (it can stand alone) and a dependent clause (it cannot). Dependent clauses start with words like because, although, when, if, since, after, before, while, until, and unless. If the dependent clause comes first, put a comma after it.',
+    ex: ['✅ When the bell rang, we ran outside.', '✅ We ran outside when the bell rang.', '❌ When the bell rang we ran outside.'],
+    spot: { kind: 'mc', prompt: 'What kind of sentence is this?', options: ['Simple', 'Compound', 'Complex'],
+      items: {
+        1: ['We stayed inside because it was raining.|2', 'I was hungry, so I ate a snack.|1', 'The cat slept on the couch.|0', 'When the bell rang, we left.|2', 'If you need help, ask me.|2', 'I like tacos, and she likes pizza.|1'],
+        2: ['Although the movie was long, everyone loved it.|2', 'The team practiced every day.|0', 'We waited inside until the storm passed.|2', 'Leo studied hard, but the test was tricky.|1', 'Since you finished early, you may read.|2', 'My sister and I cleaned the garage.|0'],
+        3: ['Unless the weather improves, the launch will be delayed.|2', 'The volcano erupted, and ash covered the town.|1', 'Researchers studied the ocean floor for months.|0', 'While the crowd cheered, the runner crossed the finish line.|2', 'The plan was risky, yet the team agreed to try it.|1', 'Because the bridge was damaged, drivers took a longer route.|2']
+      } },
+    fix: [
+      { kind: 'choice', prompt: 'Which word best connects the two ideas?',
+        items: {
+          1: ['___ it was raining, we stayed inside.|Because|And|So', 'I will call you ___ I get home.|when|but|or', '___ you finish your work, you can play.|After|But|And'],
+          2: ['___ the test was hard, I felt ready.|Although|Because|So', 'We cannot go outside ___ the rain stops.|until|and|but', '___ she was tired, Maya finished her essay.|Even though|Because|Or'],
+          3: ['___ the evidence was weak, the jury reached a verdict quickly.|Although|Because|Therefore', 'The launch will be postponed ___ the weather improves.|unless|because|and', '___ the dam was built, the valley no longer flooded every spring.|After|Before|Unless']
+        } },
+      { kind: 'choice', prompt: 'Put the two parts together. Which one is punctuated correctly?',
+        items: {
+          1: ['When the bell rang + we went to lunch|When the bell rang, we went to lunch.|When the bell rang we went to lunch.|When, the bell rang we went to lunch.',
+              'If it snows + we will build a snowman|If it snows, we will build a snowman.|If it snows we will build a snowman.|If, it snows we will build a snowman.',
+              'Before I ate dinner + I did my homework|Before I ate dinner, I did my homework.|Before I ate dinner I did my homework.|Before I ate, dinner I did my homework.'],
+          2: ['Since the store was closed + we went home|Since the store was closed, we went home.|Since the store was closed we went home.|Since the store, was closed we went home.',
+              'While I was reading + the power went out|While I was reading, the power went out.|While I was reading the power went out.|While I was, reading the power went out.',
+              'After the game ended + the fans rushed the field|After the game ended, the fans rushed the field.|After the game ended the fans rushed the field.|After, the game ended the fans rushed the field.'],
+          3: ['Although the author grew up in poverty + she became a famous novelist|Although the author grew up in poverty, she became a famous novelist.|Although the author grew up in poverty she became a famous novelist.|Although, the author grew up in poverty she became a famous novelist.',
+              'Whenever the alarm sounds + students must exit calmly|Whenever the alarm sounds, students must exit calmly.|Whenever the alarm sounds students must exit calmly.|Whenever the alarm, sounds students must exit calmly.',
+              'Until the results are confirmed + the scientists cannot publish|Until the results are confirmed, the scientists cannot publish.|Until the results are confirmed the scientists cannot publish.|Until the results, are confirmed the scientists cannot publish.']
+        } }
+    ]
+  },
+  G_OLD[4]
+];
+const REVIEW_GRAM = { title: 'Unit Review', tip: 'A mix of everything from this unit. Read carefully and take your time.', ex: [] };
+
+/* ---------------- UNITS (mountains) ----------------
+   All six are open from day one. Units without content yet show as "trail being built". */
+const UNITS = [
+  { name: 'Changes', mtn: 'Mount Shift', icon: '🏔️',
+    scene: { sky1: '#7fcbff', sky2: '#c7ecff', back: '#9fc5d8', main: '#5f8f6e', front: '#4c7a5a', cap: '#ffffff' },
+    spell: U1_SPELL, gram: U1_GRAM,
+    eq: ['How do new experiences offer new perspectives?', 'Why do people form alliances?', 'How do life forms vary in different environments?', 'How do natural forces affect Earth?', 'What factors influence how people use money?'] },
+  { name: 'Excursions Across Time', mtn: 'Canyon of Ages', icon: '🏜️',
+    scene: { sky1: '#ffb36b', sky2: '#ffe2b8', back: '#e8a774', main: '#c96b3c', front: '#a5532c', cap: '#f6d2a2' },
+    plan: { spell: ['Irregular Plurals', 'Inflectional Endings', 'Closed Syllables', 'Open Syllables', 'Consonant + le'], gram: ['Kinds of Nouns', 'Singular & Plural Nouns', 'More Plural Nouns', 'Possessive Nouns', 'Appositives'] },
+    eq: ['What contributions were made by early civilizations?', 'How did democracy develop?', 'What was life like for people in ancient cultures?', 'What influences the development of a culture?', 'What can the past teach us?'] },
+  { name: 'Accomplishments', mtn: 'Ember Peak', icon: '🌋',
+    scene: { sky1: '#ff8a7a', sky2: '#ffd0b5', back: '#a77b86', main: '#5c4450', front: '#43303a', cap: '#ff7a1a' },
+    plan: { spell: ['Vowel Team Syllables', 'r-Controlled Syllables', 'Frequently Misspelled Words', 'Prefixes', 'Suffixes -ion, -tion'], gram: ['Action Verbs & Objects', 'Verb Tenses', 'Main & Helping Verbs', 'Linking Verbs', 'Irregular Verbs'] },
+    eq: ['What happens when people share ideas?', 'What kinds of challenges transform people?', 'What can people accomplish by working together?', 'How can one person affect the opinions of others?', 'What steps can people take to promote a healthier environment?'] },
+  { name: 'Challenges', mtn: 'Glacier Ridge', icon: '🧊',
+    scene: { sky1: '#a9d8ff', sky2: '#eaf6ff', back: '#c4dcef', main: '#7fa7c9', front: '#5d87ab', cap: '#ffffff' },
+    plan: { spell: ['More Words with -ion', 'Vowel Alternation', 'Prefixes & Suffixes', 'Greek & Latin Prefixes', 'Consonant Alternation'], gram: ['Pronouns & Antecedents', 'Kinds of Pronouns', 'Possessive Pronouns', 'Pronoun-Verb Agreement', 'More Pronouns'] },
+    eq: ['How do people meet environmental challenges?', 'How do people meet personal challenges?', 'When are decisions hard to make?', 'How do people uncover what they have in common?', 'How can we take responsibility?'] },
+  { name: 'Discoveries', mtn: 'Jungle Summit', icon: '🌴',
+    scene: { sky1: '#8fe3d0', sky2: '#e0fff4', back: '#5cb08f', main: '#2f7d55', front: '#1f5e3e', cap: '#9be36b' },
+    plan: { spell: ['Homophones', 'Words from Around the World', 'Latin Roots', 'Greek Roots', 'Suffixes -ive, -age, -ize'], gram: ['Adjectives', 'Articles & Demonstratives', 'Adjectives That Compare', 'Comparing with More & Most', 'Comparing with Good & Bad'] },
+    eq: ['Why do people tell and retell myths?', 'How do people show inner strength?', 'How do people benefit from innovation?', 'How does technology lead to discoveries?', 'How have tools used for exploration evolved over time?'] },
+  { name: 'Taking Action', mtn: 'Aurora Heights', icon: '🌌',
+    scene: { sky1: '#2b2a6b', sky2: '#6a5acd', back: '#4b4f8f', main: '#2f3566', front: '#22264d', cap: '#b9f6ff' },
+    plan: { spell: ['Suffixes -ible, -able', 'Suffixes -ance, -ence, -ant, -ent', 'Greek Suffixes', 'Absorbed Prefixes', 'Words from Mythology'], gram: ['Adverbs', 'Adverbs That Compare', 'Negatives', 'Prepositions', 'Sentence Combining'] },
+    eq: ['How have people used natural resources?', 'How do we learn about historical events?', 'How can a scientific investigation be an adventure?', 'What can scientists reveal about ancient civilizations?', 'Why is taking a break important?'] }
+];
+const unitReady = u => !!UNITS[u].spell;
 const GRAM_ACTS = [
   { id: 'spot', name: 'Spot It', icon: '🔍', desc: 'Look closely and identify.' },
   { id: 'fix',  name: 'Fix It',  icon: '🔧', desc: 'Pick the version that works.' }
@@ -761,6 +894,112 @@ const WRITING = [
     ]
   }
 ];
+/* Spinner icons for the original topics, and Big Question tags (eq: [unit, week]) */
+[['🎁', '🌟', '🧗'], ['🦈', '😴', '🌋'], ['📱', '⏰', '👕']].forEach((icons, t) => icons.forEach((ic, i) => WRITING[t].topics[i].icon = ic));
+WRITING[1].topics[2].eq = [0, 3];
+
+WRITING[0].topics.push(
+  { title: 'A new experience that changed my mind', icon: '🔄', eq: [0, 0], ideas: {
+    where: ['at a new school', 'on my first trip to a big city', 'at summer camp', 'at my first job', 'on a team I had never played on'],
+    who: ['my family', 'a new friend', 'my coach', 'my cousin', 'people I had just met'],
+    start: ['I was sure I would hate it', 'I did not know anyone there', 'I thought I already knew what to expect', 'I was nervous and wanted to go home'],
+    event: ['someone invited me to join them', 'I tried something I had always avoided', 'I saw things from someone else\'s point of view', 'I found out I was actually good at it', 'a stranger helped me when I was stuck'],
+    why: ['I had judged it too quickly', 'it was nothing like I imagined', 'I had never given it a real chance'],
+    resolve: ['I ended up having a great time', 'I made a friend I still talk to', 'I asked to go back again', 'I left with a whole new opinion'],
+    lesson: ['new experiences can change how you see things', 'first impressions are not always right', 'it is worth giving things a chance'] } },
+  { title: 'A time I teamed up with someone', icon: '🤝', eq: [0, 1], ideas: {
+    where: ['at practice', 'in science class', 'at home', 'at a game', 'in my neighborhood'],
+    who: ['my best friend', 'my little sister', 'a classmate I barely knew', 'my team', 'my grandpa'],
+    start: ['we had a big job to finish', 'neither of us could do it alone', 'we did not get along at first', 'we were running out of time'],
+    event: ['we figured out how to split the work', 'we came up with a plan together', 'we each used our own strengths', 'we almost gave up but kept going'],
+    why: ['we were stronger together', 'I could not have done it by myself', 'we finally trusted each other'],
+    resolve: ['we finished just in time', 'we won the game', 'our project turned out great', 'we celebrated with high fives'],
+    lesson: ['teamwork makes hard things easier', 'everyone brings something different', 'working together builds trust'] } },
+  { title: 'My first time doing something scary', icon: '😱', ideas: {
+    where: ['at the pool', 'on stage', 'at an amusement park', 'at a tryout', 'in front of my class'],
+    who: ['my friends', 'my family', 'my teammates', 'my teacher', 'my older brother'],
+    start: ['my hands were shaking', 'I kept thinking about everything that could go wrong', 'everyone else seemed calm', 'I almost turned around and left'],
+    event: ['I jumped off the high dive', 'I gave my speech', 'I rode the tallest ride', 'I tried out for the team', 'I sang in front of everyone'],
+    why: ['I had never done anything like it', 'everyone was watching me', 'I was afraid I would mess up'],
+    resolve: ['I did it and felt amazing', 'everyone cheered for me', 'I wanted to do it again', 'I realized it was not so bad'],
+    lesson: ['being brave does not mean you are not scared', 'fear gets smaller when you face it', 'I can do hard things'] } }
+);
+
+WRITING[1].topics.push(
+  { title: 'Animals in extreme places', icon: '🐫', eq: [0, 2], ideas: {
+    topic: ['animals in extreme environments'],
+    fact: ['camels can go days without drinking water', 'polar bears have black skin under their white fur', 'some fish live in the deepest parts of the ocean', 'penguins huddle together to stay warm', 'desert foxes have big ears that help them cool down'],
+    detail: ['the fennec fox lives in the Sahara Desert', 'emperor penguins survive winters in Antarctica', 'tardigrades are tiny animals that can survive extreme heat and cold'],
+    why: ['it shows how living things adapt to survive', 'it helps scientists understand life on Earth', 'it reminds us how amazing nature is'],
+    hook: ['How does a fox survive in a blazing hot desert?', 'Imagine living somewhere colder than a freezer.', 'Some animals thrive in places that would harm humans.'],
+    thesis: ['how animals adapt to extreme places', 'what helps animals survive harsh environments', 'why some animals live where others cannot'],
+    effect: ['each animal has special features for its home', 'animals can survive where humans would struggle', 'scientists keep finding new ways animals adapt'] } },
+  { title: 'Saving money', icon: '💰', eq: [0, 4], ideas: {
+    topic: ['saving money'],
+    fact: ['saving means keeping money to use later', 'a bank can keep your money safe', 'some savings accounts pay you interest', 'a budget is a plan for how to spend money', 'small amounts saved often can add up over time'],
+    detail: ['saving five dollars a week adds up to 260 dollars in a year', 'many people save for big things like a car or college', 'an emergency fund helps when something unexpected happens'],
+    why: ['money choices affect our future', 'everyone has to handle money someday', 'saving helps people reach their goals'],
+    hook: ['What would you buy if you saved for a whole year?', 'Money does not grow on trees, but it can grow in a bank.', 'Small choices with money can lead to big results.'],
+    thesis: ['why saving money matters', 'how people can save money', 'how a budget helps people plan'],
+    effect: ['people who save are more ready for surprises', 'saving can help people buy things they really want', 'good money habits can last a lifetime'] } },
+  { title: 'Service dogs', icon: '🦮', ideas: {
+    topic: ['service dogs'],
+    fact: ['service dogs are trained to help people with disabilities', 'some service dogs guide people who are blind', 'training a service dog can take up to two years', 'service dogs are allowed in many places pets cannot go', 'some service dogs can sense when a person needs medical help'],
+    detail: ['a guide dog stops at curbs to keep its owner safe', 'some dogs can alert a person before a seizure', 'you should not pet a service dog while it is working'],
+    why: ['service dogs help people live more independently', 'people should know how to act around a working dog', 'these dogs do important jobs every day'],
+    hook: ['What dog has a full-time job?', 'Some dogs go to work every single day.', 'A service dog is not a pet. It is a partner.'],
+    thesis: ['what service dogs do', 'how service dogs are trained', 'why service dogs are so important'],
+    effect: ['their owners can do more on their own', 'service dogs earn a lot of trust', 'many people depend on them every day'] } }
+);
+
+WRITING[2].topics.push(
+  { title: 'Paid for good grades?', icon: '💵', eq: [0, 4], ideas: { issue: ['students should be paid for good grades'] },
+    sides: [
+      { label: 'YES, pay them', ideas: {
+        claim: ['students should be paid for good grades', 'students should earn money for good grades'],
+        reason: ['money can motivate students to work harder', 'it teaches that hard work pays off', 'students could learn to save and budget', 'it rewards effort in a way students care about'],
+        evidence: ['adults get paid for doing their jobs well', 'a student might study more for a reward', 'earning money can teach responsibility'],
+        counter: ['students should learn for the love of learning', 'it would cost too much'],
+        rebuttal: ['rewards can help students build good habits first', 'even small rewards can make a big difference'] } },
+      { label: 'NO, keep money out', ideas: {
+        claim: ['students should not be paid for good grades', 'grades should not come with a paycheck'],
+        reason: ['learning should be its own reward', 'students might stop trying when the money stops', 'it is not fair to students who try hard but struggle', 'it could put unhealthy pressure on students'],
+        evidence: ['some students might cheat to get the money', 'not every family can afford to pay', 'the real reward is getting smarter'],
+        counter: ['money motivates students', 'adults get paid for their work'],
+        rebuttal: ['motivation from money does not last', 'school is about learning, not a paycheck'] } }
+    ] },
+  { title: 'Team or solo?', icon: '👥', eq: [0, 1], ideas: { issue: ['students learn better working in teams'] },
+    sides: [
+      { label: 'TEAMS are better', ideas: {
+        claim: ['students learn better working in teams', 'group work is better than working alone'],
+        reason: ['students can share ideas', 'teammates can help each other understand', 'teamwork is a skill needed for jobs', 'big projects get done faster'],
+        evidence: ['explaining something to a friend helps you learn it', 'most jobs require working with others', 'one student might be great at art while another is great at writing'],
+        counter: ['some students do all the work', 'groups can be loud and distracting'],
+        rebuttal: ['teachers can give each person a clear job', 'learning to work through problems is part of the lesson'] } },
+      { label: 'SOLO is better', ideas: {
+        claim: ['students learn better working alone', 'working alone is better than group work'],
+        reason: ['students can work at their own pace', 'there are fewer distractions', 'each student is responsible for their own work', 'quiet helps many people think'],
+        evidence: ['one person in a group often ends up doing most of the work', 'some students focus better in a quiet space', 'tests are taken alone, so practice should be too'],
+        counter: ['teamwork is an important skill', 'groups can share ideas'],
+        rebuttal: ['students can still share ideas after working alone', 'students also need to learn to work independently'] } }
+    ] },
+  { title: 'Four-day school week?', icon: '📅', ideas: { issue: ['schools should have a four-day week'] },
+    sides: [
+      { label: 'YES, four days', ideas: {
+        claim: ['schools should switch to a four-day week', 'a four-day school week is a good idea'],
+        reason: ['students would have more time to rest', 'teachers would have more time to plan', 'families would have more time together', 'students might be more focused when they are in school'],
+        evidence: ['some school districts already use a four-day week', 'a three-day weekend gives time for appointments', 'rested students often pay better attention'],
+        counter: ['school days would be longer', 'families would need childcare on the extra day'],
+        rebuttal: ['longer days can include more breaks', 'many communities offer programs on the day off'] } },
+      { label: 'NO, keep five days', ideas: {
+        claim: ['schools should keep a five-day week', 'a four-day school week is a bad idea'],
+        reason: ['longer school days would be exhausting', 'students might forget more over a long weekend', 'working parents would need childcare', 'students who rely on school meals would miss a day'],
+        evidence: ['younger students have a hard time focusing for long days', 'many families cannot take an extra day off work', 'school lunch is the main meal for some students'],
+        counter: ['students need more rest', 'teachers need planning time'],
+        rebuttal: ['rest can come from lighter homework loads', 'planning time can be built into the regular week'] } }
+    ] }
+);
+
 const WRITE_STEPS = [
   { name: 'Build It', icon: '🧱', desc: 'Tap word cards to fill in the blanks.' },
   { name: 'Boost It', icon: '🚀', desc: 'Type your own words in the blanks. Ideas are there if you need them.' },
@@ -772,19 +1011,26 @@ const FREE_WORDS = { 1: 30, 2: 55, 3: 80 };
 const AVATARS = ['🐐', '🦊', '🐻', '🐼', '🐸', '🦉', '🐱', '🐶', '🐧', '🦁', '🐯', '🐨', '🦖', '🐉', '🤖', '👽'];
 const GEAR = [
   { at: 3, e: '🧢', n: 'Trail Cap' }, { at: 8, e: '🥾', n: 'Boots' }, { at: 15, e: '🎒', n: 'Backpack' },
-  { at: 24, e: '🧭', n: 'Compass' }, { at: 34, e: '🪢', n: 'Rope' }, { at: 45, e: '🔦', n: 'Headlamp' },
-  { at: 58, e: '🧤', n: 'Gloves' }, { at: 72, e: '⛺', n: 'Tent' }, { at: 86, e: '🥇', n: 'Gold Medal' }, { at: 99, e: '🚩', n: 'Summit Flag' }
+  { at: 25, e: '🧭', n: 'Compass' }, { at: 40, e: '🪢', n: 'Rope' }, { at: 60, e: '🔦', n: 'Headlamp' },
+  { at: 85, e: '🧤', n: 'Gloves' }, { at: 115, e: '⛺', n: 'Tent' }, { at: 150, e: '🕶️', n: 'Shades' },
+  { at: 190, e: '📸', n: 'Camera' }, { at: 240, e: '🔭', n: 'Telescope' }, { at: 300, e: '🛷', n: 'Sled' },
+  { at: 370, e: '🪂', n: 'Parachute' }, { at: 450, e: '🥇', n: 'Gold Medal' }, { at: 549, e: '🚩', n: 'Summit Flag' }
 ];
 const WEEK_COLORS = ['#ef5b3f', '#f29d16', '#2fae5b', '#2f86e0', '#8a4fd8', '#e2468f'];
 const CONFETTI_COLORS = ['#ef5b3f', '#f29d16', '#ffd23c', '#2fae5b', '#2f86e0', '#8a4fd8', '#e2468f'];
 
 /* ---------------- SAVE CODE ----------------
-   Slots (2 bits each, value 0-3):
-   week w: spelling acts at w*5+0..2, grammar acts at w*5+3..4  (6 weeks = 30 slots)
-   writing types at 30..32 (value = steps completed)
+   Each unit has 30 slots (2 bits each, value 0-3 stars):
+   week w: spelling acts at w*5+0..2, grammar acts at w*5+3..4  (6 weeks incl. review)
+   Writing: 3 slots (steps completed per writing type), shared across units.
+
+   v3 layout (sparse, so codes stay short even with a whole year of progress):
+     version(3) level(2) avatar(4) prefs(4) currentUnit(3) writing(3x2)
+     then per unit: 1 bit "has progress"; if set, per week: 1 bit "has progress";
+       if set: 1 bit "all 3 stars" (mastered) or 0 followed by 5x2 bits of stars.
+   v1 and v2 codes (one unit, flat) still load.
 */
-const WEEKS = 6, SLOTS = 33, CODE_VERSION = 2;
-/* v2 header: version(3) level(2) avatar(4) prefs(4: read, slow, sound, calm). v1 codes had no avatar/prefs. */
+const NUM_UNITS = 6, WEEKS = 6, UNIT_SLOTS = 30, CODE_VERSION = 3;
 const PREF_KEYS = ['read', 'slow', 'sound', 'calm'];
 function defaultPrefs() {
   let calm = false;
@@ -794,14 +1040,29 @@ function defaultPrefs() {
 const AB = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
 const spellSlot = (w, a) => w * 5 + a;
 const gramSlot = (w, a) => w * 5 + 3 + a;
-const writeSlot = t => 30 + t;
+const emptyUnits = () => Array.from({ length: NUM_UNITS }, () => new Array(UNIT_SLOTS).fill(0));
+function newStudent(name, level, avatar) {
+  return { name, level, avatar, prefs: defaultPrefs(), unit: 0, u: emptyUnits(), w: [0, 0, 0] };
+}
 
 function fnv(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
 const bitsOf = (n, len) => n.toString(2).padStart(len, '0');
 
 function encodeCode(st) {
   let bits = bitsOf(CODE_VERSION, 3) + bitsOf(st.level - 1, 2) + bitsOf(st.avatar || 0, 4)
-    + PREF_KEYS.map(k => st.prefs[k] ? '1' : '0').join('') + st.prog.map(v => bitsOf(v, 2)).join('');
+    + PREF_KEYS.map(k => st.prefs[k] ? '1' : '0').join('') + bitsOf(st.unit || 0, 3)
+    + st.w.map(v => bitsOf(v, 2)).join('');
+  for (let u = 0; u < NUM_UNITS; u++) {
+    const arr = st.u[u];
+    if (!arr.some(v => v)) { bits += '0'; continue; }
+    bits += '1';
+    for (let w = 0; w < WEEKS; w++) {
+      const wk = arr.slice(w * 5, w * 5 + 5);
+      if (!wk.some(v => v)) { bits += '0'; continue; }
+      bits += '1';
+      bits += wk.every(v => v === 3) ? '1' : '0' + wk.map(v => bitsOf(v, 2)).join('');
+    }
+  }
   while (bits.length % 5) bits += '0';
   let data = '';
   for (let i = 0; i < bits.length; i += 5) data += AB[parseInt(bits.slice(i, i + 5), 2)];
@@ -825,24 +1086,35 @@ function decodeCode(raw) {
   if (AB[c >> 5] + AB[c & 31] !== chk) throw new Error('That code does not match. Check each letter and number carefully.');
   let bits = '';
   for (const ch of body) bits += bitsOf(AB.indexOf(ch), 5);
-  bits = bits.padEnd(3 + 2 + 4 + 4 + SLOTS * 2, '0');
-  const ver = parseInt(bits.slice(0, 3), 2);
-  if (ver !== 1 && ver !== 2) throw new Error('That code is from a different version of WordClimb.');
-  const level = parseInt(bits.slice(3, 5), 2) + 1;
+  let p = 0;
+  const read = n => { const seg = bits.slice(p, p + n).padEnd(n, '0'); p += n; return parseInt(seg, 2); };
+  const ver = read(3);
+  if (ver < 1 || ver > 3) throw new Error('That code is from a different version of WordClimb.');
+  const level = read(2) + 1;
   if (level > 3) throw new Error('That code does not look right.');
-  let avatar = 0, prefs = defaultPrefs(), p = 5;
-  if (ver === 2) {
-    avatar = parseInt(bits.slice(5, 9), 2);
-    prefs = {}; PREF_KEYS.forEach((k, i) => prefs[k] = bits[9 + i] === '1');
-    p = 13;
+  const st = newStudent(name, level, 0);
+  if (ver >= 2) { st.avatar = read(4); PREF_KEYS.forEach(k => st.prefs[k] = read(1) === 1); }
+  if (ver <= 2) {
+    // Older codes: one unit stored flat (30 slots), then 3 writing slots.
+    for (let k = 0; k < 30; k++) st.u[0][k] = read(2);
+    for (let t = 0; t < 3; t++) st.w[t] = read(2);
+    return st;
   }
-  const prog = [];
-  for (let k = 0; k < SLOTS; k++) prog.push(parseInt(bits.slice(p + k * 2, p + 2 + k * 2), 2));
-  return { name, level, avatar, prefs, prog };
+  st.unit = Math.min(read(3), NUM_UNITS - 1);
+  for (let t = 0; t < 3; t++) st.w[t] = read(2);
+  for (let u = 0; u < NUM_UNITS; u++) {
+    if (!read(1)) continue;
+    for (let w = 0; w < WEEKS; w++) {
+      if (!read(1)) continue;
+      const mastered = read(1);
+      for (let a = 0; a < 5; a++) st.u[u][w * 5 + a] = mastered ? 3 : read(2);
+    }
+  }
+  return st;
 }
 
 /* ---------------- STATE ---------------- */
-let S = null;               // { name, level, prog }
+let S = null;               // { name, level, avatar, prefs, unit, u: [6 units x 30 slots], w: [3 writing] }
 let codeCopied = true;      // has the newest code been copied/seen?
 let ACT = null;             // current activity
 let WS = null;              // writing state
@@ -857,12 +1129,16 @@ function persist() {
   codeCopied = false;
   try { sessionStorage.setItem('wc_session', encodeCode(S)); } catch (e) {}
 }
+const UP = () => S.u[S.unit];                 // progress slots for the current unit
+const USP = () => UNITS[S.unit].spell;        // spelling weeks for the current unit
+const UGR = () => UNITS[S.unit].gram;         // grammar weeks for the current unit
+function unitStars(st, u) { return st.u[u].reduce((a, b) => a + b, 0); }
 function totalStars(st = S) {
-  let n = 0; for (let k = 0; k < 30; k++) n += st.prog[k];
-  for (let t = 0; t < 3; t++) n += st.prog[writeSlot(t)];
+  let n = st.w.reduce((a, b) => a + b, 0);
+  for (let u = 0; u < NUM_UNITS; u++) n += unitStars(st, u);
   return n;
 }
-const MAX_STARS = 30 * 3 + 9;
+const UNIT_MAX = UNIT_SLOTS * 3;
 
 /* ---------------- HELPERS ---------------- */
 const $ = (s, el = document) => el.querySelector(s);
@@ -1067,28 +1343,32 @@ function renderStart(msg) {
   if (f) { f.focus(); f.addEventListener('keydown', e => { if (e.key === 'Enter') ACTIONS[startTab === 'new' ? 'startNew' : 'loadCode'](); }); }
 }
 
-/* ---------------- HOME ---------------- */
-function weekStars(w) {
-  let n = 0; for (let a = 0; a < 3; a++) n += S.prog[spellSlot(w, a)];
-  for (let a = 0; a < 2; a++) n += S.prog[gramSlot(w, a)];
+/* ---------------- HOME: MOUNTAIN RANGE + UNIT TRAIL MAPS ---------------- */
+function weekStars(w, u = S.unit, st = S) {
+  let n = 0; for (let a = 0; a < 5; a++) n += st.u[u][w * 5 + a];
   return n;
 }
+// The mountain artwork, painted in each unit's colors.
+function mountainArt(sc) {
+  return `<polygon points="0,370 0,290 90,200 200,270 430,140 560,230 640,170 640,370" fill="${sc.back}"/>
+    <polygon points="0,370 120,252 180,272 330,22 470,212 530,182 640,300 640,370" fill="${sc.main}"/>
+    <polygon points="330,22 288,82 308,74 330,90 352,72 374,84" fill="${sc.cap}"/>
+    <polygon points="0,370 0,340 160,330 330,350 520,320 640,338 640,370" fill="${sc.front}"/>`;
+}
 const CAMPS = [[110, 320], [270, 284], [165, 228], [350, 192], [235, 138], [335, 82]];
-function trailMap() {
-  let cur = 0; while (cur < WEEKS && weekStars(cur) === 15) cur++;
+function trailMap(u) {
+  const sc = UNITS[u].scene;
+  let cur = 0; while (cur < WEEKS && weekStars(cur, u) === 15) cur++;
   const at = cur < WEEKS ? CAMPS[cur] : [330, 26];
   const pts = CAMPS.map(p => p.join(',')).join(' ') + ' 330,26';
-  return `<div class="map-card"><svg viewBox="0 0 640 370" role="img" aria-label="Unit 1 trail map">
+  return `<div class="map-card" style="background:linear-gradient(180deg, ${sc.sky1} 0%, ${sc.sky2} 60%, #fff4e2 100%)"><svg viewBox="0 0 640 370" role="img" aria-label="${esc(UNITS[u].mtn)} trail map">
     <circle cx="560" cy="62" r="34" fill="#ffd23c"/><circle cx="560" cy="62" r="46" fill="#ffd23c" opacity=".25"/>
-    <g fill="#fff" opacity=".9"><ellipse cx="110" cy="60" rx="46" ry="14"/><ellipse cx="140" cy="50" rx="30" ry="14"/><ellipse cx="470" cy="110" rx="40" ry="12"/></g>
-    <polygon points="0,370 0,290 90,200 200,270 430,140 560,230 640,170 640,370" fill="#9fc5d8"/>
-    <polygon points="0,370 120,252 180,272 330,22 470,212 530,182 640,300 640,370" fill="#5f8f6e"/>
-    <polygon points="330,22 288,82 308,74 330,90 352,72 374,84" fill="#fff"/>
-    <polygon points="0,370 0,340 160,330 330,350 520,320 640,338 640,370" fill="#4c7a5a"/>
+    <g fill="#fff" opacity=".85"><ellipse cx="110" cy="60" rx="46" ry="14"/><ellipse cx="140" cy="50" rx="30" ry="14"/><ellipse cx="470" cy="110" rx="40" ry="12"/></g>
+    ${mountainArt(sc)}
     <polyline points="${pts}" fill="none" stroke="#fff" stroke-width="5" stroke-dasharray="2 12" stroke-linecap="round"/>
     <g><line x1="330" y1="26" x2="330" y2="-4" stroke="#333" stroke-width="3"/><polygon points="330,-4 356,4 330,12" fill="#ef5b3f"/></g>
     ${CAMPS.map(([x, y], w) => {
-      const st = weekStars(w), c = WEEK_COLORS[w], done = st === 15;
+      const st = weekStars(w, u), c = WEEK_COLORS[w], done = st === 15;
       const lx = x < 250 ? x - 34 : x + 34, anchor = x < 250 ? 'end' : 'start';
       return `<g class="camp" data-act="openWeek" data-w="${w}">
         <circle class="ring" cx="${x}" cy="${y}" r="22" fill="${st ? c : '#fff'}" stroke="${c}" stroke-width="5"/>
@@ -1100,35 +1380,40 @@ function trailMap() {
     <text class="climber" x="${at[0] + (cur < WEEKS && at[0] < 250 ? 30 : -30)}" y="${at[1] - 16}" text-anchor="middle" font-size="36">${AVATARS[S.avatar || 0]}</text>
   </svg></div>`;
 }
+function miniMountain(u) {
+  const sc = UNITS[u].scene;
+  return `<svg viewBox="0 0 640 370" style="width:100%;height:auto;display:block;border-radius:12px;background:linear-gradient(180deg, ${sc.sky1}, ${sc.sky2})">${mountainArt(sc)}
+    ${S.unit === u ? `<text x="330" y="70" text-anchor="middle" font-size="90">${AVATARS[S.avatar || 0]}</text>` : ''}</svg>`;
+}
+function goalHTML() {
+  const total = totalStars(), ng = nextGear(total), have = gearAt(total);
+  const prevAt = have.length ? have[have.length - 1].at : 0;
+  return ng ? `<div class="goal"><span class="e">${ng.e}</span><div style="flex:1">
+      <b>${ng.at - total} more star${ng.at - total === 1 ? '' : 's'} to unlock the ${ng.n}!</b>
+      <div class="meter"><div style="width:${Math.round((total - prevAt) / (ng.at - prevAt) * 100)}%"></div></div></div></div>`
+    : `<div class="goal"><span class="e">🏆</span><b>You collected every piece of gear. Summit legend!</b></div>`;
+}
 
 function renderHome() {
   ACT = null; WS = null; renderTop();
-  const total = totalStars(), ng = nextGear(total), have = gearAt(total);
-  const prevAt = have.length ? have[have.length - 1].at : 0;
+  const total = totalStars();
   render(`
     <div class="row" style="margin-bottom:12px">
       <div><h1 style="margin:0">Hey, ${esc(cap(S.name.toLowerCase()))}! ${AVATARS[S.avatar || 0]}</h1>
-      <div class="muted">${LEVELS[S.level].icon} ${LEVELS[S.level].name} trail · ★ ${total} of ${MAX_STARS} stars</div></div>
+      <div class="muted">${LEVELS[S.level].icon} ${LEVELS[S.level].name} trail · ★ ${total} stars</div></div>
     </div>
-
-    ${trailMap()}
-
-    ${ng ? `<div class="goal"><span class="e">${ng.e}</span><div style="flex:1">
-        <b>${ng.at - total} more star${ng.at - total === 1 ? '' : 's'} to unlock the ${ng.n}!</b>
-        <div class="meter"><div style="width:${Math.round((total - prevAt) / (ng.at - prevAt) * 100)}%"></div></div></div></div>`
-      : `<div class="goal"><span class="e">🏆</span><b>You collected every piece of gear. Summit legend!</b></div>`}
-
-    <h2>Unit 1 Weeks</h2>
+    ${goalHTML()}
+    <h2>Pick a mountain</h2>
     <div class="grid g3" style="margin-bottom:26px">
-      ${Array.from({ length: WEEKS }, (_, w) => {
-        const st = weekStars(w), sp = w < 5 ? SPELL[w] : REVIEW_SPELL, gr = w < 5 ? GRAMMAR[w] : REVIEW_GRAM;
-        return `<button class="week" style="--c:${WEEK_COLORS[w]}" data-act="openWeek" data-w="${w}">
-          ${st === 15 ? '<span class="done">🏁</span>' : ''}
-          <div class="num">${w < 5 ? 'Week ' + (w + 1) : 'Week 6 · Review'}</div>
-          <h3>${esc(sp.title)}</h3>
-          <div class="small muted">Grammar: ${esc(gr.title)}</div>
-          <div class="meter"><div style="width:${Math.round(st / 15 * 100)}%"></div></div>
-          <div class="small" style="margin-top:6px">${st === 15 ? 'Camp complete!' : `★ ${st} / 15 · ${15 - st} to go`}</div>
+      ${UNITS.map((U, u) => {
+        const st = unitStars(S, u), ready = unitReady(u);
+        return `<button class="week" style="--c:${U.scene.main}" data-act="openUnit" data-u="${u}">
+          ${miniMountain(u)}
+          <div class="num" style="margin-top:10px">Unit ${u + 1} · ${esc(U.name)}</div>
+          <h3>${U.icon} ${esc(U.mtn)}</h3>
+          ${ready ? `<div class="meter"><div style="width:${Math.round(st / UNIT_MAX * 100)}%"></div></div>
+            <div class="small" style="margin-top:6px">★ ${st} / ${UNIT_MAX}${S.unit === u ? ' · 📍 You are here' : ''}</div>`
+            : `<div class="small muted" style="margin-top:6px">🚧 Trail being built</div>`}
         </button>`;
       }).join('')}
     </div>
@@ -1136,7 +1421,7 @@ function renderHome() {
     <h2>Writing Studio</h2>
     <div class="grid g3" style="margin-bottom:26px">
       ${WRITING.map((t, i) => {
-        const done = S.prog[writeSlot(i)];
+        const done = S.w[i];
         return `<button class="week" style="--c:#0f9a88" data-act="openWriting" data-t="${i}">
           <div style="font-size:2rem">${t.icon}</div>
           <h3>${t.name}</h3>
@@ -1151,9 +1436,53 @@ function renderHome() {
     </div>`);
 }
 
+function openUnit(u) {
+  if (!unitReady(u)) {
+    const P = UNITS[u].plan;
+    modal(`<h2>${UNITS[u].icon} ${esc(UNITS[u].mtn)}</h2><p class="muted">Unit ${u + 1}: ${esc(UNITS[u].name)}</p>
+      <p>🚧 This trail is still being built. Here is what is coming:</p>
+      <ol>${P.spell.map((sp, w) => `<li><b>${esc(sp)}</b> · ${esc(P.gram[w])}</li>`).join('')}</ol>
+      <button class="btn teal" data-act="closeModal">Got it</button>`);
+    return;
+  }
+  if (S.unit !== u) { S.unit = u; saveSettings(); }
+  renderUnit();
+}
+
+function renderUnit() {
+  ACT = null; WS = null; renderTop();
+  const u = S.unit, U = UNITS[u], st = unitStars(S, u);
+  render(`
+    <button class="btn ghost small" data-act="goHome">← All mountains</button>
+    <div class="band" style="margin-top:12px;background:linear-gradient(135deg, ${U.scene.main}, ${U.scene.front})">
+      <span class="big">${U.icon}</span><span class="ttl" style="font-size:1.5rem">Unit ${u + 1}: ${esc(U.mtn)}<div class="small" style="font-weight:500">${esc(U.name)}</div></span>
+      <span class="streak">★ ${st} / ${UNIT_MAX}</span></div>
+    ${trailMap(u)}
+    <div class="grid g3" style="margin-bottom:26px">
+      ${Array.from({ length: WEEKS }, (_, w) => {
+        const ws = weekStars(w), sp = w < 5 ? U.spell[w] : REVIEW_SPELL, gr = w < 5 ? U.gram[w] : REVIEW_GRAM;
+        return `<button class="week" style="--c:${WEEK_COLORS[w]}" data-act="openWeek" data-w="${w}">
+          ${ws === 15 ? '<span class="done">🏁</span>' : ''}
+          <div class="num">${w < 5 ? 'Week ' + (w + 1) : 'Week 6 · Review'}</div>
+          <h3>${esc(sp.title)}</h3>
+          <div class="small muted">Grammar: ${esc(gr.title)}</div>
+          <div class="meter"><div style="width:${Math.round(ws / 15 * 100)}%"></div></div>
+          <div class="small" style="margin-top:6px">${ws === 15 ? 'Camp complete!' : `★ ${ws} / 15 · ${15 - ws} to go`}</div>
+        </button>`;
+      }).join('')}
+    </div>`);
+}
+
 /* ---------------- WEEK SCREEN ---------------- */
+const JOIN_OPTS = ['🔗 One word', '␣ Space', '➖ Hyphen'];
+const JOIN_HINT = ['(one word)', '(two words)', '(with hyphens)'];
 function parseWord(str, wk) {
-  const [raw, cat, sentence] = str.split('|');
+  const [raw, cat, sentence, alts] = str.split('|');
+  if (USP()[wk].mode === 'join') {
+    const segs = raw.split(/[+ \-]/);
+    return { word: raw.replace(/\+/g, ''), parts: [{ t: raw.replace(/\+/g, '') }], join: true, segs,
+      chunk: JOIN_OPTS[+cat], cat: +cat, sentence, wk };
+  }
   const parts = [], chunks = [];
   const re = /\[([^\]]+)\]/g; let last = 0, m;
   while ((m = re.exec(raw))) {
@@ -1161,34 +1490,41 @@ function parseWord(str, wk) {
     parts.push({ b: m[1] }); chunks.push(m[1]); last = re.lastIndex;
   }
   if (last < raw.length) parts.push({ t: raw.slice(last) });
-  return { word: raw.replace(/[\[\]]/g, ''), parts, chunk: chunks.join('_'), cat: +cat, sentence, wk };
+  return { word: raw.replace(/[\[\]]/g, ''), parts, chunk: chunks.join('_'), cat: +cat, sentence, wk,
+    alts: alts ? alts.split(',') : null };
 }
+// Every word for the week (study list). A round uses a random ROUND_SIZE of them, so replays feel fresh.
+const allWeekWords = w => USP()[w].words[S.level].map(s => parseWord(s, w));
 function weekWords(w) {
-  if (w < 5) return SPELL[w].words[S.level].map(s => parseWord(s, w));
+  if (w < 5) return shuffle(allWeekWords(w)).slice(0, ROUND_SIZE);
   let out = [];
-  for (let k = 0; k < 5; k++) out = out.concat(shuffle(SPELL[k].words[S.level]).slice(0, 2).map(s => parseWord(s, k)));
+  for (let k = 0; k < 5; k++) out = out.concat(shuffle(allWeekWords(k)).slice(0, 2));
   return shuffle(out);
 }
 function wordHTML(wd) { return wd.parts.map(p => p.b ? `<b>${esc(p.b)}</b>` : esc(p.t)).join(''); }
+const normSpell = s => String(s).toLowerCase().replace(/[’‘`]/g, "'").replace(/[‐‑–]/g, '-').replace(/\s+/g, ' ').trim();
 
 function renderWeek(w) {
   ACT = null; renderTop();
-  const sp = w < 5 ? SPELL[w] : REVIEW_SPELL, gr = w < 5 ? GRAMMAR[w] : REVIEW_GRAM;
-  const words = w < 5 ? weekWords(w) : [];
+  const sp = w < 5 ? USP()[w] : REVIEW_SPELL, gr = w < 5 ? UGR()[w] : REVIEW_GRAM;
+  const words = w < 5 ? allWeekWords(w) : [];
+  const eq = w < 5 ? UNITS[S.unit].eq[w] : null;
   render(`
-    <button class="btn ghost small" data-act="goHome">← Trail</button>
+    <button class="btn ghost small" data-act="goUnit">← ${esc(UNITS[S.unit].mtn)}</button>
     <div class="band" style="margin-top:12px;background:linear-gradient(135deg, ${WEEK_COLORS[w]}, color-mix(in srgb, ${WEEK_COLORS[w]} 65%, #000))">
-      <span class="big">${w < 5 ? '⛺' : '🏔️'}</span><span class="ttl" style="font-size:1.6rem">${w < 5 ? 'Week ' + (w + 1) : 'Week 6: Review'}</span>
-      <span class="streak">★ ${weekStars(w)} / 15</span></div>
+      <span class="big">${w < 5 ? '⛺' : '🏔️'}</span><span class="ttl" style="font-size:1.5rem">Unit ${S.unit + 1} · ${w < 5 ? 'Week ' + (w + 1) : 'Week 6: Review'}</span>
+      <span class="streak">★ ${weekStars(w)} / 15</span>
+      <button class="btn sun small" data-act="mystery" data-w="${w}">🎲 Mystery Game</button></div>
+    ${eq ? `<div class="tip" style="background:#e3f1ff"><b>📘 Big Question:</b> ${esc(eq)} <button class="speak" style="min-height:34px;min-width:34px;font-size:.9rem" data-act="say" data-text="${esc(eq)}">🔊</button></div>` : ''}
     <div class="grid g2">
       <div class="card">
         <span class="tag">SPELLING</span>
         <h2 style="margin-top:8px">${esc(sp.title)}</h2>
         <div class="tip s"><div class="row"><b style="flex:1">Pattern tip</b><button class="speak" data-act="say" data-text="${esc(sp.tip)}">🔊</button></div>${esc(sp.tip)}</div>
-        ${words.length ? `<p class="small muted" style="margin-bottom:6px">Tap a word to hear it:</p>
+        ${words.length ? `<p class="small muted" style="margin-bottom:6px">Your ${words.length} words. Tap one to hear it:</p>
           <div class="wordlist" style="margin-bottom:16px">${words.map(wd => `<button class="wl" data-act="say" data-text="${esc(wd.word)}">${wordHTML(wd)}</button>`).join('')}</div>` : ''}
         ${SPELL_ACTS.map((a, i) => `<button class="act" data-act="startSpell" data-w="${w}" data-a="${i}">
-          <span class="ic">${a.icon}</span><span style="flex:1"><div class="t">${a.name}</div><div class="small muted">${a.desc}</div></span>${starsHTML(S.prog[spellSlot(w, i)])}</button>`).join('')}
+          <span class="ic">${a.icon}</span><span style="flex:1"><div class="t">${a.name}</div><div class="small muted">${a.desc}</div></span>${starsHTML(UP()[spellSlot(w, i)])}</button>`).join('')}
       </div>
       <div class="card">
         <span class="tag g">GRAMMAR</span>
@@ -1196,9 +1532,26 @@ function renderWeek(w) {
         <div class="tip"><div class="row"><b style="flex:1">Quick lesson</b><button class="speak" data-act="say" data-text="${esc(gr.tip)}">🔊</button></div>${esc(gr.tip)}
           ${gr.ex.map(e => `<div class="ex">${esc(e)}</div>`).join('')}</div>
         ${GRAM_ACTS.map((a, i) => `<button class="act" data-act="startGram" data-w="${w}" data-a="${i}">
-          <span class="ic">${a.icon}</span><span style="flex:1"><div class="t">${a.name}</div><div class="small muted">${a.desc}</div></span>${starsHTML(S.prog[gramSlot(w, i)])}</button>`).join('')}
+          <span class="ic">${a.icon}</span><span style="flex:1"><div class="t">${a.name}</div><div class="small muted">${a.desc}</div></span>${starsHTML(UP()[gramSlot(w, i)])}</button>`).join('')}
       </div>
     </div>`);
+}
+
+/* Mystery Game: a slot-machine pick, leaning toward activities that still need stars */
+function mystery(w) {
+  const all = [...SPELL_ACTS.map((m, a) => ({ kind: 'spell', a, m, st: UP()[spellSlot(w, a)] })), ...GRAM_ACTS.map((m, a) => ({ kind: 'gram', a, m, st: UP()[gramSlot(w, a)] }))];
+  const open = all.filter(x => x.st < 3);
+  const pick = (open.length ? open : all)[Math.floor(Math.random() * (open.length || all.length))];
+  const go = () => { closeModal(); pick.kind === 'spell' ? startSpell(w, pick.a) : startGram(w, pick.a); };
+  modal(`<div style="text-align:center"><h2>🎲 Mystery Game</h2>
+    <div id="slot" style="font-size:2.2rem;font-weight:700;min-height:3.2em;display:flex;align-items:center;justify-content:center;gap:10px"></div>
+    <button class="btn sun" id="slotGo" style="visibility:hidden">Let's go! ➜</button></div>`);
+  const slot = $('#slot'), show = x => slot.innerHTML = `<span style="font-size:3rem">${x.m.icon}</span>${x.m.name}`;
+  const reveal = () => { show(pick); sfx('streak'); const b = $('#slotGo'); b.style.visibility = 'visible'; b.onclick = go; confettiFrom(slot, 24, 180); };
+  if (settings.calm) return reveal();
+  let n = 0;
+  const spin = () => { show(all[n++ % all.length]); sfx('tap'); if (n < 14) setTimeout(spin, 60 + n * 12); else reveal(); };
+  spin();
 }
 
 /* ---------------- ACTIVITY SHELL ---------------- */
@@ -1216,9 +1569,9 @@ function actHeader() {
 function finishActivity(pct) {
   const stars = pct >= 0.9 ? 3 : pct >= 0.7 ? 2 : 1;
   const slot = ACT.kind === 'spell' ? spellSlot(ACT.w, ACT.a) : gramSlot(ACT.w, ACT.a);
-  const before = S.prog[slot], totalBefore = totalStars();
+  const before = UP()[slot], totalBefore = totalStars();
   const improved = stars > before;
-  if (improved) { S.prog[slot] = stars; persist(); }
+  if (improved) { UP()[slot] = stars; persist(); }
   renderTop(); if (improved) bumpStars();
   const gearHTML = gearUnlockHTML(totalBefore, totalStars());
   sfx('finish'); bigConfetti();
@@ -1236,6 +1589,7 @@ function finishActivity(pct) {
         : `<p class="muted">Your best is still ${before} star${before === 1 ? '' : 's'}, so your code did not change.</p>`}
       <div class="row" style="justify-content:center">
         <button class="btn ghost" data-act="retryAct">↻ Try again</button>
+        <button class="btn violet" data-act="mystery" data-w="${ACT.w}">🎲 Mystery Game</button>
         <button class="btn teal" data-act="openWeek" data-w="${ACT.w}">Back to Week ${ACT.w + 1}</button>
       </div>
     </div>`);
@@ -1277,14 +1631,18 @@ function renderListen() {
   if (ACT.tries === 0 && !ACT.revealed) setTimeout(() => speak(wd.word), 250);
 }
 function hintHTML(wd) {
+  if (wd.join) {
+    const sep = ['', ' ', '-'][wd.cat];
+    return `<div class="hint-word">${wd.segs.map(s => '_'.repeat(s.length)).join(sep === ' ' ? '&nbsp;&nbsp;' : sep)}</div><p class="muted small">Hint: ${wd.segs.length} parts ${JOIN_HINT[wd.cat]}</p>`;
+  }
   return `<div class="hint-word">${wd.parts.map(p => p.b ? `<b>${esc(p.b)}</b>` : p.t.split('').map(() => '_').join('')).join('')}</div><p class="muted small">Hint: the pattern letters are showing.</p>`;
 }
 function checkSpell() {
   const inp = $('#spellIn'), fb = $('#fb');
-  const val = inp.value.trim().toLowerCase();
+  const val = normSpell(inp.value);
   if (!val) return;
   const wd = ACT.items[ACT.idx];
-  if (val === wd.word.toLowerCase()) {
+  if (val === normSpell(wd.word)) {
     if (!ACT.revealed) ACT.score += ACT.tries === 0 ? 1 : 0.5;
     hit(inp, ACT.tries === 0 && !ACT.revealed);
     fb.className = 'feedback good'; fb.textContent = ['Nailed it! ✓', 'Yes! ✓', 'Perfect! ✓'][Math.floor(Math.random() * 3)];
@@ -1301,8 +1659,8 @@ function checkSpell() {
 
 /* Pattern Sort */
 function sortBuckets() {
-  if (ACT.w < 5) return SPELL[ACT.w].cats.map((c, i) => ({ id: i, label: c.label }));
-  return SPELL.map((s, i) => ({ id: i, label: s.short }));
+  if (ACT.w < 5) return USP()[ACT.w].cats.map((c, i) => ({ id: i, label: c.label }));
+  return USP().map((s, i) => ({ id: i, label: s.short }));
 }
 const bucketOf = wd => ACT.w < 5 ? wd.cat : wd.wk;
 function renderSort() {
@@ -1325,35 +1683,41 @@ function dropWord(b, el) {
   if (bucketOf(wd) === b) { hit(el, !ACT.lastWrong); ACT.lastWrong = false; ACT.placed[ACT.sel] = true; ACT.sel = null; renderSort(); }
   else {
     miss(); ACT.lastWrong = true; ACT.mistakes++; el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
-    const fb = $('#fb'); fb.className = 'feedback bad'; fb.textContent = 'Not that one. Listen to the sound again.';
+    const fb = $('#fb'); fb.className = 'feedback bad'; fb.textContent = 'Not that one. Look and listen again.';
     speak(wd.word, 0.75);
   }
 }
 
 /* Missing Piece */
 function chunkOptions(wd) {
-  const wk = SPELL[wd.wk];
+  if (wd.join) return JOIN_OPTS.slice();
+  if (wd.alts) return shuffle([wd.chunk, ...wd.alts]);
+  const wk = USP()[wd.wk];
   const same = wk.cats[wd.cat].chunks.filter(c => c !== wd.chunk);
   const all = [...new Set(wk.cats.flatMap(c => c.chunks))].filter(c => c !== wd.chunk && !same.includes(c));
   const pool = [...new Set([...shuffle(same), ...shuffle(all)])].slice(0, 3);
   return shuffle([wd.chunk, ...pool]);
 }
+const chunkLabel = o => o.replace(/_/g, ' … ');
 function renderChunk() {
   if (ACT.idx >= ACT.items.length) return finishActivity(ACT.score / ACT.items.length);
   const wd = ACT.items[ACT.idx];
   if (!ACT.opts) { ACT.opts = chunkOptions(wd); ACT.wrong = []; ACT.solved = false; }
+  const shown = wd.join
+    ? (ACT.solved ? esc(wd.word) : wd.segs.map(esc).join('<span class="blank">?</span>'))
+    : wd.parts.map(p => p.b ? `<span class="blank">${ACT.solved ? esc(p.b) : '?'}</span>` : esc(p.t)).join('');
   render(`${actHeader()}
     <div class="card" style="text-align:center">
-      <p class="big-q">Which letters finish the word?</p>
+      <p class="big-q">${wd.join ? 'How do these parts join together?' : 'Which letters finish the word?'}</p>
       <div class="row" style="justify-content:center"><button class="btn teal" data-act="sayWord">🔊 Hear word</button><button class="btn ghost" data-act="saySentence">📖 In a sentence</button></div>
-      <div class="chunkword">${wd.parts.map(p => p.b ? `<span class="blank">${ACT.solved ? esc(p.b) : '?'}</span>` : esc(p.t)).join('')}</div>
-      <div class="pool">${ACT.opts.map(o => `<button class="chip chunkchip ${ACT.wrong.includes(o) ? 'shake' : ''}" style="font-size:1.4rem;min-width:80px;${ACT.wrong.includes(o) ? 'opacity:.35' : ''}" data-act="pickChunk" data-o="${esc(o)}" ${ACT.wrong.includes(o) || ACT.solved ? 'disabled' : ''}>${esc(o)}</button>`).join('')}</div>
+      <div class="chunkword">${shown}</div>
+      <div class="pool">${ACT.opts.map((o, i) => `<button class="chip chunkchip ${ACT.wrong.includes(o) ? 'shake' : ''}" style="font-size:1.4rem;min-width:80px;${ACT.wrong.includes(o) ? 'opacity:.35' : ''}" data-act="pickChunk" data-i="${i}" ${ACT.wrong.includes(o) || ACT.solved ? 'disabled' : ''}>${esc(chunkLabel(o))}</button>`).join('')}</div>
       <div class="feedback ${ACT.solved ? 'good' : ''}" id="fb">${ACT.solved ? 'Yes! ✓' : ACT.wrong.length ? '<span style="color:var(--red)">Try another one.</span>' : ''}</div>
     </div>`);
   if (!ACT.solved && ACT.wrong.length === 0) setTimeout(() => speak(wd.word), 250);
 }
-function pickChunk(o, el) {
-  const wd = ACT.items[ACT.idx];
+function pickChunk(i, el) {
+  const wd = ACT.items[ACT.idx], o = ACT.opts[i];
   if (o === wd.chunk) {
     hit(el, ACT.wrong.length === 0);
     if (ACT.wrong.length === 0) ACT.score++;
@@ -1363,20 +1727,21 @@ function pickChunk(o, el) {
 }
 
 /* ---------------- GRAMMAR ACTIVITIES ---------------- */
+const GRAM_ROUND = 8;
 function makeQs(w, a, lvl) {
-  const G = GRAMMAR[w], part = a === 0 ? G.spot : G.fix;
-  return part.items[lvl].map(str => {
+  const G = UGR()[w];
+  return [].concat(a === 0 ? G.spot : G.fix).flatMap(part => part.items[lvl].map(str => {
     if (part.kind === 'mc') { const [text, ans] = str.split('|'); return { kind: 'mc', prompt: part.prompt, text, options: part.options, answer: part.options[+ans] }; }
     if (part.kind === 'split') { const [subj, pred] = str.split('|').map(s => s.trim()); const sw = subj.split(/\s+/), pw = pred.split(/\s+/); return { kind: 'split', prompt: part.prompt, words: sw.concat(pw), answerIndex: sw.length }; }
     if (part.kind === 'punct') { const [text, ans] = str.split('|'); return { kind: 'mc', prompt: part.prompt, text: text + ' ___', options: ['. (period)', '? (question mark)', '! (exclamation point)'], answers: ans.split('').map(c => ({ '.': 0, '?': 1, '!': 2 }[c])) }; }
     const [text, right, ...wrong] = str.split('|');
     return { kind: 'mc', prompt: part.prompt, text, options: shuffle([right, ...wrong]), answer: right };
-  });
+  }));
 }
 function startGram(w, a) {
   const meta = GRAM_ACTS[a];
   let items;
-  if (w < 5) items = shuffle(makeQs(w, a, S.level));
+  if (w < 5) items = shuffle(makeQs(w, a, S.level)).slice(0, GRAM_ROUND);
   else { items = []; for (let k = 0; k < 5; k++) items = items.concat(shuffle(makeQs(k, a, S.level)).slice(0, 2)); items = shuffle(items); }
   ACT = { kind: 'gram', w, a, name: meta.name, icon: meta.icon, items, idx: 0, score: 0, wrong: [], solved: false, streak: 0, best: 0 };
   renderGram();
@@ -1419,15 +1784,89 @@ function answerGram(correct, i, el) {
 }
 
 /* ---------------- WRITING ---------------- */
+/* Topic spinner: spin, then keep it or re-spin (2 re-spins). The ⭐ Wildcard slice lets them pick anything. */
+const SPIN_COLORS = ['#ef5b3f', '#f29d16', '#2fae5b', '#2f86e0', '#8a4fd8', '#e2468f', '#14a3a3', '#c2410c'];
+const RESPINS = 2;
+const spinMemory = {};   // re-spins left per writing type; resets when they finish a paragraph
 function renderWritingTopic(t) {
   renderTop();
-  const T = WRITING[t];
-  WS = { t, topic: null, side: null, step: null, vals: {}, active: null };
+  const mem = spinMemory[t] = spinMemory[t] || { spins: RESPINS, landed: [] };
+  WS = { t, topic: null, side: null, step: null, vals: {}, active: null, mem, rot: 0, spinning: false };
+  const T = WRITING[t], n = T.topics.length + 1, seg = 360 / n, R = 150, C = 160;
+  const pt = (deg, r) => [C + r * Math.sin(deg * Math.PI / 180), C - r * Math.cos(deg * Math.PI / 180)];
+  const slices = [...T.topics.map(tp => tp.icon || '📝'), '⭐'].map((ic, i) => {
+    const [x1, y1] = pt(i * seg - seg / 2, R), [x2, y2] = pt(i * seg + seg / 2, R), [tx, ty] = pt(i * seg, R * 0.66);
+    return `<path d="M${C},${C} L${x1},${y1} A${R},${R} 0 0,1 ${x2},${y2} Z" fill="${i === n - 1 ? '#ffd23c' : SPIN_COLORS[i % SPIN_COLORS.length]}" stroke="#fff" stroke-width="3"/>
+      <text x="${tx}" y="${ty + 12}" text-anchor="middle" font-size="34">${ic}</text>`;
+  }).join('');
   render(`
-    <button class="btn ghost small" data-act="goHome">← Trail</button>
+    <button class="btn ghost small" data-act="goHome">← Home</button>
     <div class="band write" style="margin-top:12px"><span class="big">${T.icon}</span><span class="ttl" style="font-size:1.6rem">${T.name} Writing</span></div>
-    <p class="muted">${T.blurb} Pick a topic to start.</p>
-    <div class="grid g3">${T.topics.map((tp, i) => `<button class="week" data-act="pickTopic" data-i="${i}"><h3>${esc(tp.title)}</h3>${tp.sides ? '<div class="small muted">You will pick a side.</div>' : ''}</button>`).join('')}</div>`);
+    <p class="muted">${T.blurb} Spin the wheel to get your topic!</p>
+    <div class="grid g2" style="align-items:start">
+      <div class="card" style="text-align:center">
+        <div style="position:relative;max-width:340px;margin:0 auto">
+          <svg viewBox="0 0 320 330" style="width:100%;height:auto;display:block">
+            <g id="wheel" style="transform-box:view-box;transform-origin:160px 160px;transform:rotate(0deg)">${slices}</g>
+            <circle cx="160" cy="160" r="22" fill="#fff" stroke="#22314d" stroke-width="4"/>
+            <polygon points="160,30 146,2 174,2" fill="#22314d"/>
+          </svg>
+        </div>
+        ${mem.landed.length ? '' : '<button class="btn sun" id="spinBtn" data-act="spin" style="font-size:1.3rem;padding:14px 36px;margin-top:10px">🎡 SPIN!</button>'}
+      </div>
+      <div>
+        <div id="spinResult">${mem.landed.length ? `<div class="card" style="border:3px solid var(--sun)"><b>Your spins so far:</b>
+          <div class="pool" style="justify-content:flex-start;margin:10px 0">${mem.landed.map(i => `<button class="chip" data-act="pickTopic" data-i="${i}">${T.topics[i].icon || '📝'} ${esc(T.topics[i].title)}</button>`).join('')}</div>
+          ${mem.spins > 0 ? `<button class="btn ghost" data-act="respin">🎡 Spin again (${mem.spins} left)</button>` : ''}</div>` : ''}</div>
+        <div class="card"><h3>On the wheel</h3>
+          ${T.topics.map(tp => `<div style="padding:4px 0">${tp.icon || '📝'} ${esc(tp.title)}${tp.eq ? ' <span class="tag" style="background:#e3f1ff;color:#2459a6">📘 Unit ' + (tp.eq[0] + 1) + '</span>' : ''}</div>`).join('')}
+          <div style="padding:4px 0">⭐ <b>Wildcard:</b> pick any topic you want!</div>
+        </div>
+      </div>
+    </div>`);
+}
+function spinWheel() {
+  if (WS.spinning) return;
+  const T = WRITING[WS.t], n = T.topics.length + 1, seg = 360 / n;
+  const k = Math.floor(Math.random() * n);
+  const jitter = (Math.random() - 0.5) * seg * 0.6;
+  const target = ((360 - k * seg + jitter) % 360 + 360) % 360;
+  WS.rot += 360 * 5 + ((target - WS.rot % 360) + 360) % 360;
+  const wheel = $('#wheel'), btn = $('#spinBtn');
+  if (btn) btn.style.visibility = 'hidden';
+  $('#spinResult').innerHTML = '';
+  if (settings.calm) { wheel.style.transition = 'none'; wheel.style.transform = `rotate(${WS.rot}deg)`; return landWheel(k); }
+  WS.spinning = true;
+  wheel.style.transition = 'transform 3.2s cubic-bezier(.12,.7,.18,1)';
+  wheel.style.transform = `rotate(${WS.rot}deg)`;
+  let t = 0, gap = 50;
+  while (t < 3000) { setTimeout(() => sfx('tap'), t); t += gap; gap *= 1.12; }
+  setTimeout(() => { WS.spinning = false; landWheel(k); }, 3300);
+}
+function landWheel(k) {
+  const T = WRITING[WS.t];
+  const box = $('#spinResult'); if (!box) return;
+  if (k === T.topics.length) {
+    sfx('gear'); confettiFrom(box, 40, 240);
+    box.innerHTML = `<div class="card unlock" style="text-align:left"><span class="e">⭐</span>WILDCARD! You get to pick any topic:
+      <div class="pool" style="justify-content:flex-start;margin-top:10px">${T.topics.map((tp, i) => `<button class="chip" data-act="pickTopic" data-i="${i}">${tp.icon || '📝'} ${esc(tp.title)}</button>`).join('')}</div></div>`;
+    return;
+  }
+  sfx('streak'); confettiFrom(box, 20, 160);
+  if (!WS.mem.landed.includes(k)) WS.mem.landed.push(k);
+  const tp = T.topics[k];
+  box.innerHTML = `<div class="card" style="border:3px solid var(--sun)">
+    <div class="small muted">You landed on:</div>
+    <h2 style="margin:6px 0">${tp.icon || '📝'} ${esc(tp.title)}</h2>
+    ${tp.eq ? `<p class="small" style="background:#e3f1ff;border-radius:10px;padding:8px 10px">📘 Unit ${tp.eq[0] + 1} Big Question: ${esc(UNITS[tp.eq[0]].eq[tp.eq[1]])}</p>` : ''}
+    <div class="row" style="margin-top:10px">
+      <button class="btn sun" data-act="pickTopic" data-i="${k}">Let's go! ➜</button>
+      ${WS.mem.spins > 0 ? `<button class="btn ghost" data-act="respin">🎡 Spin again (${WS.mem.spins} left)</button>` : ''}
+    </div>
+    ${WS.mem.spins === 0 && WS.mem.landed.length > 1 ? `<p class="small muted" style="margin:12px 0 6px">Or pick one of your spins:</p>
+      <div class="pool" style="justify-content:flex-start">${WS.mem.landed.filter(i => i !== k).map(i => `<button class="chip" data-act="pickTopic" data-i="${i}">${T.topics[i].icon || '📝'} ${esc(T.topics[i].title)}</button>`).join('')}</div>` : ''}
+  </div>`;
+  if (settings.read) speak('You landed on ' + tp.title);
 }
 function renderSidePick() {
   const tp = WRITING[WS.t].topics[WS.topic];
@@ -1438,11 +1877,12 @@ function renderSidePick() {
     <div class="grid g2">${tp.sides.map((sd, i) => `<button class="week" data-act="pickSide" data-i="${i}"><h3>${esc(sd.label)}</h3></button>`).join('')}</div>`);
 }
 function renderStepPick() {
-  const T = WRITING[WS.t], tp = T.topics[WS.topic], done = S.prog[writeSlot(WS.t)];
+  const T = WRITING[WS.t], tp = T.topics[WS.topic], done = S.w[WS.t];
   render(`
     <button class="btn ghost small" data-act="openWriting" data-t="${WS.t}">← Topics</button>
     <h1 style="margin-top:12px">${T.icon} ${esc(tp.title)}</h1>
     ${tp.sides ? `<p class="muted">Your side: <b>${esc(tp.sides[WS.side].label)}</b></p>` : ''}
+    ${tp.eq ? `<div class="tip" style="background:#e3f1ff">📘 <b>Unit ${tp.eq[0] + 1} Big Question:</b> ${esc(UNITS[tp.eq[0]].eq[tp.eq[1]])}</div>` : ''}
     <p class="muted">Each step gives you less help. Finish a step to unlock the next one.</p>
     ${WRITE_STEPS.map((s, i) => {
       const locked = i > done;
@@ -1637,9 +2077,10 @@ function renderFree() {
 }
 
 function finishWriting(text) {
-  const slot = writeSlot(WS.t), step = WS.step + 1;
-  const improved = step > S.prog[slot], totalBefore = totalStars();
-  if (improved) { S.prog[slot] = step; persist(); }
+  const slot = WS.t, step = WS.step + 1;
+  delete spinMemory[WS.t];
+  const improved = step > S.w[slot], totalBefore = totalStars();
+  if (improved) { S.w[slot] = step; persist(); }
   renderTop(); if (improved) bumpStars();
   const gearHTML = gearUnlockHTML(totalBefore, totalStars());
   sfx('finish'); bigConfetti();
@@ -1660,7 +2101,7 @@ function finishWriting(text) {
         <button class="btn sun" data-act="copyCode">📋 Copy my code</button></div>` : ''}
       <div class="row" style="justify-content:center">
         <button class="btn ghost" data-act="backSteps">Back to steps</button>
-        <button class="btn sun" data-act="goHome">Trail home</button>
+        <button class="btn sun" data-act="goHome">Home</button>
       </div>
     </div>`);
 }
@@ -1676,39 +2117,49 @@ function renderTeacher() {
     <div class="row" style="margin:10px 0 18px"><button class="btn sun" data-act="teacherRun">Show progress</button><button class="btn ghost" data-act="teacherCSV" id="csvBtn" disabled>📋 Copy as spreadsheet</button></div>
     <div id="tout"></div>
     <div class="card" style="margin-top:20px"><h3>How the stars work</h3>
-      <p class="small">Each activity earns 1 to 3 stars: 1 for finishing, 2 for 70% or better on the first try, 3 for 90% or better. Each week has 15 stars (3 spelling activities and 2 grammar activities). Writing shows steps completed (Build It, Boost It, Write It) for each type.</p>
+      <p class="small">Each activity earns 1 to 3 stars: 1 for finishing, 2 for 70% or better on the first try, 3 for 90% or better. Each week has 15 stars (3 spelling activities and 2 grammar activities), so each unit has 90. Pick "Unit N weeks" to see week-by-week detail. Writing shows steps completed (Build It, Boost It, Write It) for each type.</p>
       <p class="small">Codes are checked, so a student who changes a letter will get an error instead of fake stars. Codes are not a password though, so a determined kid could share one.</p></div>`);
 }
-let teacherRows = [];
+let teacherRows = [], teacherUnit = -1;
+function wkSplit(st, u, w) {
+  let s = 0, g = 0; for (let a = 0; a < 3; a++) s += st.u[u][spellSlot(w, a)]; for (let a = 0; a < 2; a++) g += st.u[u][gramSlot(w, a)];
+  return { s, g };
+}
 function teacherRun() {
   const raw = $('#tcodes').value.split(/[\n,;]+|\s{2,}|\s(?=[A-Za-z]+-)/).map(s => s.trim()).filter(Boolean);
   teacherRows = raw.map(c => { try { return Object.assign({ ok: true, code: c }, decodeCode(c)); } catch (e) { return { ok: false, code: c, err: e.message }; } });
-  const wk = st => Array.from({ length: WEEKS }, (_, w) => {
-    let s = 0, g = 0; for (let a = 0; a < 3; a++) s += st.prog[spellSlot(w, a)]; for (let a = 0; a < 2; a++) g += st.prog[gramSlot(w, a)];
-    return { s, g };
-  });
-  $('#tout').innerHTML = teacherRows.length ? `<div class="scroll-x"><table class="t"><thead><tr><th>Student</th><th>Trail</th>
-    ${Array.from({ length: WEEKS }, (_, w) => `<th>Wk ${w + 1}<br><span class="small">Spell / Gram</span></th>`).join('')}
+  teacherTable();
+  $('#csvBtn').disabled = !teacherRows.some(r => r.ok);
+}
+function teacherTable() {
+  const detail = teacherUnit >= 0;
+  const cols = detail ? WEEKS : NUM_UNITS;
+  $('#tout').innerHTML = teacherRows.length ? `
+    <div class="row" style="margin-bottom:10px"><b>Show:</b>
+      <button class="chip ${detail ? '' : 'sel'}" data-act="teacherUnit" data-u="-1">All units</button>
+      ${UNITS.map((U, u) => unitReady(u) ? `<button class="chip ${teacherUnit === u ? 'sel' : ''}" data-act="teacherUnit" data-u="${u}">Unit ${u + 1} weeks</button>` : '').join('')}</div>
+    <div class="scroll-x"><table class="t"><thead><tr><th>Student</th><th>Trail</th>
+    ${detail ? Array.from({ length: WEEKS }, (_, w) => `<th>Wk ${w + 1}<br><span class="small">Spell / Gram</span></th>`).join('')
+      : UNITS.map((U, u) => `<th>Unit ${u + 1}<br><span class="small">of ${UNIT_MAX}</span></th>`).join('')}
     ${WRITING.map(t => `<th>${t.name}</th>`).join('')}<th>Total ★</th></tr></thead><tbody>
     ${teacherRows.map(r => r.ok ? `<tr><td>${AVATARS[r.avatar || 0]} ${esc(r.name)}</td><td>${LEVELS[r.level].name}</td>
-      ${wk(r).map(x => `<td>${x.s}/9 · ${x.g}/6</td>`).join('')}
-      ${WRITING.map((_, t) => `<td>${r.prog[writeSlot(t)]}/3</td>`).join('')}<td><b>${totalStars(r)}</b></td></tr>`
-      : `<tr><td colspan="${3 + WEEKS + WRITING.length}" style="text-align:left;color:var(--red)">${esc(r.code)}: ${esc(r.err)}</td></tr>`).join('')}
+      ${detail ? Array.from({ length: WEEKS }, (_, w) => { const x = wkSplit(r, teacherUnit, w); return `<td>${x.s}/9 · ${x.g}/6</td>`; }).join('')
+        : UNITS.map((U, u) => `<td>${unitStars(r, u) || '·'}</td>`).join('')}
+      ${WRITING.map((_, t) => `<td>${r.w[t]}/3</td>`).join('')}<td><b>${totalStars(r)}</b></td></tr>`
+      : `<tr><td colspan="${3 + cols + WRITING.length}" style="text-align:left;color:var(--red)">${esc(r.code)}: ${esc(r.err)}</td></tr>`).join('')}
     </tbody></table></div>` : '<p class="muted">No codes found.</p>';
-  $('#csvBtn').disabled = !teacherRows.some(r => r.ok);
 }
 function teacherCSV() {
   const head = ['Student', 'Trail'];
-  for (let w = 0; w < WEEKS; w++) head.push(`Wk${w + 1} Spelling`, `Wk${w + 1} Grammar`);
+  UNITS.forEach((U, u) => head.push(`Unit ${u + 1} Stars`));
+  UNITS.forEach((U, u) => { if (unitReady(u)) for (let w = 0; w < WEEKS; w++) head.push(`U${u + 1} Wk${w + 1} Spelling`, `U${u + 1} Wk${w + 1} Grammar`); });
   WRITING.forEach(t => head.push(t.name)); head.push('Total Stars');
   const lines = [head.join('\t')];
   teacherRows.filter(r => r.ok).forEach(r => {
     const row = [r.name, LEVELS[r.level].name];
-    for (let w = 0; w < WEEKS; w++) {
-      let s = 0, g = 0; for (let a = 0; a < 3; a++) s += r.prog[spellSlot(w, a)]; for (let a = 0; a < 2; a++) g += r.prog[gramSlot(w, a)];
-      row.push(s, g);
-    }
-    WRITING.forEach((_, t) => row.push(r.prog[writeSlot(t)])); row.push(totalStars(r));
+    UNITS.forEach((U, u) => row.push(unitStars(r, u)));
+    UNITS.forEach((U, u) => { if (unitReady(u)) for (let w = 0; w < WEEKS; w++) { const x = wkSplit(r, u, w); row.push(x.s, x.g); } });
+    WRITING.forEach((_, t) => row.push(r.w[t])); row.push(totalStars(r));
     lines.push(row.join('\t'));
   });
   copyText(lines.join('\n')).then(ok => toast(ok ? 'Copied! Paste into Google Sheets.' : 'Copy failed. Try again.'));
@@ -1723,7 +2174,7 @@ const ACTIONS = {
   startNew: () => {
     const name = ($('#nm').value || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 12);
     if (name.length < 2) { $('#err').textContent = 'Type your first name (letters only).'; return; }
-    useStudent({ name, level: newLevel, avatar: newAvatar, prefs: defaultPrefs(), prog: new Array(SLOTS).fill(0) });
+    useStudent(newStudent(name, newLevel, newAvatar));
     persist(); renderHome(); codeModal(true);
   },
   loadCode: () => {
@@ -1733,6 +2184,12 @@ const ACTIONS = {
   teacher: () => renderTeacher(),
   teacherRun: () => teacherRun(),
   teacherCSV: () => teacherCSV(),
+  teacherUnit: d => { teacherUnit = +d.u; teacherTable(); },
+  openUnit: d => openUnit(+d.u),
+  goUnit: () => renderUnit(),
+  mystery: d => mystery(+d.w),
+  spin: () => spinWheel(),
+  respin: () => { if (WS.mem.spins > 0) { WS.mem.spins--; spinWheel(); } },
   codeModal: () => codeModal(false),
   settingsModal: () => settingsModal(),
   togglePref: d => {
@@ -1763,7 +2220,7 @@ const ACTIONS = {
   checkSpell: () => checkSpell(),
   pickWord: d => { ACT.sel = +d.i; renderSort(); speak(ACT.items[ACT.sel].word); },
   dropWord: (d, el) => dropWord(+d.b, el),
-  pickChunk: (d, el) => pickChunk(d.o, el),
+  pickChunk: (d, el) => pickChunk(+d.i, el),
   pickOpt: (d, el) => { const i = +d.i, q = ACT.items[ACT.idx]; if (settings.read) speak(q.options[i]); answerGram(isRight(q, i), i, el); },
   pickSplit: (d, el) => { const i = +d.i, q = ACT.items[ACT.idx]; answerGram(i === q.answerIndex, i, el); },
   nextQ: () => { ACT.idx++; ACT.wrong = []; ACT.solved = false; renderGram(); },
