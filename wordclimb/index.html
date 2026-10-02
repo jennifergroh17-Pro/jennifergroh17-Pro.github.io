@@ -323,6 +323,17 @@
     body * { visibility: hidden; }
     .print-area, .print-area * { visibility: visible; }
     .print-area { display: block; position: absolute; left: 0; top: 0; width: 100%; padding: 24px; font-size: 14pt; line-height: 2; }
+    .print-area.doc { font-size: 11pt; line-height: 1.45; padding: 0; color: #000; }
+    .pdoc h1 { font-size: 18pt; margin: 0 0 4pt; } .pdoc h2 { font-size: 14pt; margin: 14pt 0 6pt; border-bottom: 1.5pt solid #000; }
+    .pdoc .sub { font-size: 10pt; margin-bottom: 8pt; }
+    .pdoc .page { page-break-after: always; } .pdoc .page:last-child { page-break-after: auto; }
+    .pdoc ol { columns: 2; column-gap: 28pt; margin: 0; padding-left: 22pt; } .pdoc ol li { margin: 3pt 0; break-inside: avoid; }
+    .pdoc ol.one { columns: 1; }
+    .pdoc .trails { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14pt; } .pdoc .trails ol { columns: 1; }
+    .pdoc .line { border-bottom: 1pt solid #000; display: inline-block; width: 85%; height: 1.4em; }
+    .pdoc .nameline { margin: 4pt 0 12pt; }
+    .pdoc table { width: 100%; border-collapse: collapse; font-size: 10.5pt; } .pdoc td, .pdoc th { border: 1pt solid #999; padding: 4pt 6pt; vertical-align: top; text-align: left; }
+    .pdoc th { background: #eee; }
   }
   @media (max-width: 560px) {
     body { font-size: 17px; }
@@ -2317,7 +2328,7 @@ const CONFETTI_COLORS = ['#ef5b3f', '#f29d16', '#ffd23c', '#2fae5b', '#2f86e0', 
        if set: 1 bit "all 3 stars" (mastered) or 0 followed by 5x2 bits of stars.
    v1 and v2 codes (one unit, flat) still load.
 */
-const NUM_UNITS = 6, WEEKS = 6, UNIT_SLOTS = 30, CODE_VERSION = 3;
+const NUM_UNITS = 6, WEEKS = 6, UNIT_SLOTS = 30, CODE_VERSION = 4, BEE_MAX = 127;
 const PREF_KEYS = ['read', 'slow', 'sound', 'calm'];
 function defaultPrefs() {
   let calm = false;
@@ -2329,7 +2340,7 @@ const spellSlot = (w, a) => w * 5 + a;
 const gramSlot = (w, a) => w * 5 + 3 + a;
 const emptyUnits = () => Array.from({ length: NUM_UNITS }, () => new Array(UNIT_SLOTS).fill(0));
 function newStudent(name, level, avatar) {
-  return { name, level, avatar, prefs: defaultPrefs(), unit: 0, u: emptyUnits(), w: [0, 0, 0] };
+  return { name, level, avatar, prefs: defaultPrefs(), unit: 0, u: emptyUnits(), w: [0, 0, 0], bee: 0 };
 }
 
 function fnv(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
@@ -2338,7 +2349,7 @@ const bitsOf = (n, len) => n.toString(2).padStart(len, '0');
 function encodeCode(st) {
   let bits = bitsOf(CODE_VERSION, 3) + bitsOf(st.level - 1, 2) + bitsOf(st.avatar || 0, 4)
     + PREF_KEYS.map(k => st.prefs[k] ? '1' : '0').join('') + bitsOf(st.unit || 0, 3)
-    + st.w.map(v => bitsOf(v, 2)).join('');
+    + st.w.map(v => bitsOf(v, 2)).join('') + bitsOf(Math.min(st.bee || 0, BEE_MAX), 7);
   for (let u = 0; u < NUM_UNITS; u++) {
     const arr = st.u[u];
     if (!arr.some(v => v)) { bits += '0'; continue; }
@@ -2376,7 +2387,7 @@ function decodeCode(raw) {
   let p = 0;
   const read = n => { const seg = bits.slice(p, p + n).padEnd(n, '0'); p += n; return parseInt(seg, 2); };
   const ver = read(3);
-  if (ver < 1 || ver > 3) throw new Error('That code is from a different version of WordClimb.');
+  if (ver < 1 || ver > 4) throw new Error('That code is from a different version of WordClimb.');
   const level = read(2) + 1;
   if (level > 3) throw new Error('That code does not look right.');
   const st = newStudent(name, level, 0);
@@ -2389,6 +2400,7 @@ function decodeCode(raw) {
   }
   st.unit = Math.min(read(3), NUM_UNITS - 1);
   for (let t = 0; t < 3; t++) st.w[t] = read(2);
+  if (ver >= 4) st.bee = read(7);
   for (let u = 0; u < NUM_UNITS; u++) {
     if (!read(1)) continue;
     for (let w = 0; w < WEEKS; w++) {
@@ -2591,7 +2603,7 @@ function settingsModal() {
     <h3 style="margin-top:16px">Your climber</h3>
     ${avatarGrid(S.avatar || 0, 'setAvatar')}
     <h3 style="margin-top:16px">Your trail</h3>
-    <p class="small muted">Switch any time. Your stars stay with you.</p>
+    <p class="small muted">Switch any time. Your stars stay with you. <button class="btn ghost small" data-act="startQuiz" data-from="settings">🧭 Take the trail quiz</button></p>
     <div class="grid">${[1, 2, 3].map(l => `
       <button class="levelpick ${S.level === l ? 'sel' : ''}" data-act="setLevel" data-l="${l}">
         <span class="ic">${LEVELS[l].icon}</span> <b>${LEVELS[l].name}</b><br><span class="small muted">${LEVELS[l].desc}</span>
@@ -2623,6 +2635,7 @@ function renderStart(msg) {
           <button class="levelpick ${newLevel === l ? 'sel' : ''}" data-act="pickNewLevel" data-l="${l}">
             <div class="ic">${LEVELS[l].icon}</div><b>${LEVELS[l].name}</b><div class="small muted">${LEVELS[l].desc}</div>
           </button>`).join('')}</div>
+        <p style="text-align:center;margin:-6px 0 12px"><button class="btn ghost small" data-act="startQuiz" data-from="start">🧭 Not sure? Take the 2-minute trail quiz</button></p>
         <div class="err" id="err">${esc(msg || '')}</div>
         <button class="btn sun" style="width:100%" data-act="startNew">Start climbing ➜</button>
       ` : `
@@ -2725,6 +2738,14 @@ function renderHome() {
       }).join('')}
     </div>
 
+    <h2>Spelling Bee</h2>
+    <button class="week" style="--c:#f2b705;margin-bottom:26px;display:flex;gap:16px;align-items:center" data-act="openBee">
+      <span style="font-size:3rem">🐝</span>
+      <span style="flex:1"><h3 style="margin:0">Spelling Bee</h3><span class="small muted">No timer. Spell as many words in a row as you can.</span>
+        <div class="small" style="margin-top:4px">Best: <b>${S.bee || 0} in a row</b> ${BEE_BADGES.filter(b => (S.bee || 0) >= b.at).map(b => b.e).join(' ')}</div></span>
+      <span class="btn sun small">Play ➜</span>
+    </button>
+
     <div class="card"><h2>🎒 Gear Locker</h2>
       <div class="gear">${GEAR.map(g => `<div class="g ${total >= g.at ? 'have' : 'lock'}"><span class="e">${g.e}</span>${total >= g.at ? g.n : '★ ' + g.at}</div>`).join('')}</div>
     </div>`);
@@ -2770,14 +2791,15 @@ function renderUnit() {
 /* ---------------- WEEK SCREEN ---------------- */
 const JOIN_OPTS = ['🔗 One word', '␣ Space', '➖ Hyphen'];
 const JOIN_HINT = ['(one word)', '(two words)', '(with hyphens)'];
-function parseWord(str, wk) {
+function parseWord(str, wk, u = S.unit) {
   const [raw, cat, sentence, alts] = str.split('|');
-  if (USP()[wk].mode === 'join') {
+  const mode = UNITS[u].spell[wk].mode;
+  if (mode === 'join') {
     const segs = raw.split(/[+ \-]/);
     return { word: raw.replace(/\+/g, ''), parts: [{ t: raw.replace(/\+/g, '') }], join: true, segs,
       chunk: JOIN_OPTS[+cat], cat: +cat, sentence, wk };
   }
-  if (USP()[wk].mode === 'syll') {
+  if (mode === 'syll') {
     // "fac·tor": kids pick where the syllables split. Wrong choices shift the first split by one letter.
     const syls = raw.split('·'), word = syls.join(''), cut = syls[0].length;
     const at = c => word.slice(0, c) + '·' + word.slice(c);
@@ -2793,10 +2815,10 @@ function parseWord(str, wk) {
   }
   if (last < raw.length) parts.push({ t: raw.slice(last) });
   return { word: raw.replace(/[\[\]]/g, ''), parts, chunk: chunks.join('_'), cat: +cat, sentence, wk,
-    alts: alts ? alts.split(',') : null, homo: USP()[wk].mode === 'homo' };
+    alts: alts ? alts.split(',') : null, homo: mode === 'homo' };
 }
 // Every word for the week (study list). A round uses a random ROUND_SIZE of them, so replays feel fresh.
-const allWeekWords = w => USP()[w].words[S.level].map(s => parseWord(s, w));
+const allWeekWords = (w, u = S.unit, lvl = S.level) => UNITS[u].spell[w].words[lvl].map(s => parseWord(s, w, u));
 function weekWords(w) {
   if (w < 5) return shuffle(allWeekWords(w)).slice(0, ROUND_SIZE);
   let out = [];
@@ -3038,8 +3060,8 @@ function pickChunk(i, el) {
 
 /* ---------------- GRAMMAR ACTIVITIES ---------------- */
 const GRAM_ROUND = 8;
-function makeQs(w, a, lvl) {
-  const G = UGR()[w];
+function makeQs(w, a, lvl, u = S.unit) {
+  const G = UNITS[u].gram[w];
   return [].concat(a === 0 ? G.spot : G.fix).flatMap(part => part.items[lvl].map(str => {
     if (part.kind === 'mc') { const [text, ans] = str.split('|'); return { kind: 'mc', prompt: part.prompt, text, options: part.options, answer: part.options[+ans] }; }
     if (part.kind === 'split') { const [subj, pred] = str.split('|').map(s => s.trim()); const sw = subj.split(/\s+/), pw = pred.split(/\s+/); return { kind: 'split', prompt: part.prompt, words: sw.concat(pw), answerIndex: sw.length }; }
@@ -3398,6 +3420,7 @@ function finishWriting(text) {
   renderTop(); if (improved) bumpStars();
   const gearHTML = gearUnlockHTML(totalBefore, totalStars());
   sfx('finish'); bigConfetti();
+  $('#printArea').className = 'print-area';
   $('#printArea').innerHTML = `<h2>${esc(cap(S.name.toLowerCase()))}: ${esc(WRITING[WS.t].name)} Paragraph</h2><p>${esc(text)}</p>`;
   WS.finalText = text;
   render(`
@@ -3430,10 +3453,288 @@ function renderTeacher() {
     <textarea class="write" id="tcodes" style="min-height:140px" placeholder="MARIA-7K2P-Q9XM&#10;JAYDEN-4MRT-..."></textarea>
     <div class="row" style="margin:10px 0 18px"><button class="btn sun" data-act="teacherRun">Show progress</button><button class="btn ghost" data-act="teacherCSV" id="csvBtn" disabled>📋 Copy as spreadsheet</button></div>
     <div id="tout"></div>
+    ${printablesHTML()}
     <div class="card" style="margin-top:20px"><h3>How the stars work</h3>
       <p class="small">Each activity earns 1 to 3 stars: 1 for finishing, 2 for 70% or better on the first try, 3 for 90% or better. Each week has 15 stars (3 spelling activities and 2 grammar activities), so each unit has 90. Pick "Unit N weeks" to see week-by-week detail. Writing shows steps completed (Build It, Boost It, Write It) for each type.</p>
       <p class="small">Codes are checked, so a student who changes a letter will get an error instead of fake stars. Codes are not a password though, so a determined kid could share one.</p></div>`);
 }
+/* ---------------- SPELLING BEE ----------------
+   No timer. Practice Bee keeps going forever; Challenge Bee ends after 3 misses.
+   The best streak (words in a row) is saved in the code. */
+const BEE_BADGES = [
+  { at: 10, e: '🐝', n: 'Busy Bee' }, { at: 25, e: '🍯', n: 'Honey Hero' },
+  { at: 50, e: '👑', n: 'Bee Royalty' }, { at: 100, e: '🏆', n: 'Hive Legend' }
+];
+const BEE_CHEERS = { 5: '🐝 5 in a row!', 10: '🐝 10 in a row! Busy Bee!', 15: '🔥 15 in a row!', 25: '🍯 25! Honey Hero!', 50: '👑 50! Bee Royalty!' };
+let BEE = null, beeSetup = { u: -1, mode: 'practice' };
+function beeBadgesHTML(best) {
+  return `<div class="gear">${BEE_BADGES.map(b => `<div class="g ${best >= b.at ? 'have' : 'lock'}"><span class="e">${b.e}</span>${best >= b.at ? b.n : b.at + ' in a row'}</div>`).join('')}</div>`;
+}
+function renderBeeSetup() {
+  ACT = null; WS = null; BEE = null; renderTop();
+  render(`
+    <button class="btn ghost small" data-act="goHome">← Home</button>
+    <div class="band" style="margin-top:12px;background:linear-gradient(135deg,#ffd23c,#f29d16);color:#3a2500">
+      <span class="big">🐝</span><span class="ttl" style="font-size:1.6rem">Spelling Bee</span><span class="streak">Best: ${S.bee || 0} in a row</span></div>
+    <div class="card"><h3>1. Pick your words</h3>
+      <div class="pool" style="justify-content:flex-start">
+        <button class="chip ${beeSetup.u === -1 ? 'sel' : ''}" data-act="beeUnit" data-u="-1">🌎 All mountains</button>
+        ${UNITS.map((U, u) => `<button class="chip ${beeSetup.u === u ? 'sel' : ''}" data-act="beeUnit" data-u="${u}">${U.icon} Unit ${u + 1}</button>`).join('')}
+      </div>
+      <p class="small muted" style="margin-top:8px">Words come from your ${LEVELS[S.level].name} trail.</p></div>
+    <div class="card"><h3>2. Pick your mode</h3>
+      <div class="grid g2">
+        <button class="levelpick ${beeSetup.mode === 'practice' ? 'sel' : ''}" data-act="beeMode" data-m="practice"><span class="ic">🌼</span> <b>Practice Bee</b><br><span class="small muted">No pressure. Keep spelling as long as you want. Miss one? Type it once and keep going.</span></button>
+        <button class="levelpick ${beeSetup.mode === 'challenge' ? 'sel' : ''}" data-act="beeMode" data-m="challenge"><span class="ic">❤️</span> <b>Challenge Bee</b><br><span class="small muted">You get 3 hearts. How long can you last?</span></button>
+      </div></div>
+    <button class="btn sun" style="width:100%;font-size:1.3rem" data-act="startBee">Start the Bee! 🐝</button>
+    <div class="card" style="margin-top:16px"><h3>Bee badges</h3>${beeBadgesHTML(S.bee || 0)}</div>`);
+}
+function beePool() {
+  const units = beeSetup.u === -1 ? UNITS.map((_, u) => u) : [beeSetup.u];
+  let pool = [];
+  units.forEach(u => { for (let w = 0; w < 5; w++) pool = pool.concat(allWeekWords(w, u, S.level)); });
+  return shuffle(pool);
+}
+function startBee() {
+  BEE = { pool: beePool(), idx: 0, streak: 0, roundBest: 0, correct: 0, hearts: beeSetup.mode === 'challenge' ? 3 : null,
+    missed: false, startBest: S.bee || 0 };
+  renderBee();
+}
+function beeWord() { return BEE.pool[BEE.idx % BEE.pool.length]; }
+function renderBee(feedback) {
+  const wd = beeWord();
+  render(`
+    <div class="band" style="background:linear-gradient(135deg,#ffd23c,#f29d16);color:#3a2500">
+      <button class="btn ghost small" style="color:#3a2500;border-color:rgba(0,0,0,.25)" data-act="beeEnd">End round</button>
+      <span class="big">🐝</span><span class="ttl">Spelling Bee</span>
+      ${BEE.hearts !== null ? `<span class="streak" style="font-size:1.2rem">${'❤️'.repeat(BEE.hearts)}${'🤍'.repeat(3 - BEE.hearts)}</span>` : ''}
+      <span class="streak ${BEE.streak >= 3 ? 'hot' : ''}" style="font-size:1.1rem">🔥 ${BEE.streak} in a row</span>
+    </div>
+    <div class="card" style="text-align:center">
+      <p class="big-q">Listen, then spell the word.</p>
+      <div class="row" style="justify-content:center;margin-bottom:16px">
+        <button class="btn teal" data-act="beeSay">🔊 Hear word</button>
+        <button class="btn ghost" data-act="beeSlow">🐢 Slow</button>
+        <button class="btn ghost" data-act="beeSentence">📖 In a sentence</button>
+      </div>
+      <div style="min-height:3rem">${BEE.missed ? `<div class="hint-word">${esc(wd.word)}</div><p class="muted">${BEE.hearts === null ? 'Type it once to lock it in.' : 'That word was tricky. Remember it for next time!'}</p>` : ''}</div>
+      ${BEE.missed && BEE.hearts !== null ? '' : `<input id="beeIn" class="field" style="max-width:420px;text-align:center;font-size:1.5rem" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="type here" />`}
+      <div class="feedback ${feedback ? feedback[0] : ''}" id="fb">${feedback ? feedback[1] : ''}</div>
+      ${BEE.missed && BEE.hearts !== null
+        ? `<button class="btn sun" data-act="${BEE.hearts > 0 ? 'beeNext' : 'beeEnd'}" id="beeNextBtn">${BEE.hearts > 0 ? 'Next word ➜' : 'See my results ➜'}</button>`
+        : `<button class="btn sun" data-act="beeCheck">Check ✓</button>`}
+      <p class="small muted" style="margin-top:14px">Spelled this round: ${BEE.correct} · Your best ever: ${Math.max(S.bee || 0, BEE.roundBest)} in a row</p>
+    </div>`);
+  const inp = $('#beeIn');
+  if (inp) { inp.focus(); inp.addEventListener('keydown', e => { if (e.key === 'Enter') beeCheck(); }); }
+  const nb = $('#beeNextBtn'); if (nb) nb.focus();
+  if (!BEE.missed) setTimeout(() => speak(wd.word), 250);
+}
+function beeCheck() {
+  const inp = $('#beeIn'); if (!inp) return;
+  const val = normSpell(inp.value); if (!val) return;
+  const wd = beeWord();
+  if (val === normSpell(wd.word)) {
+    if (BEE.missed) { BEE.missed = false; BEE.idx++; renderBee(['good', 'Locked in! Next one. ✓']); return; }
+    BEE.streak++; BEE.correct++; BEE.roundBest = Math.max(BEE.roundBest, BEE.streak);
+    if (BEE.streak > (S.bee || 0)) S.bee = Math.min(BEE.streak, BEE_MAX);
+    if (BEE_CHEERS[BEE.streak]) { sfx('streak'); toast(BEE_CHEERS[BEE.streak]); confettiFrom(inp, 30, 220); }
+    else { sfx('good'); confettiFrom(inp, 14); }
+    inp.disabled = true;
+    const fb = $('#fb'); fb.className = 'feedback good'; fb.textContent = ['Buzz-worthy! ✓', 'Yes! ✓', 'Perfect! ✓', 'Nailed it! ✓'][Math.floor(Math.random() * 4)];
+    setTimeout(() => { BEE.idx++; renderBee(); }, 750);
+  } else {
+    if (BEE.missed) { sfx('bad'); const fb = $('#fb'); fb.className = 'feedback bad'; fb.textContent = 'Almost. Copy the word shown above.'; inp.select(); return; }
+    sfx('bad'); BEE.streak = 0; BEE.missed = true;
+    if (BEE.hearts !== null) BEE.hearts--;
+    renderBee(['bad', BEE.hearts === 0 ? 'Out of hearts!' : 'Not quite. Here is the word.']);
+    speak(wd.word);
+  }
+}
+function beeEnd() {
+  const best = S.bee || 0, before = BEE.startBest, improved = best > before;
+  if (improved) persist();
+  const newBadges = BEE_BADGES.filter(b => before < b.at && best >= b.at);
+  renderTop(); sfx('finish'); if (BEE.correct) bigConfetti();
+  render(`
+    <div class="card result" style="max-width:620px;margin:20px auto">
+      <div style="font-size:3rem">🐝${AVATARS[S.avatar || 0]}</div>
+      <h1>Bee round complete!</h1>
+      <p style="font-size:1.2rem">You spelled <b>${BEE.correct}</b> word${BEE.correct === 1 ? '' : 's'} correctly.<br>Best streak this round: <b>${BEE.roundBest}</b> in a row.</p>
+      ${newBadges.map(b => `<div class="unlock"><span class="e">${b.e}</span>New Bee badge: ${b.n}!</div>`).join('')}
+      ${improved ? `<p><span class="streak hot">🏆 New personal best: ${best} in a row!</span></p>
+        <div class="codebox"><div class="small">✨ NEW BEST SAVED! YOUR NEW CODE:</div><div class="code">${esc(encodeCode(S))}</div>
+        <button class="btn sun" data-act="copyCode">📋 Copy my code</button></div>`
+        : `<p class="muted">Your best ever is ${best} in a row. Can you beat it?</p>`}
+      <div class="row" style="justify-content:center">
+        <button class="btn ghost" data-act="openBee">Change settings</button>
+        <button class="btn sun" data-act="startBee">🐝 Go again</button>
+        <button class="btn teal" data-act="goHome">Home</button>
+      </div>
+    </div>`);
+  BEE = null;
+}
+
+/* ---------------- PLACEMENT QUIZ ----------------
+   10 questions, alternating spelling and grammar. Starts on Ridge and moves up or down after each pair.
+   Answers get neutral feedback, so it feels like a check-in, not a test. The kid makes the final pick. */
+const QUIZ_LEN = 10;
+let QZ = null;
+function startQuiz(from) {
+  const name = $('#nm') ? $('#nm').value : '';
+  QZ = { i: 0, lvl: 2, pair: [], right: 0, from, name, q: null };
+  nextQuizQ();
+}
+const rnd = n => Math.floor(Math.random() * n);
+function nextQuizQ() {
+  if (QZ.i >= QUIZ_LEN) return renderQuizResult();
+  const u = rnd(2), w = rnd(5);
+  if (QZ.i % 2 === 0) {
+    const words = allWeekWords(w, u, QZ.lvl);
+    QZ.q = { kind: 'spell', wd: words[rnd(words.length)] };
+  } else {
+    // Some weeks only have tap-the-word questions; keep looking until we find a multiple-choice one.
+    let qs = [];
+    for (let tries = 0; !qs.length && tries < 50; tries++) qs = makeQs(rnd(5), rnd(2), QZ.lvl, rnd(2)).filter(q => q.kind !== 'split');
+    QZ.q = { kind: 'gram', g: qs[rnd(qs.length)] };
+  }
+  renderQuiz();
+}
+function renderQuiz() {
+  const q = QZ.q;
+  const head = `<div class="band" style="background:linear-gradient(135deg,#5f8bd8,#3b5fae)">
+      <span class="big">🧭</span><span class="ttl">Find Your Trail</span>
+      <div style="flex-basis:100%;display:flex;align-items:center;gap:10px"><div class="meter" style="flex:1;margin:0"><div style="width:${Math.round(QZ.i / QUIZ_LEN * 100)}%"></div></div>
+      <span class="togo">${QZ.i + 1} of ${QUIZ_LEN}</span></div></div>
+    <p class="muted" style="text-align:center">No grades here. Just do your best so we can find the right trail for you.</p>`;
+  if (q.kind === 'spell') {
+    render(`${head}<div class="card" style="text-align:center">
+      <p class="big-q">Listen, then spell the word.</p>
+      <div class="row" style="justify-content:center;margin-bottom:16px">
+        <button class="btn teal" data-act="quizSay">🔊 Hear word</button><button class="btn ghost" data-act="quizSlow">🐢 Slow</button><button class="btn ghost" data-act="quizSentence">📖 In a sentence</button></div>
+      <input id="qzIn" class="field" style="max-width:420px;text-align:center;font-size:1.5rem" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="type here" />
+      <div class="row" style="justify-content:center;margin-top:14px"><button class="btn ghost" data-act="quizAnswer" data-ok="0">I'm not sure, skip</button><button class="btn sun" data-act="quizSpell">Next ➜</button></div>
+    </div>`);
+    const inp = $('#qzIn'); inp.focus(); inp.addEventListener('keydown', e => { if (e.key === 'Enter') ACTIONS.quizSpell(); });
+    setTimeout(() => speak(q.wd.word), 250);
+  } else {
+    const g = q.g;
+    render(`${head}<div class="card">
+      <div class="row"><p class="big-q" style="flex:1">${esc(g.prompt)}</p><button class="speak" data-act="say" data-text="${esc(g.prompt)}">🔊</button></div>
+      <div class="sentence-card"><span class="txt">${esc(g.text)}</span><button class="speak" data-act="say" data-text="${esc(g.text)}">🔊</button></div>
+      <div class="opts">${g.options.map((o, i) => `<div class="opt-row"><button class="opt" data-act="quizAnswer" data-ok="${isRight(g, i) ? 1 : 0}">${esc(o)}</button><button class="speak" data-act="say" data-text="${esc(o)}">🔊</button></div>`).join('')}
+      <div class="opt-row"><button class="opt" style="color:var(--muted)" data-act="quizAnswer" data-ok="0">I'm not sure, skip</button></div></div>
+    </div>`);
+    if (settings.read) setTimeout(() => speak(g.prompt + '. ' + g.text), 250);
+  }
+}
+function quizAnswer(ok) {
+  QZ.pair.push(ok); if (ok) QZ.right++;
+  QZ.i++;
+  if (QZ.pair.length === 2) {
+    const n = QZ.pair.filter(Boolean).length;
+    if (n === 2) QZ.lvl = Math.min(3, QZ.lvl + 1);
+    if (n === 0) QZ.lvl = Math.max(1, QZ.lvl - 1);
+    QZ.pair = [];
+  }
+  sfx('tap');
+  nextQuizQ();
+}
+function renderQuizResult() {
+  const rec = QZ.lvl;
+  sfx('finish');
+  render(`<div class="card result" style="max-width:720px;margin:20px auto">
+    <div style="font-size:3rem">🧭</div>
+    <h1>Here is what we found!</h1>
+    <p style="font-size:1.15rem">Based on your answers, we suggest <b>${LEVELS[rec].icon} ${LEVELS[rec].name}</b>.</p>
+    <p class="muted">But you know yourself best. Pick the trail that feels right, and you can switch any time in Settings.</p>
+    <div class="grid g3" style="margin:16px 0;text-align:left">${[1, 2, 3].map(l => `
+      <button class="levelpick ${l === rec ? 'sel' : ''}" data-act="quizPick" data-l="${l}">
+        <div class="ic">${LEVELS[l].icon}</div><b>${LEVELS[l].name}</b>${l === rec ? ' <span class="tag w">⭐ Suggested</span>' : ''}<div class="small muted">${LEVELS[l].desc}</div>
+      </button>`).join('')}</div>
+  </div>`);
+}
+function quizPick(l) {
+  const from = QZ.from, name = QZ.name; QZ = null;
+  if (from === 'start') { newLevel = l; startTab = 'new'; renderStart(); $('#nm').value = name; toast(`${LEVELS[l].icon} ${LEVELS[l].name} picked! Now type your name and start.`); return; }
+  if (l !== S.level) { S.level = l; persist(); toast('Trail switched to ' + LEVELS[l].name + '. Your code changed!'); }
+  renderHome();
+}
+
+/* ---------------- TEACHER PRINTABLES ---------------- */
+let PR = { u: 0, w: 0, lvl: 2 };
+function printablesHTML() {
+  const sel = (id, opts, cur) => `<select id="${id}" class="field" style="padding:8px 10px;font-size:1rem">${opts.map(([v, l]) => `<option value="${v}" ${v === cur ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>`;
+  return `<div class="card" style="margin-top:20px"><h2>🖨️ Printables</h2>
+    <p class="small muted">Pick a unit and week, then print. Everything prints in clean black and white.</p>
+    <div class="grid g3" style="margin-bottom:14px">
+      <label><b class="small">Unit</b>${sel('prU', UNITS.map((U, u) => [u, `Unit ${u + 1}: ${U.name}`]), PR.u)}</label>
+      <label><b class="small">Week</b>${sel('prW', [0, 1, 2, 3, 4].map(w => [w, `Week ${w + 1}: ${UNITS[PR.u].spell[w].title}`]), PR.w)}</label>
+      <label><b class="small">Trail (for test, answer sheet, and key)</b>${sel('prL', [1, 2, 3].map(l => [l, `${LEVELS[l].icon} ${LEVELS[l].name}`]), PR.lvl)}</label>
+    </div>
+    <div class="row">
+      <button class="btn ghost small" data-act="printDoc" data-k="lists">📋 Word lists (all 3 trails)</button>
+      <button class="btn ghost small" data-act="printDoc" data-k="dict">🗣️ Dictation test script</button>
+      <button class="btn ghost small" data-act="printDoc" data-k="sheet">✏️ Student answer sheet</button>
+      <button class="btn ghost small" data-act="printDoc" data-k="key">🔑 Grammar answer key</button>
+      <button class="btn sun small" data-act="printDoc" data-k="all">🖨️ Print the whole week</button>
+    </div></div>`;
+}
+function readPrintChoices() {
+  const u = $('#prU'), w = $('#prW'), l = $('#prL');
+  if (u) PR.u = +u.value; if (w) PR.w = +w.value; if (l) PR.lvl = +l.value;
+}
+function printHeader(title) {
+  const U = UNITS[PR.u], wk = U.spell[PR.w];
+  return `<h1>${esc(title)}</h1><div class="sub">WordClimb · Unit ${PR.u + 1}: ${esc(U.name)} · Week ${PR.w + 1} · Spelling: ${esc(wk.title)} · Grammar: ${esc(U.gram[PR.w].title)}</div>`;
+}
+function printLists() {
+  const wk = UNITS[PR.u].spell[PR.w];
+  return `<div class="page">${printHeader('Spelling Word Lists')}
+    <p><b>Pattern:</b> ${esc(wk.tip)}</p>
+    <div class="trails">${[1, 2, 3].map(l => `<div><h2>${LEVELS[l].name}</h2><ol class="one">${allWeekWords(PR.w, PR.u, l).map(wd => `<li>${esc(wd.word)}</li>`).join('')}</ol></div>`).join('')}</div></div>`;
+}
+function printDictation() {
+  const words = allWeekWords(PR.w, PR.u, PR.lvl);
+  return `<div class="page">${printHeader(`Spelling Test Script · ${LEVELS[PR.lvl].name}`)}
+    <p class="sub">Read the word, read the sentence, then read the word again.</p>
+    <ol class="one">${words.map(wd => `<li><b>${esc(wd.word)}</b>: ${esc(wd.sentence)}</li>`).join('')}</ol></div>`;
+}
+function printSheet() {
+  const n = allWeekWords(PR.w, PR.u, PR.lvl).length;
+  return `<div class="page">${printHeader('Spelling Test')}
+    <div class="nameline">Name: <span class="line" style="width:45%"></span> &nbsp; Date: <span class="line" style="width:25%"></span></div>
+    <ol>${Array.from({ length: n }, () => `<li><span class="line"></span></li>`).join('')}</ol></div>`;
+}
+function keyAnswer(q) {
+  if (q.kind === 'split') return `Predicate starts at "${q.words[q.answerIndex]}"`;
+  return q.answers ? q.answers.map(i => q.options[i]).join(' or ') : q.answer;
+}
+function printKey() {
+  const G = UNITS[PR.u].gram[PR.w];
+  return `<div class="page">${printHeader(`Grammar Answer Key · ${LEVELS[PR.lvl].name}`)}
+    ${GRAM_ACTS.map((act, a) => {
+      let lastPrompt = '';
+      const qs = makeQs(PR.w, a, PR.lvl, PR.u);
+      return `<h2>${act.name}</h2><table><tr><th style="width:5%">#</th><th>Question</th><th style="width:34%">Answer</th></tr>
+        ${qs.map((q, i) => {
+          const showPrompt = q.prompt !== lastPrompt; lastPrompt = q.prompt;
+          const text = q.kind === 'split' ? q.words.join(' ') : q.text;
+          return `<tr><td>${i + 1}</td><td>${showPrompt ? `<i>${esc(q.prompt)}</i><br>` : ''}${esc(text)}</td><td><b>${esc(keyAnswer(q))}</b></td></tr>`;
+        }).join('')}</table>`;
+    }).join('')}</div>`;
+}
+function printDoc(kind) {
+  readPrintChoices();
+  const parts = { lists: printLists, dict: printDictation, sheet: printSheet, key: printKey };
+  const html = kind === 'all' ? ['lists', 'dict', 'sheet', 'key'].map(k => parts[k]()).join('') : parts[kind]();
+  const pa = $('#printArea');
+  pa.className = 'print-area doc';
+  pa.innerHTML = `<div class="pdoc">${html}</div>`;
+  window.print();
+}
+
 let teacherRows = [], teacherUnit = -1;
 function wkSplit(st, u, w) {
   let s = 0, g = 0; for (let a = 0; a < 3; a++) s += st.u[u][spellSlot(w, a)]; for (let a = 0; a < 2; a++) g += st.u[u][gramSlot(w, a)];
@@ -3455,25 +3756,25 @@ function teacherTable() {
     <div class="scroll-x"><table class="t"><thead><tr><th>Student</th><th>Trail</th>
     ${detail ? Array.from({ length: WEEKS }, (_, w) => `<th>Wk ${w + 1}<br><span class="small">Spell / Gram</span></th>`).join('')
       : UNITS.map((U, u) => `<th>Unit ${u + 1}<br><span class="small">of ${UNIT_MAX}</span></th>`).join('')}
-    ${WRITING.map(t => `<th>${t.name}</th>`).join('')}<th>Total ★</th></tr></thead><tbody>
+    ${WRITING.map(t => `<th>${t.name}</th>`).join('')}<th>🐝 Bee best</th><th>Total ★</th></tr></thead><tbody>
     ${teacherRows.map(r => r.ok ? `<tr><td>${AVATARS[r.avatar || 0]} ${esc(r.name)}</td><td>${LEVELS[r.level].name}</td>
       ${detail ? Array.from({ length: WEEKS }, (_, w) => { const x = wkSplit(r, teacherUnit, w); return `<td>${x.s}/9 · ${x.g}/6</td>`; }).join('')
         : UNITS.map((U, u) => `<td>${unitStars(r, u) || '·'}</td>`).join('')}
-      ${WRITING.map((_, t) => `<td>${r.w[t]}/3</td>`).join('')}<td><b>${totalStars(r)}</b></td></tr>`
-      : `<tr><td colspan="${3 + cols + WRITING.length}" style="text-align:left;color:var(--red)">${esc(r.code)}: ${esc(r.err)}</td></tr>`).join('')}
+      ${WRITING.map((_, t) => `<td>${r.w[t]}/3</td>`).join('')}<td>${r.bee || 0}</td><td><b>${totalStars(r)}</b></td></tr>`
+      : `<tr><td colspan="${4 + cols + WRITING.length}" style="text-align:left;color:var(--red)">${esc(r.code)}: ${esc(r.err)}</td></tr>`).join('')}
     </tbody></table></div>` : '<p class="muted">No codes found.</p>';
 }
 function teacherCSV() {
   const head = ['Student', 'Trail'];
   UNITS.forEach((U, u) => head.push(`Unit ${u + 1} Stars`));
   UNITS.forEach((U, u) => { if (unitReady(u)) for (let w = 0; w < WEEKS; w++) head.push(`U${u + 1} Wk${w + 1} Spelling`, `U${u + 1} Wk${w + 1} Grammar`); });
-  WRITING.forEach(t => head.push(t.name)); head.push('Total Stars');
+  WRITING.forEach(t => head.push(t.name)); head.push('Bee Best Streak', 'Total Stars');
   const lines = [head.join('\t')];
   teacherRows.filter(r => r.ok).forEach(r => {
     const row = [r.name, LEVELS[r.level].name];
     UNITS.forEach((U, u) => row.push(unitStars(r, u)));
     UNITS.forEach((U, u) => { if (unitReady(u)) for (let w = 0; w < WEEKS; w++) { const x = wkSplit(r, u, w); row.push(x.s, x.g); } });
-    WRITING.forEach((_, t) => row.push(r.w[t])); row.push(totalStars(r));
+    WRITING.forEach((_, t) => row.push(r.w[t])); row.push(r.bee || 0, totalStars(r));
     lines.push(row.join('\t'));
   });
   copyText(lines.join('\n')).then(ok => toast(ok ? 'Copied! Paste into Google Sheets.' : 'Copy failed. Try again.'));
@@ -3499,6 +3800,24 @@ const ACTIONS = {
   teacherRun: () => teacherRun(),
   teacherCSV: () => teacherCSV(),
   teacherUnit: d => { teacherUnit = +d.u; teacherTable(); },
+  printDoc: d => printDoc(d.k),
+  openBee: () => renderBeeSetup(),
+  beeUnit: d => { beeSetup.u = +d.u; renderBeeSetup(); },
+  beeMode: d => { beeSetup.mode = d.m; renderBeeSetup(); },
+  startBee: () => startBee(),
+  beeSay: () => speak(beeWord().word),
+  beeSlow: () => speak(beeWord().word, 0.5),
+  beeSentence: () => { const wd = beeWord(); speak(`${wd.word}. ${wd.sentence} ${wd.word}.`); },
+  beeCheck: () => beeCheck(),
+  beeNext: () => { BEE.missed = false; BEE.idx++; renderBee(); },
+  beeEnd: () => beeEnd(),
+  startQuiz: d => { closeModal(); startQuiz(d.from); },
+  quizSay: () => speak(QZ.q.wd.word),
+  quizSlow: () => speak(QZ.q.wd.word, 0.5),
+  quizSentence: () => { const wd = QZ.q.wd; speak(`${wd.word}. ${wd.sentence} ${wd.word}.`); },
+  quizSpell: () => { const v = normSpell($('#qzIn').value); if (!v) { toast('Type your best guess, or tap skip.'); return; } quizAnswer(v === normSpell(QZ.q.wd.word)); },
+  quizAnswer: d => quizAnswer(d.ok === '1'),
+  quizPick: d => quizPick(+d.l),
   openUnit: d => openUnit(+d.u),
   goUnit: () => renderUnit(),
   mystery: d => mystery(+d.w),
@@ -3575,7 +3894,7 @@ const ACTIONS = {
 // Any button that moves to a different screen stops the voice first.
 const NAV_ACTS = new Set(['goStart', 'goHome', 'goUnit', 'openUnit', 'openWeek', 'openWriting', 'backSteps', 'quitAct', 'retryAct',
   'startSpell', 'startGram', 'mystery', 'pickTopic', 'pickSide', 'pickStep', 'finishWrite', 'finishFree', 'nextQ', 'teacher', 'logout',
-  'spin', 'respin', 'startNew', 'loadCode']);
+  'spin', 'respin', 'startNew', 'loadCode', 'openBee', 'startBee', 'beeNext', 'beeEnd', 'startQuiz', 'quizAnswer', 'quizSpell', 'quizPick']);
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]');
   if (!el || el.disabled) return;
@@ -3589,6 +3908,9 @@ document.addEventListener('click', e => {
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopSpeech(); });
 window.addEventListener('pagehide', stopSpeech);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('change', e => {
+  if (e.target.id === 'prU') { readPrintChoices(); PR.w = 0; const card = e.target.closest('.card'); card.outerHTML = printablesHTML(); }
+});
 window.addEventListener('beforeunload', e => {
   if (S && !codeCopied) { e.preventDefault(); e.returnValue = ''; }
 });
