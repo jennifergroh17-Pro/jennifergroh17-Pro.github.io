@@ -2454,10 +2454,17 @@ function pickVoice() {
   voice = vs.find(v => /en-US/i.test(v.lang) && /Google|Samantha|Natural/i.test(v.name)) || vs.find(v => /en-US/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
 }
 if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+let lastSpoken = '';
+function stopSpeech() { if ('speechSynthesis' in window) speechSynthesis.cancel(); lastSpoken = ''; }
 function speak(text, rate) {
   if (!('speechSynthesis' in window) || !text) return;
+  // Tapping the same 🔊 again while it is still talking stops it.
+  const busy = speechSynthesis.speaking || speechSynthesis.pending;
+  if (busy && text === lastSpoken) return stopSpeech();
   speechSynthesis.cancel();
+  lastSpoken = text;
   const u = new SpeechSynthesisUtterance(text.replace(/_+/g, 'blank'));
+  u.onend = () => { if (lastSpoken === text) lastSpoken = ''; };
   if (voice) u.voice = voice;
   u.rate = rate || (settings.slow ? 0.7 : 0.95);
   speechSynthesis.speak(u);
@@ -3501,6 +3508,7 @@ const ACTIONS = {
   settingsModal: () => settingsModal(),
   togglePref: d => {
     settings[d.k] = !settings[d.k]; saveSettings(); applyCalm(); renderTop(); settingsModal();
+    if (d.k === 'read' && !settings.read) stopSpeech();
     if (d.k === 'sound' && settings.sound) sfx('good');
     if (d.k === 'slow') speak(settings.slow ? 'Slow voice on.' : 'Normal voice.');
   },
@@ -3564,12 +3572,22 @@ const ACTIONS = {
   printPara: () => window.print()
 };
 
+// Any button that moves to a different screen stops the voice first.
+const NAV_ACTS = new Set(['goStart', 'goHome', 'goUnit', 'openUnit', 'openWeek', 'openWriting', 'backSteps', 'quitAct', 'retryAct',
+  'startSpell', 'startGram', 'mystery', 'pickTopic', 'pickSide', 'pickStep', 'finishWrite', 'finishFree', 'nextQ', 'teacher', 'logout',
+  'spin', 'respin', 'startNew', 'loadCode']);
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]');
   if (!el || el.disabled) return;
   const fn = ACTIONS[el.dataset.act];
-  if (fn) { e.preventDefault(); fn(el.dataset, el); }
+  if (!fn) return;
+  e.preventDefault();
+  if (NAV_ACTS.has(el.dataset.act)) stopSpeech();
+  fn(el.dataset, el);
 });
+// Switching tabs, minimizing, or closing the page also stops it.
+document.addEventListener('visibilitychange', () => { if (document.hidden) stopSpeech(); });
+window.addEventListener('pagehide', stopSpeech);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 window.addEventListener('beforeunload', e => {
   if (S && !codeCopied) { e.preventDefault(); e.returnValue = ''; }
