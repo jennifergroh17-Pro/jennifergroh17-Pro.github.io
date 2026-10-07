@@ -1,0 +1,1606 @@
+<!doctype html>
+<!--
+  SMART SHOPPER: Grocery and Checking Account Practice
+  (c) 2026 Brazen Learning. All rights reserved.
+
+  QUICK SETTINGS (all at the very top of the <script> section below):
+    TEACHER_PIN  : 4-digit PIN for the Teacher area. Default is 1234.
+    SUBMIT_MODE  : 'post' sends scores quietly in the background.
+                   'open' opens the pre-filled Google Form in a new tab
+                   (use this if 'post' scores do not show up in your form).
+    FORM_URL     : your Google Form link ending in /formResponse
+    ENTRY_NAME, ENTRY_MODE, ENTRY_LEVEL, ENTRY_STARS, ENTRY_RESULT :
+                   the entry.123456789 numbers from a pre-filled link.
+  While any Form setting still says [PASTE ...], the Turn in button stays
+  hidden and students just see their completion code.
+
+  DEPLOY: drag this one index.html onto Netlify. No server, no logins.
+  Outside calls: the optional Google Font and the optional Form send.
+  Both fail quietly. Everything else runs in the browser.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smart Shopper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" onerror="this.remove()">
+<style>
+:root{
+  --bg:#f6f1e3;--card:#fffdf6;--ink:#1b2a1e;--muted:#34463a;
+  --green:#2d6a36;--green2:#1f4f27;--gsoft:#e1eed9;
+  --line:#b9ae8d;--yellow:#e9b92c;--ysoft:#fff3c9;--orange:#c96f1c;--osoft:#fde3cb;
+  --focus:#1d4ed8;--shadow:0 2px 8px rgba(40,50,30,.13);--r:16px;
+}
+html.hc{
+  --bg:#ffffff;--card:#ffffff;--ink:#000000;--muted:#000000;
+  --green:#00450f;--green2:#00330b;--gsoft:#d4f2d4;
+  --line:#000000;--yellow:#c99700;--ysoft:#fff2a0;--orange:#a34d00;--osoft:#ffd7ad;
+  --shadow:none;
+}
+*{box-sizing:border-box}
+html{font-size:18px}
+html.big{font-size:22px}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+  line-height:1.45;overflow-x:hidden}
+h1{font-size:1.7rem;margin:.2rem 0 .6rem}
+h2{font-size:1.35rem;margin:.2rem 0 .5rem}
+h3{font-size:1.1rem;margin:.6rem 0 .3rem}
+p{margin:.35rem 0}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.sr{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:50;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;
+  padding:.5rem 1rem;background:var(--green2);color:#fff;box-shadow:var(--shadow)}
+.top .brand{font-weight:700;font-size:1.25rem;margin-right:auto;white-space:nowrap}
+.top .btn{background:#fff;color:var(--green2);border-color:#fff}
+.top .btn.readbtn{background:var(--ysoft);border-color:var(--yellow);font-size:1.1rem}
+.top .btn.readbtn.on{background:var(--yellow)}
+
+/* buttons */
+.btn{min-height:48px;min-width:48px;padding:.45rem 1rem;border-radius:12px;border:2px solid var(--green);
+  background:var(--card);color:var(--green2);font-weight:700;cursor:pointer;box-shadow:var(--shadow);
+  display:inline-flex;align-items:center;justify-content:center;gap:.4rem;text-align:center}
+.btn:hover{background:var(--gsoft)}
+.btn.primary{background:var(--green);color:#fff}
+.btn.primary:hover{background:var(--green2)}
+.btn.big{font-size:1.25rem;padding:.7rem 1.4rem;min-height:60px}
+.btn.soft{border-color:var(--line);color:var(--ink)}
+.btn[disabled]{opacity:.45;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.7rem 0}
+
+main{max-width:1240px;margin:0 auto;padding:1rem}
+.card{background:var(--card);border:2px solid var(--line);border-radius:var(--r);padding:1rem 1.2rem;box-shadow:var(--shadow);margin:0 0 1rem}
+.center{text-align:center}
+.narrow{max-width:760px;margin-left:auto;margin-right:auto}
+.note{color:var(--muted)}
+.emoji-big{font-size:3rem;line-height:1}
+.stepline{font-weight:700;color:var(--muted)}
+
+/* stars */
+.stars{color:#9a6d00;letter-spacing:.1em;font-size:1.2rem}
+html.hc .stars{color:#000}
+.stars.big{font-size:2.6rem}
+
+/* home */
+.modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin:1rem 0}
+.mode{min-height:150px;border-radius:var(--r);border:3px solid var(--green);background:var(--card);box-shadow:var(--shadow);
+  cursor:pointer;text-align:left;padding:1rem 1.2rem;display:grid;grid-template-columns:auto 1fr;gap:.2rem 1rem;align-items:center}
+.mode:hover{background:var(--gsoft)}
+.mode .mi{font-size:2.6rem;grid-row:span 3}
+.mode .mt{font-size:1.3rem;font-weight:700}
+.mode .ml{color:var(--muted)}
+.mode .msr{display:flex;flex-wrap:wrap;gap:.2rem 1rem}
+.levels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.lvl{min-height:150px;border-radius:var(--r);border:3px solid var(--green);background:var(--card);cursor:pointer;
+  box-shadow:var(--shadow);padding:1rem;text-align:center;display:flex;flex-direction:column;gap:.3rem;align-items:center;justify-content:center}
+.lvl:hover{background:var(--gsoft)}
+.lvl b{font-size:1.3rem}
+input.txt{min-height:52px;font-size:1.3rem;padding:.4rem .7rem;border:2px solid var(--green);border-radius:12px;background:#fff;color:#000;width:100%;max-width:340px}
+.facts{list-style:none;padding:0;margin:.5rem 0;display:grid;gap:.4rem}
+.facts li{font-size:1.15rem;background:var(--gsoft);border-radius:12px;padding:.45rem .8rem}
+.warnbox{background:var(--osoft);border:2px solid var(--orange);border-radius:12px;padding:.5rem .8rem;font-weight:700}
+
+/* feedback (never red) */
+.fb{min-height:1.5rem;margin:.6rem 0;font-size:1.1rem}
+.fb:empty{display:none}
+.fb .good,.fb .notyet,.fb .info{border-radius:12px;padding:.6rem .9rem;border:2px solid}
+.fb .good{background:var(--gsoft);border-color:var(--green)}
+.fb .notyet{background:var(--ysoft);border-color:var(--yellow)}
+.fb .info{background:var(--card);border-color:var(--line)}
+
+/* builder */
+.builder{display:grid;grid-template-columns:360px minmax(0,1fr);gap:1rem;align-items:start}
+.side{position:sticky;top:76px;max-height:calc(100vh - 90px);overflow:auto;background:var(--card);border:2px solid var(--line);
+  border-radius:var(--r);padding:.9rem;box-shadow:var(--shadow)}
+.adhead{background:var(--card);border:2px dashed var(--green);border-radius:var(--r);padding:.6rem 1rem;margin-bottom:.6rem}
+.adhead h2{margin:0}
+.sale{font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:.7rem;margin-top:.6rem}
+.item{position:relative;min-height:48px;border:2px solid var(--line);border-radius:14px;background:var(--card);cursor:pointer;
+  padding:.6rem .7rem;text-align:left;display:grid;grid-template-columns:auto 1fr;gap:.1rem .5rem;box-shadow:var(--shadow)}
+.item .ie{font-size:1.8rem;grid-row:span 2}
+.item .iname{font-weight:700}
+.item .tag{justify-self:start}
+.item .iprice{grid-column:1/-1;font-size:1.3rem;font-weight:700}
+.item .isize,.item .iunit,.item .ion{grid-column:1/-1}
+.item .ion{color:var(--green2);font-weight:700}
+.item.on{background:var(--gsoft);border-color:var(--green);border-width:3px}
+.item.hint{outline:4px solid var(--yellow);outline-offset:2px}
+.hintbadge{grid-column:1/-1;background:var(--ysoft);border-radius:8px;padding:0 .4rem;font-weight:700;justify-self:start}
+.tag{display:inline-block;border-radius:999px;padding:0 .6rem;font-weight:700;border:2px solid}
+.tag.need{background:var(--gsoft);border-color:var(--green);color:var(--green2)}
+.tag.want{background:var(--ysoft);border-color:var(--yellow);color:#4a3600}
+html.hc .tag.want{color:#000}
+.bar{height:28px;border-radius:14px;background:#e9e3d0;border:2px solid var(--line);overflow:hidden;margin:.3rem 0}
+.bar span{display:block;height:100%;border-radius:12px}
+.bar.ok span{background:#3f8f4b}
+.bar.close span{background:var(--yellow)}
+.bar.over span{background:var(--orange)}
+.bigmoney{font-size:1.25rem;font-weight:700}
+.mylist{list-style:none;padding:0;margin:.4rem 0;display:flex;flex-wrap:wrap;gap:.35rem}
+.chip{min-height:48px;border:2px solid var(--line);background:#fff;border-radius:12px;padding:.2rem .6rem;cursor:pointer}
+html.hc .chip{background:#fff}
+.totals div{display:flex;justify-content:space-between;gap:.5rem}
+.sidebtns{display:grid;gap:.5rem;margin-top:.6rem}
+
+/* cards to tap (extras, put back) */
+.picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:.7rem;margin:.6rem 0}
+.pick{min-height:110px;border:2px solid var(--line);border-radius:14px;background:var(--card);cursor:pointer;box-shadow:var(--shadow);
+  padding:.6rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15rem;text-align:center}
+.pick .pe{font-size:2.1rem}
+.pick b{font-size:1.1rem}
+.pick.on{background:var(--gsoft);border:3px solid var(--green)}
+.pick.back{background:#eee8d6;border-style:dashed;opacity:.8}
+html.hc .pick.back{background:#fff}
+.pick.face{background:var(--green);color:#fff;font-size:1.3rem}
+.countbox{display:flex;flex-direction:column;align-items:center;background:var(--gsoft);border-radius:var(--r);padding:1rem;margin:.6rem 0}
+.countbox .num{font-size:2.6rem;font-weight:700}
+
+/* yes / no */
+.yn{display:flex;gap:1rem;flex-wrap:wrap;margin:.8rem 0}
+.yn .btn{min-width:160px;font-size:1.4rem;min-height:70px}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin:.6rem 0}
+
+/* register */
+.regwrap{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:1rem;align-items:start}
+table.reg{width:100%;border-collapse:collapse;background:var(--card);border:2px solid var(--line);border-radius:12px}
+.reg th,.reg td{border:1px solid var(--line);padding:.35rem .5rem;text-align:left}
+.reg th{background:var(--gsoft)}
+.reg td.num,.reg th.num{text-align:right;white-space:nowrap}
+.reg tr.cur td{background:var(--ysoft);font-weight:700}
+.reg tr.later td{color:var(--muted)}
+.reg tr.fee td{background:var(--osoft)}
+.workpanel{position:sticky;top:76px}
+.mathbox{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.3rem;background:#fff;color:#000;border:2px solid var(--line);
+  border-radius:12px;padding:.6rem 1rem;white-space:pre;display:inline-block;margin:.3rem 0;line-height:1.35}
+.inline-in{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.inline-in input{max-width:220px}
+
+/* receipt */
+.rwrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1rem;align-items:start}
+.receipt{background:#fff;color:#000;border:2px solid #888;border-radius:6px;padding:.8rem;font-family:ui-monospace,Menlo,Consolas,monospace;box-shadow:var(--shadow)}
+.receipt .rh{text-align:center;font-weight:700;margin-bottom:.4rem}
+.rline{display:flex;justify-content:space-between;width:100%;min-height:48px;align-items:center;padding:.2rem .6rem;margin:.15rem 0;
+  border:2px dashed #bbb;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;text-align:left;color:#000}
+.rline.marked{background:#fff1c2;border:3px solid #b07d00}
+.rline.shown{border:3px solid #b05a00;background:#ffe2c4}
+.rflat{display:flex;justify-content:space-between;padding:.25rem .6rem;font-weight:700}
+.rtot{border-top:2px dashed #000;margin-top:.3rem;padding-top:.3rem}
+.why{display:block;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:1rem}
+table.ad{width:100%;border-collapse:collapse;background:var(--card)}
+.ad td,.ad th{border-bottom:1px solid var(--line);padding:.2rem .5rem}
+.ad td.num{text-align:right}
+
+/* modal and calculator */
+.modalback{position:fixed;inset:0;padding-top:80px!important;background:rgba(20,30,20,.45);z-index:40;display:flex;align-items:flex-start;justify-content:center;padding:4vh 1rem;overflow:auto}
+.modalback[hidden]{display:none}
+.modal{background:var(--card);border:3px solid var(--green);border-radius:var(--r);max-width:760px;width:100%;padding:1rem 1.3rem;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.modal .mhead{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.calc{position:fixed;right:1rem;top:80px;z-index:60;width:320px;max-width:calc(100vw - 2rem);background:var(--card);border:3px solid var(--green);
+  border-radius:var(--r);padding:.7rem;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.calc[hidden]{display:none}
+.calc.left{right:auto;left:1rem}
+.calc .chead{display:flex;justify-content:space-between;align-items:center}
+.calc .ok{font-weight:700;color:var(--green2)}
+.calc .disp{background:#fff;color:#000;border:2px solid var(--line);border-radius:10px;text-align:right;padding:.3rem .6rem;margin:.4rem 0;min-height:4.2rem}
+.calc .disp .pend{font-size:1rem;min-height:1.4rem;color:#333}
+.calc .disp .cur{font-size:1.9rem;font-weight:700;overflow:hidden;text-overflow:ellipsis}
+.calc .keys{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem}
+.calc .keys button{min-height:56px;font-size:1.5rem;font-weight:700;border-radius:10px;border:2px solid var(--line);background:#fff;color:#000;cursor:pointer}
+.calc .keys button.op{background:var(--gsoft);border-color:var(--green)}
+.calc .keys button.eq{background:var(--green);color:#fff}
+
+/* switches */
+.sw{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.4rem 0;border-bottom:1px solid var(--line)}
+.sw button{min-width:96px}
+.sw button[aria-checked="true"]{background:var(--green);color:#fff}
+
+.finish .code{font-size:2rem;font-weight:700;letter-spacing:.08em;font-family:ui-monospace,Menlo,Consolas,monospace}
+.codebox{background:var(--gsoft);border-radius:var(--r);padding:.6rem 1rem;display:inline-block;margin:.6rem 0}
+.recap{text-align:left;display:inline-block;margin:.4rem 0}
+footer.legal{text-align:center;color:var(--muted);padding:1rem;font-size:1rem}
+.keytable{border-collapse:collapse;margin:.4rem 0 1rem;background:var(--card)}
+.keytable td,.keytable th{border:1px solid var(--line);padding:.25rem .5rem;text-align:left}
+
+@media (max-width:900px){
+  .builder,.regwrap,.rwrap{grid-template-columns:1fr}
+  .side,.workpanel{position:static;max-height:none}
+  .modes,.levels,.choices{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media print{.top,.calc,footer{display:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="brand">🛒 Smart Shopper</span>
+  <button class="btn" id="homeBtn">🏠 Home</button>
+  <button class="btn readbtn" id="readBtn" aria-pressed="false">🔊 Read it to me</button>
+  <button class="btn" id="calcBtn" aria-expanded="false">🧮 Calculator</button>
+  <button class="btn" id="sizeBtn" aria-pressed="false">🔠 Bigger text</button>
+  <button class="btn" id="gearBtn">⚙️ Settings</button>
+</header>
+<main id="app" tabindex="-1"></main>
+<div class="modalback" id="modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="mhead"><h2 id="mTitle"></h2><button class="btn" id="mClose">✖ Close</button></div>
+    <div id="mBody"></div>
+  </div>
+</div>
+<div class="calc" id="calc" hidden role="dialog" aria-label="Calculator">
+  <div class="chead"><b>🧮 Calculator</b><span><button class="btn" id="calcMove" aria-label="Move calculator to the other side">⇆ Move</button> <button class="btn" id="calcClose" aria-label="Close calculator">✖</button></span></div>
+  <div class="ok">Calculator is always OK.</div>
+  <div class="disp" aria-live="polite"><div class="pend" id="cPend"></div><div class="cur" id="cCur">0</div></div>
+  <div class="keys" id="cKeys">
+    <button data-k="C" class="op">C</button><button data-k="back" class="op" aria-label="Backspace">⌫</button><button data-k="/" class="op" aria-label="divide">÷</button><button data-k="*" class="op" aria-label="times">×</button>
+    <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button><button data-k="-" class="op" aria-label="minus">−</button>
+    <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button><button data-k="+" class="op" aria-label="plus">+</button>
+    <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button><button data-k="=" class="eq" aria-label="equals">=</button>
+    <button data-k="0" style="grid-column:span 2">0</button><button data-k=".">.</button><button data-k="neg" class="op" aria-label="plus or minus">±</button>
+  </div>
+</div>
+<div id="live" class="sr" aria-live="polite"></div>
+<footer class="legal" id="legal"></footer>
+<script>
+'use strict';
+/* ============ TEACHER SETTINGS: change these ============ */
+const TEACHER_PIN  = '1234';
+const SUBMIT_MODE  = 'post';   // 'post' = quiet send. 'open' = opens the pre-filled form in a new tab.
+const FORM_URL     = '[PASTE your form link ending in /formResponse]';
+const ENTRY_NAME   = '[PASTE entry number for Name]';
+const ENTRY_MODE   = '[PASTE entry number for Mode]';
+const ENTRY_LEVEL  = '[PASTE entry number for Level]';
+const ENTRY_STARS  = '[PASTE entry number for Stars]';
+const ENTRY_RESULT = '[PASTE entry number for Result]';
+/* ======================================================== */
+
+const LEGAL = '© 2026 Brazen Learning. All rights reserved. Do not copy, share, or resell without permission.';
+
+/* ---------- store ad (prices in cents) ---------- */
+const ITEMS = [
+  ['milk','Milk','🥛',128,384,1],
+  ['chips','Potato chips','🥔',10,450,0],
+  ['bread','Bread','🍞',20,280,1],
+  ['soda','Soda (12-pack)','🥤',144,720,0],
+  ['rice','Rice','🍚',32,320,1],
+  ['cookies','Cookies','🍪',14,420,0,378],
+  ['beans','Canned beans','🥫',15,120,1],
+  ['chicken','Chicken breast','🍗',48,960,1],
+  ['icecream','Ice cream','🍨',48,576,0],
+  ['frozveg','Frozen vegetables','🥦',12,156,1],
+  ['candy','Candy bag','🍬',11,550,0],
+  ['pb','Peanut butter','🥜',16,320,1],
+  ['punch','Fruit punch','🧃',64,384,0],
+  ['pasta','Pasta','🍝',16,160,1],
+  ['pizza','Frozen pizza','🍕',24,720,0],
+  ['apples','Apples (bag)','🍎',48,576,1],
+  ['coffee','Flavored coffee','☕',24,1200,0],
+  ['oatmeal','Oatmeal','🌾',18,450,1],
+  ['energy','Energy drink','⚡',16,208,0],
+  ['beef','Ground beef','🥩',32,896,1],
+  ['cheese','Shredded cheese','🧀',16,432,1],
+  ['cereal','Cereal','🥣',20,500,1]
+].map(a=>({id:a[0],name:a[1],e:a[2],oz:a[3],c:a[4],n:!!a[5],sale:a[6]||0}));
+const BYID = {}; ITEMS.forEach(it=>BYID[it.id]=it);
+const pr = it => it.sale || it.c;           // price you pay (cookies on sale)
+const unitC = it => pr(it)/it.oz;            // cents per ounce
+function unitText(it){ const u=unitC(it); return '$'+(u/100).toFixed(Number.isInteger(u)?2:3)+' per oz'; }
+
+const EXTRAS = [
+  ['candybar','Candy bar','🍫',189,'The candy'],
+  ['magazine','Magazine','📰',599,'The magazine'],
+  ['colddrink','Cold drink','🧊',229,'The cold drink'],
+  ['gum','Pack of gum','🍃',149,'The gum'],
+  ['donuts','Box of donuts','🍩',379,'The donuts'],
+  ['charger','Phone charger','🔌',799,'The charger']
+].map(a=>({id:a[0],name:a[1],e:a[2],c:a[3],short:a[4]}));
+const XBYID = {}; EXTRAS.forEach(x=>XBYID[x.id]=x);
+
+const LV = {
+  1:{who:'Marcus',icon:'🧑',budget:4000,bal:12075,coupon:null,needs:6,story:'Marcus is shopping for himself this week.'},
+  2:{who:'Ana',icon:'👩',budget:6000,bal:18550,coupon:{off:300,min:3000},needs:8,story:'Ana is shopping for her family.'},
+  3:{who:'Ray & Dee',icon:'👫',budget:8000,bal:24075,coupon:{off:500,min:5000},needs:10,story:'Ray and Dee are shopping for their new apartment.'}
+};
+function couponText(L){ return L.coupon ? `${money(L.coupon.off,true)} off when you spend ${money(L.coupon.min,true)} or more` : 'No coupon'; }
+function paidFor(sub,L){ return (L.coupon && sub>=L.coupon.min) ? sub-L.coupon.off : sub; }
+
+const MODES = {
+  G:{name:'Grocery List Game',lesson:'Lesson 4',icon:'🛒',blurb:'Build a list that fits the budget.'},
+  E:{name:'Extras Challenge',lesson:'Lesson 6',icon:'🍫',blurb:'See what small extras really cost.'},
+  C:{name:'Checking Account Check-Up',lesson:'',icon:'🏦',blurb:'Keep the balance up to date.'},
+  B:{name:'Boss Level',lesson:'Lesson 8',icon:'👑',blurb:'Shop, check the receipt, update the account.'}
+};
+
+/* ---------- money helpers (integer cents) ---------- */
+function money(c,short){
+  const neg=c<0; c=Math.abs(Math.round(c));
+  const d=Math.floor(c/100), ct=c%100;
+  return (neg?'-':'')+'$'+d+(short&&ct===0?'':'.'+String(ct).padStart(2,'0'));
+}
+function parseMoney(s){
+  s=String(s==null?'':s).trim().replace(/[\s,$]/g,'').replace(/[−–]/g,'-');
+  let neg=false;
+  if(/^\(.*\)$/.test(s)){ neg=true; s=s.slice(1,-1); }
+  if(s.startsWith('-')){ neg=!neg; s=s.slice(1); }
+  const m=s.match(/^(\d*)(?:\.(\d{0,2}))?$/);
+  if(!m || (m[1]==='' && !m[2])) return null;
+  const c=parseInt(m[1]||'0',10)*100+parseInt(((m[2]||'')+'00').slice(0,2),10);
+  return neg?-c:c;
+}
+const sum = arr => arr.reduce((a,b)=>a+b,0);
+
+/* ---------- storage (works even when blocked) ---------- */
+const KEY='smartshopper.v1';
+const DB={name:'',kids:{},set:{big:false,sound:false,hc:false,challenge:false,hideHints:false}};
+function load(){
+  try{
+    const raw=localStorage.getItem(KEY); if(!raw) return;
+    const d=JSON.parse(raw);
+    if(d && typeof d==='object'){
+      if(typeof d.name==='string') DB.name=d.name;
+      if(d.kids && typeof d.kids==='object') DB.kids=d.kids;
+      if(d.set) Object.assign(DB.set,d.set);
+    }
+  }catch(e){}
+}
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){} }
+function kid(){ const k=DB.name.trim().toLowerCase(); if(!DB.kids[k]) DB.kids[k]={name:DB.name,p:{}}; return DB.kids[k]; }
+function best(m,lv){ const r=kid().p[m+lv]; return r?r.s:0; }
+function record(m,lv,s,amt){
+  const p=kid().p, k=m+lv, old=p[k];
+  p[k]={s:Math.max(s,old?old.s:0),a:amt,t:Date.now()};
+  save();
+}
+function hintsOn(){ return !DB.set.hideHints; }
+
+/* ---------- tiny DOM helpers ---------- */
+const $=s=>document.querySelector(s);
+const app=$('#app');
+function h(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function starsHTML(n,big){ let s=''; for(let i=1;i<=3;i++) s+=i<=n?'★':'☆'; return `<span class="stars${big?' big':''}" role="img" aria-label="${n} of 3 stars">${s}</span>`; }
+function fbHTML(kind,text){ return text?`<div class="${kind}">${text}</div>`:''; }
+function setFb(kind,text,id){ const el=document.getElementById(id||'fb'); if(el){ el.innerHTML=fbHTML(kind,text); } $('#live').textContent=String(text||'').replace(/<[^>]+>/g,' '); }
+const GOOD=['Yes! That is it.','Nice work!','You got it!','Correct!','Great job!'];
+const goodWord=()=>GOOD[Math.floor(Math.random()*GOOD.length)];
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function rnd(n){ return Math.floor(Math.random()*n); }
+
+/* ---------- views ---------- */
+let VIEW=null;
+function go(v){ stopSpeech(); closeModal(); VIEW=v; draw(); window.scrollTo(0,0); try{ app.focus({preventScroll:true}); }catch(e){} }
+function draw(){ app.innerHTML=VIEW.html(); if(VIEW.after) VIEW.after(); }
+app.addEventListener('click',e=>{
+  const b=e.target.closest('[data-a]'); if(!b||!app.contains(b)||b.disabled) return;
+  if(VIEW && VIEW.act) VIEW.act(b.dataset.a,b,e);
+});
+app.addEventListener('keydown',e=>{
+  if(e.key!=='Enter') return;
+  const inp=e.target.closest('input[data-enter]'); if(!inp) return;
+  e.preventDefault(); if(VIEW && VIEW.act) VIEW.act(inp.dataset.enter,inp,e);
+});
+function val(id){ const el=document.getElementById(id); return el?el.value:''; }
+function focusEl(id){ const el=document.getElementById(id); if(el) try{ el.focus(); }catch(e){} }
+
+/* ---------- modal ---------- */
+let MODAL_ACT=null;
+function openModal(title,html,act){
+  stopSpeech();
+  $('#mTitle').textContent=title; $('#mBody').innerHTML=html; MODAL_ACT=act||null;
+  $('#modal').hidden=false; setTimeout(()=>{ const f=$('#mBody input')||$('#mClose'); try{ f.focus(); }catch(e){} },30);
+}
+function closeModal(){ if($('#modal').hidden) return; $('#modal').hidden=true; MODAL_ACT=null; stopSpeech(); }
+$('#mClose').onclick=closeModal;
+$('#modal').addEventListener('click',e=>{
+  if(e.target.id==='modal'){ closeModal(); return; }
+  const b=e.target.closest('[data-m]'); if(b && MODAL_ACT) MODAL_ACT(b.dataset.m,b);
+});
+$('#mBody').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){ const i=e.target.closest('input[data-menter]'); if(i && MODAL_ACT){ e.preventDefault(); MODAL_ACT(i.dataset.menter,i); } }
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){ if(!$('#modal').hidden) closeModal(); else if(!$('#calc').hidden) toggleCalc(false); }
+});
+function mathModal(html){ openModal('🧮 Show me the math',`<div class="say">${html}</div>`); }
+
+/* ---------- read it to me ---------- */
+let speaking=false, voice=null;
+function pickVoice(){
+  try{
+    const vs=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));
+    voice=vs.find(v=>v.localService && /en-US/i.test(v.lang))||vs.find(v=>v.localService)||vs.find(v=>/en-US/i.test(v.lang))||vs[0]||null;
+  }catch(e){ voice=null; }
+}
+if('speechSynthesis' in window){ pickVoice(); try{ speechSynthesis.onvoiceschanged=pickVoice; }catch(e){} }
+function speechClean(t){
+  return String(t)
+    .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}]/gu,' ')
+    .replace(/[★☆✓✖⌫]/g,' ')
+    .replace(/-\$/g,' minus $')
+    .replace(/\s[-−]\s/g,' minus ')
+    .replace(/÷/g,' divided by ').replace(/×/g,' times ').replace(/=/g,' equals ')
+    .replace(/(\d)\s*oz\b/g,'$1 ounces')
+    .replace(/\s+/g,' ').trim();
+}
+function setReadBtn(){ const b=$('#readBtn'); b.classList.toggle('on',speaking); b.setAttribute('aria-pressed',speaking); b.innerHTML=speaking?'⏹️ Stop reading':'🔊 Read it to me'; }
+function stopSpeech(){ try{ if('speechSynthesis' in window) speechSynthesis.cancel(); }catch(e){} speaking=false; setReadBtn(); }
+function speak(text){
+  if(!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance==='undefined'){
+    toast('Read aloud is not on this computer. All the words are on the screen.'); return;
+  }
+  stopSpeech();
+  const t=speechClean(text); if(!t) return;
+  try{
+    const u=new SpeechSynthesisUtterance(t);
+    if(!voice) pickVoice(); if(voice) u.voice=voice;
+    u.rate=.92; u.lang='en-US';
+    u.onend=u.onerror=()=>{ speaking=false; setReadBtn(); };
+    speaking=true; setReadBtn(); speechSynthesis.speak(u);
+  }catch(e){ speaking=false; setReadBtn(); }
+}
+function screenText(){
+  if(!$('#modal').hidden){
+    const parts=[$('#mTitle').textContent];
+    $('#mBody').querySelectorAll('h3,p,li,.mathbox').forEach(e=>{
+      if(e.classList.contains('mathbox')){ const L=e.textContent.split('\n').map(x=>x.trim()).filter(x=>x&&!/^-+$/.test(x));
+        parts.push(L[0]+' '+(L[1][0]==='+'?'plus':'minus')+' '+L[1].slice(1).trim()+' equals what?'); }
+      else if(!e.closest('li')||e.tagName==='LI') parts.push(e.innerText);
+    });
+    return parts.join('. ');
+  }
+  if(VIEW && VIEW.read){ const r=VIEW.read(); if(r) return r; }
+  const parts=[...app.querySelectorAll('.say')].map(e=>e.innerText.trim()).filter(Boolean);
+  const fb=app.querySelector('.fb'); if(fb && fb.innerText.trim()) parts.push(fb.innerText.trim());
+  return parts.join('. ');
+}
+$('#readBtn').onclick=()=>{ if(speaking){ stopSpeech(); return; } speak(screenText()); };
+document.addEventListener('visibilitychange',()=>{ if(document.hidden) stopSpeech(); });
+window.addEventListener('pagehide',stopSpeech);
+
+function toast(msg){
+  const t=document.createElement('div'); t.className='card'; t.setAttribute('role','status');
+  t.style.cssText='position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);z-index:80;max-width:90vw';
+  t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),4000);
+}
+
+/* ---------- soft chime (only when Sound is on) ---------- */
+let actx=null;
+function chime(){
+  if(!DB.set.sound) return;
+  try{
+    actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    const now=actx.currentTime;
+    [523.25,659.25].forEach((f,i)=>{
+      const o=actx.createOscillator(), g=actx.createGain();
+      o.type='sine'; o.frequency.value=f; g.gain.setValueAtTime(0,now+i*.12);
+      g.gain.linearRampToValueAtTime(.12,now+i*.12+.02); g.gain.exponentialRampToValueAtTime(.001,now+i*.12+.35);
+      o.connect(g).connect(actx.destination); o.start(now+i*.12); o.stop(now+i*.12+.4);
+    });
+  }catch(e){}
+}
+
+/* ---------- calculator ---------- */
+const CALC={cur:'0',acc:null,op:null,fresh:true};
+const OPS={'+':'+','-':'−','*':'×','/':'÷'};
+function cFmt(r){ if(!isFinite(r)) return null; r=Math.round(r*1e9)/1e9; let s=String(r); if(s.length>14) s=r.toPrecision(10).replace(/\.?0+$/,''); return s; }
+function cApply(a,op,b){ return op==='+'?a+b:op==='-'?a-b:op==='*'?a*b:b===0?NaN:a/b; }
+function calcPress(k){
+  const C=CALC;
+  if(/^\d$/.test(k)){ if(C.fresh||C.cur==='0'){ C.cur=k; C.fresh=false; } else if(C.cur.replace(/[-.]/g,'').length<12) C.cur+=k; }
+  else if(k==='.'){ if(C.fresh){ C.cur='0.'; C.fresh=false; } else if(!C.cur.includes('.')) C.cur+='.'; }
+  else if(k==='C'){ C.cur='0'; C.acc=null; C.op=null; C.fresh=true; }
+  else if(k==='back'){ if(!C.fresh){ C.cur=C.cur.length>1?C.cur.slice(0,-1):'0'; if(C.cur==='-'||C.cur==='') C.cur='0'; } }
+  else if(k==='neg'){ if(C.cur!=='0') C.cur=C.cur.startsWith('-')?C.cur.slice(1):'-'+C.cur; }
+  else if(k in OPS){
+    if(C.op!==null && !C.fresh){ const r=cFmt(cApply(C.acc,C.op,parseFloat(C.cur))); if(r===null){ calcErr(); return; } C.cur=r; }
+    C.acc=parseFloat(C.cur); C.op=k; C.fresh=true;
+  }
+  else if(k==='='){
+    if(C.op!==null){ const r=cFmt(cApply(C.acc,C.op,parseFloat(C.cur))); if(r===null){ calcErr(); return; } C.cur=r; C.acc=null; C.op=null; C.fresh=true; }
+  }
+  calcShow();
+}
+function calcErr(){ CALC.cur='0'; CALC.acc=null; CALC.op=null; CALC.fresh=true; calcShow(); $('#cPend').textContent='You cannot divide by 0.'; }
+function calcShow(){ $('#cCur').textContent=CALC.cur; $('#cPend').textContent=CALC.op!==null?cFmt(CALC.acc)+' '+OPS[CALC.op]:''; }
+$('#cKeys').addEventListener('click',e=>{ const b=e.target.closest('[data-k]'); if(b) calcPress(b.dataset.k); });
+function toggleCalc(show){
+  const c=$('#calc'); const on=show===undefined?c.hidden:show;
+  c.hidden=!on; $('#calcBtn').setAttribute('aria-expanded',on);
+  if(on) setTimeout(()=>{ try{ c.querySelector('[data-k="7"]').focus(); }catch(e){} },20);
+}
+$('#calcBtn').onclick=()=>toggleCalc();
+$('#calcClose').onclick=()=>toggleCalc(false);
+$('#calcMove').onclick=()=>$('#calc').classList.toggle('left');
+document.addEventListener('keydown',e=>{
+  if($('#calc').hidden) return;
+  if(e.target.closest('input')) return;
+  const map={'Enter':'=','=':'=','Backspace':'back','Delete':'C','x':'*','X':'*'};
+  let k=map[e.key]||e.key;
+  if(/^[\d.+\-*/=]$/.test(k)||k==='back'||k==='C'){
+    if(e.key==='Enter' && e.target.closest('button') && !e.target.closest('#calc')) return;
+    e.preventDefault(); calcPress(k);
+  }
+});
+
+/* ---------- settings + bigger text ---------- */
+function applySettings(){
+  document.documentElement.classList.toggle('big',!!DB.set.big);
+  document.documentElement.classList.toggle('hc',!!DB.set.hc);
+  $('#sizeBtn').setAttribute('aria-pressed',!!DB.set.big);
+  $('#sizeBtn').innerHTML=DB.set.big?'🔡 Smaller text':'🔠 Bigger text';
+}
+$('#sizeBtn').onclick=()=>{ DB.set.big=!DB.set.big; save(); applySettings(); };
+$('#homeBtn').onclick=()=>go(homeView());
+function swHTML(key,label){ const on=!!DB.set[key]; return `<div class="sw"><span>${label}</span><button class="btn" role="switch" aria-checked="${on}" data-m="sw" data-k="${key}">${on?'On':'Off'}</button></div>`; }
+function settingsHTML(){
+  return `<p class="say">Change how the app looks and sounds.</p>
+  ${swHTML('big','🔠 Bigger text')}${swHTML('sound','🔔 Sound effects')}${swHTML('hc','🌓 High contrast')}
+  <p class="note say">Read it to me works any time. Sound effects are soft chimes.</p>
+  <div class="row"><button class="btn" data-m="teacher">🔒 Teacher area</button></div>`;
+}
+function settingsAct(a,b){
+  if(a==='sw'){ const k=b.dataset.k; DB.set[k]=!DB.set[k]; save(); applySettings(); $('#mBody').innerHTML=settingsHTML(); if(k==='sound') chime(); }
+  if(a==='teacher'){
+    openModal('🔒 Teacher area',`<p class="say">Type the 4-digit PIN.</p><input class="txt" id="pin" type="password" inputmode="numeric" maxlength="8" autocomplete="off" data-menter="pin" aria-label="PIN"><div class="row"><button class="btn primary" data-m="pin">Open</button></div><div class="fb" id="pinfb"></div>`,(a2)=>{
+      if(a2!=='pin') return;
+      if(val('pin')===String(TEACHER_PIN)){ closeModal(); go(teacherView()); }
+      else setFb('notyet','That PIN does not match. Try again.','pinfb');
+    });
+  }
+}
+$('#gearBtn').onclick=()=>openModal('⚙️ Settings',settingsHTML(),settingsAct);
+
+/* ---------- score turn-in ---------- */
+function formReady(){ return [FORM_URL,ENTRY_NAME,ENTRY_MODE,ENTRY_LEVEL,ENTRY_STARS,ENTRY_RESULT].every(v=>typeof v==='string' && v.trim() && !/PASTE/i.test(v)); }
+function entryKey(e){ e=String(e).trim(); return /^entry\./.test(e)?e:'entry.'+e; }
+function sendScore(d){
+  const p=new URLSearchParams();
+  p.append(entryKey(ENTRY_NAME),d.name); p.append(entryKey(ENTRY_MODE),d.mode);
+  p.append(entryKey(ENTRY_LEVEL),String(d.level)); p.append(entryKey(ENTRY_STARS),String(d.stars));
+  p.append(entryKey(ENTRY_RESULT),d.result);
+  try{
+    if(SUBMIT_MODE==='open'){
+      const base=FORM_URL.split('?')[0].replace(/\/formResponse\/?$/,'/viewform');
+      window.open(base+'?usp=pp_url&'+p.toString(),'_blank','noopener');
+    }else if(window.fetch){
+      fetch(FORM_URL,{method:'POST',mode:'no-cors',body:p}).catch(()=>{});
+    }
+  }catch(e){}
+}
+function codeFor(m,lv,stars,amt){ return `${m}${lv}-${stars}-${amt<0?'N':''}${Math.abs(amt)}`; }
+
+/* ================= HOME ================= */
+function homeView(){
+  return {
+    html(){
+      if(!DB.name) return `<section class="card narrow center">
+        <div class="emoji-big">🛒</div>
+        <h1 class="say">Welcome to Smart Shopper!</h1>
+        <p class="say">Type your first name and last initial.</p>
+        <p class="note say">Example: Maria G.</p>
+        <div class="row" style="justify-content:center"><input class="txt" id="nm" maxlength="24" autocomplete="off" aria-label="First name and last initial" data-enter="saveName"></div>
+        <div class="row" style="justify-content:center"><button class="btn primary big" data-a="saveName">Let's go</button></div>
+        <div class="fb" id="fb"></div></section>`;
+      const cards=Object.keys(MODES).map(m=>{
+        const M=MODES[m];
+        const st=[1,2,3].map(l=>`<span>Level ${l} ${starsHTML(best(m,l))}</span>`).join('');
+        return `<button class="mode" data-a="mode" data-m="${m}"><span class="mi">${M.icon}</span>
+          <span class="mt">${M.name}</span><span class="ml">${M.lesson?M.lesson+'. ':''}${M.blurb}</span><span class="msr">${st}</span></button>`;
+      }).join('');
+      return `<h1 class="say">Hi, ${h(DB.name)}! Pick a game.</h1>
+        <p class="note say">Try Level 2 when Level 1 feels easy.</p>
+        <div class="modes">${cards}</div>
+        <p class="note say">Your stars are just for you. Your best try is saved.</p>
+        <div class="row"><button class="btn soft" data-a="rename">Not ${h(DB.name)}? Change name</button></div>`;
+    },
+    after(){ focusEl('nm'); },
+    read(){ if(!DB.name) return null; return `Hi, ${DB.name}! Pick a game. Grocery List Game. Extras Challenge. Checking Account Check-Up. Boss Level. Try Level 2 when Level 1 feels easy.`; },
+    act(a,b){
+      if(a==='saveName'){
+        const n=val('nm').trim().replace(/\s+/g,' ');
+        if(!/[A-Za-z]{2}/.test(n)){ setFb('notyet','Type your first name and last initial. Example: Maria G.'); return; }
+        DB.name=n; save(); kid(); save(); draw(); return;
+      }
+      if(a==='rename'){ DB.name=''; save(); draw(); return; }
+      if(a==='mode') go(levelView(b.dataset.m));
+    }
+  };
+}
+function levelView(m){
+  const M=MODES[m];
+  return {
+    html(){
+      const btns=[1,2,3].map(l=>{ const L=LV[l];
+        const info=m==='C'?`Starts with ${money(L.bal)}`:`Budget ${money(L.budget)}`;
+        return `<button class="lvl" data-a="lv" data-l="${l}"><b>Level ${l}</b><span>${L.icon} ${h(L.who)}</span><span>${info}</span>${starsHTML(best(m,l))}</button>`;
+      }).join('');
+      return `<h1 class="say">${M.icon} ${M.name}</h1><p class="say">${M.blurb}</p>
+        <p class="say">Pick a level.</p><div class="levels">${btns}</div>
+        <p class="note say">Try Level 2 when Level 1 feels easy.</p>
+        <div class="row"><button class="btn soft" data-a="back">⬅️ Back</button></div>`;
+    },
+    act(a,b){
+      if(a==='back') go(homeView());
+      if(a==='lv') startMode(m,+b.dataset.l);
+    }
+  };
+}
+function startMode(m,lv){ go(({G:groceryView,E:extrasView,C:checkView,B:bossView})[m](lv)); }
+
+function shopperCardHTML(lv,m,extra){
+  const L=LV[lv];
+  let facts='';
+  if(m==='C') facts=`<li>🏦 Starting balance: ${money(L.bal)}</li>${lv===3?'<li>⚠️ If your balance goes below zero, the bank charges $25.</li>':''}`;
+  else {
+    facts=`<li>💵 Budget: ${money(L.budget)}</li>`;
+    if(m!=='E') facts+=`<li>🥛 Needs on the list: at least ${L.needs}</li>`;
+    facts+=`<li>🎟️ Coupon: ${couponText(L)}</li>`;
+    if(m==='B') facts+=`<li>🏦 Bank balance: ${money(L.bal)}</li>`;
+  }
+  return `<section class="card narrow center">
+    <p class="stepline say">Level ${lv}: ${MODES[m].name}</p>
+    <div class="emoji-big">${L.icon}</div>
+    <h1 class="say">Meet ${h(L.who)}</h1>
+    <p class="say">${L.story}</p>
+    <ul class="facts say" style="text-align:left">${facts}</ul>
+    ${extra||''}
+    <div class="row" style="justify-content:center"><button class="btn primary big" data-a="start">Let's go ➡️</button></div>
+  </section>`;
+}
+
+/* ================= FINISH ================= */
+function finishView(o){
+  // o: {m,lv,stars,amt,title,lines,again,extra:[{label,fn}],resultText}
+  record(o.m,o.lv,o.stars,o.amt);
+  chime();
+  const code=codeFor(o.m,o.lv,o.stars,o.amt);
+  let sent=false;
+  return {
+    html(){
+      return `<section class="card narrow center finish">
+        <div class="emoji-big">🎉</div>
+        <h1 class="say">${o.title}</h1>
+        ${starsHTML(o.stars,true)}
+        <p class="say">You earned ${o.stars} of 3 stars.</p>
+        <ul class="recap say">${o.lines.map(l=>`<li>${l}</li>`).join('')}</ul>
+        <div><div class="codebox"><p class="say">Your completion code:</p><p class="code" id="code">${code}</p></div></div>
+        ${formReady()?`<div class="row" style="justify-content:center"><button class="btn primary big" data-a="turnin">📤 Turn in my score</button></div>`:''}
+        <div class="fb" id="fb">${sent?fbHTML('good','Turned in. Nice work.'):''}</div>
+        <div class="row" style="justify-content:center">
+          ${(o.extra||[]).map((x,i)=>`<button class="btn" data-a="x" data-i="${i}">${x.label}</button>`).join('')}
+          <button class="btn" data-a="again">🔁 Play again</button>
+          ${o.lv<3?`<button class="btn" data-a="next">⬆️ Try Level ${o.lv+1}</button>`:''}
+          <button class="btn" data-a="home">🏠 Home</button>
+        </div>
+        <p class="note">Stars are private. Your best try is saved. Hints never cost stars.</p>
+      </section>`;
+    },
+    act(a,b){
+      if(a==='turnin'){
+        sendScore({name:DB.name,mode:MODES[o.m].name,level:o.lv,stars:o.stars,result:`${o.resultText}. Code ${code}`});
+        sent=true; setFb('good','Turned in. Nice work.'); return;
+      }
+      if(a==='again') startMode(o.m,o.lv);
+      if(a==='next') startMode(o.m,o.lv+1);
+      if(a==='home') go(homeView());
+      if(a==='x') o.extra[+b.dataset.i].fn();
+    }
+  };
+}
+
+/* ================= LIST BUILDER (Grocery + Boss) ================= */
+function newB(){ return {sel:new Set(),sort:false,hint:null,presses:0}; }
+function tot(B,lv,boss,extraC){
+  const L=LV[lv], its=[...B.sel].map(id=>BYID[id]);
+  const sub=sum(its.map(pr))+(extraC||0);
+  const couponOn=!!(L.coupon && sub>=L.coupon.min);
+  const paid=paidFor(sub,L);
+  return {sub,couponOn,paid,shown:boss?sub:paid,needs:its.filter(i=>i.n).length,its};
+}
+function cardHTML(it,B){
+  const on=B.sel.has(it.id), hint=B.hint===it.id, ch=DB.set.challenge;
+  const price=it.sale?`${money(it.sale)} <span style="font-size:1rem;font-weight:400">(10% off ${money(it.c)})</span>`:money(it.c);
+  return `<button class="item${on?' on':''}${hint?' hint':''}" data-a="item" data-id="${it.id}" aria-pressed="${on}">
+    <span class="ie">${it.e}</span><span class="iname">${h(it.name)}</span>
+    <span class="tag ${it.n?'need':'want'}">${it.n?'Need':'Want'}</span>
+    <span class="iprice">${price}</span><span class="isize">Size: ${it.oz} oz</span>
+    ${ch?'':`<span class="iunit">${unitText(it)}</span>`}
+    <span class="ion">${on?'✓ On my list':'+ Add to list'}</span>
+    ${hint?'<span class="hintbadge">💡 Good deal</span>':''}</button>`;
+}
+function sideHTML(B,lv,boss){
+  const L=LV[lv], t=tot(B,lv,boss), left=L.budget-t.shown;
+  const cls=t.shown>L.budget?'over':(t.shown>=L.budget*0.85?'close':'ok');
+  const pct=Math.min(100,Math.round(t.shown*100/L.budget));
+  let status=left>=0?`You have ${money(left)} left.`:`You are ${money(-left)} over. What can go back?`;
+  if(left<0 && boss && L.coupon && t.paid<=L.budget) status+=' A coupon may help. You check it next.';
+  let coup='';
+  if(L.coupon){
+    if(boss) coup=`<p>🎟️ Coupon: ${couponText(L)}. You check it next.</p>`;
+    else coup=t.couponOn?`<p>🎟️ Coupon used: ${money(-L.coupon.off)}</p>`:`<p>🎟️ Coupon: ${couponText(L)}. Your list is under ${money(L.coupon.min,true)}.</p>`;
+  }
+  const list=t.its.length?t.its.map(i=>`<li><button class="chip" data-a="item" data-id="${i.id}" aria-label="Take ${h(i.name)} off">${i.e} ${h(i.name)} ${money(pr(i))} ✖</button></li>`).join(''):'<li class="note">Nothing yet. Tap an item.</li>';
+  return `<div class="say"><b>${L.icon} ${h(L.who)}</b>. Budget ${money(L.budget)}.</div>
+    <div class="say bigmoney">${boss?'List total':'You pay'}: ${money(t.shown)}</div>
+    <div class="bar ${cls}" role="img" aria-label="Budget used ${pct} percent"><span style="width:${pct}%"></span></div>
+    <p class="say">${status}</p>
+    ${coup}
+    <p class="say bigmoney">Needs on list: ${t.needs} of ${L.needs}${t.needs>=L.needs?' ✓':''}</p>
+    <h3>My list</h3><ul class="mylist">${list}</ul>
+    <div class="totals">${!boss&&t.couponOn?`<div><span>List total</span><b>${money(t.sub)}</b></div><div><span>Coupon</span><b>${money(-L.coupon.off)}</b></div>`:''}
+      <div><span>${boss?'List total':'You pay'}</span><b>${money(t.shown)}</b></div></div>
+    <div class="sidebtns">
+      ${hintsOn()?'<button class="btn" data-a="hint">💡 Hint</button>':''}
+      <button class="btn" data-a="math">🧮 Show me the math</button>
+      <button class="btn primary big" data-a="done">✅ I am done</button>
+    </div>
+    <div class="fb" id="fb"></div>`;
+}
+function builderHTML(B,lv,boss,stepline){
+  let items=ITEMS.slice();
+  if(B.sort && !DB.set.challenge) items.sort((a,b)=>unitC(a)-unitC(b)||a.name.localeCompare(b.name));
+  return `${stepline||''}<div class="builder">
+    <aside class="side" id="side">${sideHTML(B,lv,boss)}</aside>
+    <section>
+      <div class="adhead"><h2 class="say">🏪 Maple Street Market</h2><p class="say">Prices good this week only.</p><p class="sale say">🍪 Cookies are 10% off!</p></div>
+      <p class="say">Tap an item to add it. Tap it again to take it off.</p>
+      ${DB.set.challenge?'':`<button class="btn" data-a="sort" aria-pressed="${B.sort}">${B.sort?'🔤 Show store order':'⬇️ Sort by unit price'}</button>`}
+      <div class="grid" id="grid">${items.map(it=>cardHTML(it,B)).join('')}</div>
+    </section></div>`;
+}
+function builderMath(B,lv,boss){
+  const L=LV[lv], t=tot(B,lv,boss);
+  let s='<h3>Add up your list</h3>';
+  s+=t.its.length?`<p>${t.its.map(i=>money(pr(i))).join(' + ')} = <b>${money(t.sub)}</b></p>`:'<p>Your list is empty. Add items first.</p>';
+  if(L.coupon && !boss){
+    s+='<h3>Coupon</h3>'+(t.couponOn?`<p>${money(t.sub)} is ${money(L.coupon.min,true)} or more. Take off ${money(L.coupon.off)}.</p><p>${money(t.sub)} - ${money(L.coupon.off)} = <b>${money(t.paid)}</b></p>`:`<p>${money(t.sub)} is less than ${money(L.coupon.min,true)}. No coupon yet.</p>`);
+  }
+  s+='<h3>Money left</h3>'+(t.shown<=L.budget?`<p>${money(L.budget)} - ${money(t.shown)} = <b>${money(L.budget-t.shown)}</b> left</p>`:`<p>${money(t.shown)} - ${money(L.budget)} = <b>${money(t.shown-L.budget)}</b> over</p>`);
+  s+=`<h3>Unit price</h3><p>Unit price = price ÷ ounces.</p><p>Milk: $3.84 ÷ 128 oz = $0.03 per oz.</p><p>A smaller unit price is a better deal.</p>`;
+  return s;
+}
+function builderHint(B,lv,boss){
+  const L=LV[lv], t=tot(B,lv,boss);
+  const cand=ITEMS.filter(it=>it.n && !B.sel.has(it.id)).sort((a,b)=>unitC(a)-unitC(b)||pr(a)-pr(b));
+  B.hint=null;
+  if(t.paid>L.budget){
+    const wants=t.its.filter(i=>!i.n).sort((a,b)=>pr(b)-pr(a));
+    if(wants.length) return `You are ${money(t.paid-L.budget)} over. ${wants[0].name} is a want. Try putting it back.`;
+    const big=t.its.slice().sort((a,b)=>pr(b)-pr(a))[0];
+    if(t.needs>L.needs) return `You are ${money(t.paid-L.budget)} over. You have extra needs. Try putting back ${big.name}.`;
+    const cheap=cand.find(c=>pr(c)<pr(big));
+    return `You are ${money(t.paid-L.budget)} over. Swap ${big.name} for a cheaper need${cheap?' like '+cheap.name:''}.`;
+  }
+  if(t.needs<L.needs && cand.length){
+    // best per-ounce deal that still fits
+    const room=L.budget-t.paid;
+    const fit=cand.find(c=>pr(c)<=room)||cand[0];
+    B.hint=fit.id;
+    return `Try ${fit.name}. It is ${DB.set.challenge?money(pr(fit))+' for '+fit.oz+' oz':unitText(fit)}. That is a good deal for a need.`;
+  }
+  return 'Your list works! Tap I am done.';
+}
+// Handles shared list actions. Returns true when handled.
+function builderAct(a,b,B,lv,boss){
+  if(a==='item'){
+    const id=b.dataset.id; if(B.sel.has(id)) B.sel.delete(id); else B.sel.add(id);
+    if(B.hint===id) B.hint=null;
+    const card=app.querySelector(`.item[data-id="${id}"]`);
+    if(card){ card.outerHTML=cardHTML(BYID[id],B); }
+    $('#side').innerHTML=sideHTML(B,lv,boss);
+    const fromChip=b.classList.contains('chip');
+    const again=fromChip?($('#side .chip')||$('#side [data-a="done"]')):app.querySelector(`.item[data-id="${id}"]`);
+    if(again) try{ again.focus({preventScroll:true}); }catch(e){}
+    return true;
+  }
+  if(a==='sort'){ B.sort=!B.sort; B.hint=null; draw(); return true; }
+  if(a==='hint'){
+    const msg=builderHint(B,lv,boss);
+    app.querySelectorAll('.item.hint').forEach(el=>{ el.outerHTML=cardHTML(BYID[el.dataset.id],B); });
+    if(B.hint){ const el=app.querySelector(`.item[data-id="${B.hint}"]`); el.outerHTML=cardHTML(BYID[B.hint],B); const n=app.querySelector(`.item[data-id="${B.hint}"]`); try{ n.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} }
+    setFb('info','💡 '+msg); return true;
+  }
+  if(a==='math'){ mathModal(builderMath(B,lv,boss)); return true; }
+  return false;
+}
+function checkList(B,lv,boss){
+  const L=LV[lv], t=tot(B,lv,boss), msgs=[];
+  if(!t.its.length) return {ok:false,msg:'Your list is empty. Tap an item to add it.'};
+  if(t.needs<L.needs) msgs.push(`You have ${t.needs} need${t.needs===1?'':'s'}. ${L.who} needs at least ${L.needs}. Add ${L.needs-t.needs} more need${L.needs-t.needs===1?'':'s'}.`);
+  if(t.paid>L.budget) msgs.push(`You are ${money(t.paid-L.budget)} over the ${money(L.budget)} budget. Put something back.`);
+  return {ok:!msgs.length,msg:msgs.join(' '),t};
+}
+
+/* ================= MODE 1: GROCERY LIST ================= */
+function groceryView(lv){
+  const L=LV[lv], st={phase:'card',B:newB()};
+  return {
+    html(){ return st.phase==='card'?shopperCardHTML(lv,'G'):builderHTML(st.B,lv,false); },
+    read(){ if(st.phase==='card') return null;
+      const t=tot(st.B,lv,false);
+      return `Build ${L.who}'s grocery list. Budget ${money(L.budget)}. You pay ${money(t.paid)}. Needs on list: ${t.needs} of ${L.needs}. Tap an item to add it. Each card shows the price, the size, and the unit price. Tap I am done when you finish. `+((app.querySelector('.fb')||{}).innerText||''); },
+    act(a,b){
+      if(a==='start'){ st.phase='build'; draw(); return; }
+      if(builderAct(a,b,st.B,lv,false)) return;
+      if(a==='done'){
+        st.B.presses++;
+        const r=checkList(st.B,lv,false);
+        if(!r.ok){ setFb('notyet','🤔 Not yet. '+r.msg); return; }
+        const t=r.t, stars=st.B.presses===1?3:st.B.presses===2?2:1;
+        const deals=t.its.slice().sort((x,y)=>unitC(x)-unitC(y)).slice(0,3).map(i=>`${i.name} (${unitText(i)})`);
+        const lines=[`You pay ${money(t.paid)}${t.couponOn?' after the '+money(L.coupon.off,true)+' coupon':''}.`,
+          `Money left: ${money(L.budget-t.paid)}.`,`Needs on your list: ${t.needs}.`,`Your 3 best deals: ${deals.join(', ')}.`];
+        go(finishView({m:'G',lv,stars,amt:t.paid,title:`${L.who}'s list fits!`,lines,resultText:`Paid ${money(t.paid)} of ${money(L.budget)}`}));
+      }
+    }
+  };
+}
+
+/* ================= MODE 2: EXTRAS CHALLENGE ================= */
+const XSTART = {
+  1:['milk','beans','rice','pasta','apples','frozveg','bread','chicken','pb','oatmeal'],
+  2:ITEMS.filter(i=>i.n).map(i=>i.id).concat(['punch']),
+  3:ITEMS.filter(i=>i.n).map(i=>i.id).concat(['soda','punch','icecream'])
+};
+function extrasView(lv){
+  const L=LV[lv];
+  const st={phase:'card',picks:[],back:new Set(),checks:0,wasOver:false,reflect:null};
+  const startIds=XSTART[lv];
+  const startSub=sum(startIds.map(id=>pr(BYID[id])));
+  const xSum=()=>sum(st.picks.map(id=>XBYID[id].c));
+  function cart(){
+    const its=startIds.filter(id=>!st.back.has(id)).map(id=>BYID[id]);
+    const xs=st.picks.filter(id=>!st.back.has('x:'+id)).map(id=>XBYID[id]);
+    const sub=sum(its.map(pr))+sum(xs.map(x=>x.c));
+    return {its,xs,sub,paid:paidFor(sub,L),couponOn:!!(L.coupon&&sub>=L.coupon.min),needs:its.filter(i=>i.n).length};
+  }
+  function couponLine(c){
+    if(!L.coupon) return '';
+    return c.couponOn?`🎟️ Your total is ${money(c.sub)}. That is ${money(L.coupon.min,true)} or more. So the ${money(L.coupon.off,true)} coupon comes off. You pay ${money(c.paid)}.`
+      :`🎟️ Your total is ${money(c.sub)}. That is under ${money(L.coupon.min,true)}. So the coupon does not work.`;
+  }
+  function statusLine(c){ return c.paid<=L.budget?`Budget ${money(L.budget)}. You have ${money(L.budget-c.paid)} left.`:`Budget ${money(L.budget)}. You are ${money(c.paid-L.budget)} over. What can go back?`; }
+  function sideHTMLx(){
+    const c=cart(), pct=Math.min(100,Math.round(c.paid*100/L.budget));
+    const cls=c.paid>L.budget?'over':(c.paid>=L.budget*.85?'close':'ok');
+    return `<div class="say"><b>${L.icon} ${h(L.who)}</b>. Budget ${money(L.budget)}.</div>
+      <div class="say bigmoney">You pay: ${money(c.paid)}</div>
+      <div class="bar ${cls}" role="img" aria-label="Budget used ${pct} percent"><span style="width:${pct}%"></span></div>
+      <p class="say">${statusLine(c)}</p>${L.coupon?`<p class="say">${couponLine(c)}</p>`:''}
+      <p class="say bigmoney">Needs on list: ${c.needs} of ${L.needs}${c.needs>=L.needs?' ✓':''}</p>
+      <div class="sidebtns">${hintsOn()?'<button class="btn" data-a="hint">💡 Hint</button>':''}
+      <button class="btn" data-a="math">🧮 Show me the math</button>
+      <button class="btn primary big" data-a="check">✅ Check my list</button></div><div class="fb" id="fb"></div>`;
+  }
+  function pickCard(id,isX){
+    const it=isX?XBYID[id]:BYID[id], key=isX?'x:'+id:id, out=st.back.has(key);
+    return `<button class="pick ${out?'back':'on'}" data-a="tog" data-k="${key}" aria-pressed="${!out}">
+      <span class="pe">${it.e}</span><b>${h(it.name)}</b><span>${money(isX?it.c:pr(it))}</span>
+      ${isX?'<span class="tag want">Extra</span>':`<span class="tag ${it.n?'need':'want'}">${it.n?'Need':'Want'}</span>`}
+      <span>${out?'↩️ Put back':'✓ In my cart'}</span></button>`;
+  }
+  function mathFor(){
+    const c=cart(), xs=st.picks.map(id=>XBYID[id]);
+    let s=`<h3>Your list</h3><p>${startIds.map(id=>money(pr(BYID[id]))).join(' + ')} = <b>${money(startSub)}</b></p>`;
+    if(xs.length) s+=`<h3>Your extras</h3><p>${xs.map(x=>money(x.c)).join(' + ')} = <b>${money(xSum())}</b></p><p>${money(startSub)} + ${money(xSum())} = <b>${money(startSub+xSum())}</b></p>`;
+    if(st.phase==='putback'||st.phase==='whatif'){
+      s+=`<h3>Your cart now</h3><p>${[...c.its.map(i=>money(pr(i))),...c.xs.map(x=>money(x.c))].join(' + ')} = <b>${money(c.sub)}</b></p>`;
+    }
+    if(L.coupon) s+=`<h3>Coupon</h3><p>${c.couponOn?`${money(c.sub)} - ${money(L.coupon.off)} = <b>${money(c.paid)}</b>`:`${money(c.sub)} is under ${money(L.coupon.min,true)}. No coupon.`}</p>`;
+    s+=`<h3>Budget</h3><p>${c.paid<=L.budget?`${money(L.budget)} - ${money(c.paid)} = <b>${money(L.budget-c.paid)}</b> left`:`${money(c.paid)} - ${money(L.budget)} = <b>${money(c.paid-L.budget)}</b> over`}</p>`;
+    if(st.phase==='whatif') s+=`<h3>4 weeks</h3><p>4 × ${money(xSum())} = <b>${money(4*xSum())}</b></p>`;
+    return s;
+  }
+  function finish(){
+    const c=cart(), stars=(!st.wasOver||st.checks<=1)?3:st.checks===2?2:1;
+    const lines=[`Three small extras cost ${money(xSum())}.`,`You pay ${money(c.paid)}. Budget ${money(L.budget)}.`,`4 weeks of extras: ${money(4*xSum())}.`];
+    if(st.reflect) lines.push(`Next time you would skip: ${st.reflect.toLowerCase()}.`);
+    go(finishView({m:'E',lv,stars,amt:c.paid,title:'Extras Challenge done!',lines,resultText:`Paid ${money(c.paid)} of ${money(L.budget)}. Extras ${money(xSum())}`}));
+  }
+  const v={
+    html(){
+      const step=`<p class="stepline say">Level ${lv}: Extras Challenge</p>`;
+      if(st.phase==='card') return shopperCardHTML(lv,'E');
+      if(st.phase==='list'){
+        const c=cart();
+        return `<section class="card narrow">${step}<h1 class="say">This is ${h(L.who)}'s list</h1>
+          <ul class="facts say">${startIds.map(id=>{const i=BYID[id];return `<li>${i.e} ${h(i.name)}: ${money(pr(i))}</li>`;}).join('')}</ul>
+          <p class="say bigmoney">List total: ${money(startSub)}</p><p class="say">Budget: ${money(L.budget)}.</p>
+          ${L.coupon?`<p class="say">🎟️ Coupon: ${couponText(L)}.</p>`:''}
+          <div class="row"><button class="btn" data-a="math">🧮 Show me the math</button><button class="btn primary big" data-a="go">Next ➡️</button></div></section>`;
+      }
+      if(st.phase==='pick'){
+        const n=st.picks.length;
+        return `${step}<h1 class="say">Pick 3 extras at the checkout</h1>
+          <p class="say">Small things by the register. Pick any 3.</p>
+          <p class="say bigmoney">Picked: ${n} of 3</p>
+          <div class="picks">${EXTRAS.map(x=>{const on=st.picks.includes(x.id);return `<button class="pick${on?' on':''}" data-a="px" data-id="${x.id}" aria-pressed="${on}"><span class="pe">${x.e}</span><b>${x.name}</b><span>${money(x.c)}</span><span>${on?'✓ Picked':'Tap to pick'}</span></button>`;}).join('')}</div>
+          <div class="row"><button class="btn" data-a="math">🧮 Show me the math</button><button class="btn primary big" data-a="addx" ${n===3?'':'disabled'}>🛒 Add them to my cart</button></div><div class="fb" id="fb"></div>`;
+      }
+      if(st.phase==='count'){
+        const c=cart(), xs=st.picks.map(id=>XBYID[id]);
+        return `<section class="card narrow">${step}<h1 class="say">Here come the extras</h1>
+          <p class="say">${xs.map(x=>`${x.name} ${money(x.c)}`).join(', ')}</p>
+          <div class="countbox"><span>New total</span><span class="num" id="countNum">${money(startSub)}</span></div>
+          <p class="say bigmoney">Three small extras cost you ${money(xSum())}.</p>
+          <p class="say">${money(startSub)} + ${money(xSum())} = ${money(c.sub)}</p>
+          ${L.coupon?`<p class="say">${couponLine(c)}</p>`:''}
+          <p class="say bigmoney">${statusLine(c)}</p>
+          <div class="row"><button class="btn" data-a="math">🧮 Show me the math</button>
+          ${c.paid>L.budget?'<button class="btn primary big" data-a="toback">↩️ Put things back</button>':'<button class="btn primary big" data-a="towhat">Next ➡️</button>'}</div></section>`;
+      }
+      if(st.phase==='putback'){
+        return `${step}<div class="builder"><aside class="side" id="side">${sideHTMLx()}</aside><section>
+          <h1 class="say">What can go back?</h1><p class="say">Tap an item to put it back. Tap again to keep it.</p>
+          <h2>Extras</h2><div class="picks">${st.picks.map(id=>pickCard(id,true)).join('')}</div>
+          <h2>Your list</h2><div class="picks">${startIds.map(id=>pickCard(id,false)).join('')}</div></section></div>`;
+      }
+      if(st.phase==='whatif'){
+        return `<section class="card narrow">${step}<h1 class="say">💭 What if?</h1>
+          <p class="say">You buy these 3 extras every week.</p>
+          <p class="say bigmoney">4 weeks of extras cost ${money(4*xSum())}.</p>
+          <p class="say">That is ${money(xSum())} a week. Small extras add up.</p>
+          <div class="row"><button class="btn" data-a="math">🧮 Show me the math</button><button class="btn primary big" data-a="afterwhat">Next ➡️</button></div></section>`;
+      }
+      if(st.phase==='reflect'){
+        const opts=['The candy','The magazine','The charger','Something else'];
+        return `<section class="card narrow">${step}<h1 class="say">One quick question</h1>
+          <p class="say">What would you skip first next time?</p>
+          <div class="choices">${opts.map(o=>`<button class="btn big" data-a="ref" data-o="${o}">${o}</button>`).join('')}</div>
+          <div class="fb" id="fb"></div></section>`;
+      }
+      return '';
+    },
+    after(){
+      if(st.phase!=='count') return;
+      const el=$('#countNum'), from=startSub, to=startSub+xSum();
+      const reduce=window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(reduce){ el.textContent=money(to); return; }
+      const t0=performance.now(), dur=1400;
+      const stepF=now=>{ if(!document.body.contains(el)) return; const p=Math.min(1,(now-t0)/dur); el.textContent=money(Math.round(from+(to-from)*p)); if(p<1) requestAnimationFrame(stepF); };
+      requestAnimationFrame(stepF);
+    },
+    act(a,b){
+      if(a==='math'){ mathModal(mathFor()); return; }
+      if(a==='start'){ st.phase='list'; draw(); return; }
+      if(a==='go'){ st.phase='pick'; draw(); return; }
+      if(a==='px'){
+        const id=b.dataset.id, i=st.picks.indexOf(id);
+        if(i>=0) st.picks.splice(i,1); else if(st.picks.length<3) st.picks.push(id); else { setFb('info','You have 3. Tap one to unpick it first.'); return; }
+        draw(); const n=app.querySelector(`[data-id="${id}"]`); if(n) n.focus(); return;
+      }
+      if(a==='addx'){ st.phase='count'; draw(); return; }
+      if(a==='toback'){ st.wasOver=true; st.phase='putback'; draw(); return; }
+      if(a==='towhat'){ st.phase='whatif'; draw(); return; }
+      if(a==='tog'){
+        const k=b.dataset.k; if(st.back.has(k)) st.back.delete(k); else st.back.add(k);
+        draw(); const n=app.querySelector(`[data-k="${CSS.escape(k)}"]`); if(n) n.focus({preventScroll:true}); return;
+      }
+      if(a==='hint'){
+        const c=cart();
+        if(c.paid<=L.budget && c.needs>=L.needs){ setFb('info','💡 Your cart works now. Tap Check my list.'); return; }
+        if(c.needs<L.needs){ setFb('info',`💡 Keep at least ${L.needs} needs. Bring a need back.`); return; }
+        const x=c.xs.slice().sort((p,q)=>q.c-p.c)[0];
+        const w=c.its.filter(i=>!i.n).sort((p,q)=>pr(q)-pr(p))[0];
+        setFb('info',x?`💡 Extras are easy to put back. Try the ${x.name.toLowerCase()} (${money(x.c)}).`:w?`💡 ${w.name} is a want. Try putting it back.`:'💡 Put back a need you have extra of.');
+        return;
+      }
+      if(a==='check'){
+        st.checks++;
+        const c=cart(), msgs=[];
+        if(c.needs<L.needs) msgs.push(`Keep at least ${L.needs} needs. You have ${c.needs}.`);
+        if(c.paid>L.budget) msgs.push(`You are still ${money(c.paid-L.budget)} over. Put one more thing back.`);
+        if(msgs.length){ setFb('notyet','🤔 Not yet. '+msgs.join(' ')); return; }
+        chime(); st.phase='whatif'; draw(); return;
+      }
+      if(a==='afterwhat'){ if(lv===3){ st.phase='reflect'; draw(); } else finish(); return; }
+      if(a==='ref'){ st.reflect=b.dataset.o; finish(); }
+    }
+  };
+  return v;
+}
+
+/* ================= NUMBER STEP (shared) ================= */
+function plainM(c){ return money(c).replace('$',''); }
+function numState(cfg){ return {tries:0,hintN:0,cfg}; }
+function numPanel(S){
+  const c=S.cfg;
+  return `<div class="inline-in"><label class="bigmoney" for="ans">${c.label}</label>
+      <input class="txt" id="ans" inputmode="decimal" autocomplete="off" data-enter="ncheck" placeholder="0.00">
+      <button class="btn primary big" data-a="ncheck">Check</button></div>
+    <div class="row nrow">${hintsOn()?'<button class="btn" data-a="nhint">💡 Hint</button>':''}
+      <button class="btn" data-a="nmath">🧮 Show me the math</button>
+      ${S.tries>=2?'<button class="btn" data-a="nshow">👀 Show the answer</button>':''}</div>
+    <div class="fb" id="fb">${S.msg||''}</div>`;
+}
+// returns 'ok', 'shown' or null
+function numAct(a,S){
+  const c=S.cfg;
+  if(a==='nhint'){ const hs=c.hints; setFb('info','💡 '+hs[Math.min(S.hintN,hs.length-1)]); S.hintN++; return null; }
+  if(a==='nmath'){ mathModal(c.math); return null; }
+  if(a==='nshow') return 'shown';
+  if(a==='ncheck'){
+    const raw=val('ans').trim();
+    if(!raw){ setFb('info','Type your answer in the box first.'); focusEl('ans'); return null; }
+    const t=parseMoney(raw); S.tries++;
+    if(t===c.expect) return 'ok';
+    setFb('notyet','🤔 '+(t===null?'Type a number like 12.50.':c.why(t)));
+    const r=app.querySelector('.nrow');
+    if(S.tries>=2 && r && !r.querySelector('[data-a="nshow"]')) r.insertAdjacentHTML('beforeend','<button class="btn" data-a="nshow">👀 Show the answer</button>');
+    focusEl('ans'); return null;
+  }
+  return null;
+}
+function closeWhy(t,expect){
+  const d=Math.abs(t-expect);
+  if(expect<0 && t===-expect) return 'Close! This one is below zero. Put a minus sign in front.';
+  if(d<100) return 'So close. Check the cents.';
+  if(d%100===0 && d<=1000) return 'Close. The cents are right. Check the dollars.';
+  return null;
+}
+function vmath(a,op,b){
+  const A=plainM(a), B=plainM(b), w=Math.max(A.length,B.length)+2;
+  return `<div class="mathbox">${A.padStart(w)}\n${op}${B.padStart(w-1)}\n${'-'.repeat(w)}\n${'?'.padStart(w)}</div>`;
+}
+
+/* ================= MODE 3: CHECKING ACCOUNT ================= */
+const R=(d,w,out,inn,fee)=>({d,w,out:out||0,inn:inn||0,fee:!!fee});
+const CHECK={
+  1:{rows:[R('Oct 1','Groceries',3248),R('Oct 2','Gas',2500),R('Oct 3','Phone bill',4000),R('Oct 4','Pharmacy copay',1200),R('Oct 5','Coffee',435)],
+     extra:[[5,R('Oct 6','Snacks',540)]]},
+  2:{rows:[R('Oct 1','Groceries',4235),R('Oct 3','Paycheck',0,28640),R('Oct 4','Check #101: Rent share',30000),R('Oct 6','Gas',3500),
+           R('Oct 8','Electric bill',8967),R('Oct 10','Paycheck',0,14320),R('Oct 12','Phone bill',5500),R('Oct 13','Lunch',875)],
+     extra:[[8,R('Oct 14','Movie ticket',1200)]]},
+  3:{rows:[R('Oct 1','Debit card: Groceries',7640),R('Oct 2','Deposit: Birthday money',0,5000),R('Oct 3','Automatic payment: Car insurance',12890),
+           R('Oct 5','Check #205: Dentist',6000),R('Oct 6','Debit card: Gas',3820),R('Oct 6','Overdraft fee',2500,0,true),R('Oct 9','Paycheck',0,41260),
+           R('Oct 10','Automatic payment: Phone',6500),R('Oct 12','Debit card: Shoes',5499),R('Oct 14','Automatic payment: Streaming',1549)],
+     extra:[[7,R('Oct 9','Check #206: Rent share',22500)]]}
+};
+const FORGOT={row:R('Oct 11','Debit card: Pizza Palace',1845),options:['Debit card: Pizza Palace $18.45','Paycheck $412.60','Debit card: Gas $38.20','Debit card: Shoes $54.99']};
+function checkRows(lv,challenge){
+  const base=CHECK[lv].rows.slice();
+  if(challenge){ CHECK[lv].extra.slice().reverse().forEach(([i,r])=>base.splice(i,0,r)); }
+  let bal=LV[lv].bal;
+  return base.map(r=>{ const prev=bal; bal=bal-r.out+r.inn; return Object.assign({},r,{prev,bal}); });
+}
+const AFFORD={
+  1:{bal:6240,bill:['Phone bill',4000,'on Monday'],items:[['Pizza','🍕',1450],['Headphones','🎧',2999],['Movie ticket','🎬',1100]]},
+  2:{bal:14375,bill:['Electric bill',8967,'on Monday'],items:[['Shoes','👟',5999],['Haircut','💈',2500],['Concert ticket','🎤',4850]]},
+  3:{bal:21030,bill:['Car insurance',12890,'tomorrow'],items:[['Video game','🎮',6999],['Jacket','🧥',8500],['Gas','⛽',4000]]}
+};
+function rowStep(r,lv){
+  const isOut=r.out>0, amt=isOut?r.out:r.inn, op=isOut?'-':'+';
+  const hints=[isOut?'Money out. Subtract it from the old balance.':'Money in. Add it to the old balance.',
+    `Do ${plainM(r.prev)} ${op} ${plainM(amt)}. The calculator can help.`,
+    r.bal<0?'This one is below zero. Your answer needs a minus sign.':'Line up the decimal points. Then work right to left.'];
+  let math=`<p>Old balance ${money(r.prev)}. ${isOut?'Money out':'Money in'} ${money(amt)}.</p>`;
+  if(r.prev>=0 && r.bal>=0) math+=vmath(r.prev,op,amt);
+  else if(r.prev>=0 && r.bal<0) math+=`<p>The money out is bigger than the balance.</p><p>Do ${plainM(amt)} - ${plainM(r.prev)} = ?</p><p>Then put a minus sign in front.</p>`;
+  else if(r.prev<0 && isOut) math+=`<p>You are already below zero.</p><p>Add ${plainM(-r.prev)} + ${plainM(amt)} = ?</p><p>Then put a minus sign in front.</p>`;
+  else math+=`<p>You are below zero. Money in brings you back up.</p><p>Do ${plainM(amt)} - ${plainM(-r.prev)} = ?</p>`;
+  math+='<p>Money out means subtract. Money in means add.</p>';
+  return numState({label:'New balance: $',expect:r.bal,hints,math,why:t=>{
+    if(!isOut && t===r.prev-amt) return 'Close. You subtracted. Money in means add.';
+    if(isOut && t===r.prev+amt) return 'Close. You added. Money out means subtract.';
+    if(t===r.prev) return 'That is the old balance. Now use this row.';
+    return closeWhy(t,r.bal)||'Not yet. Try again. The calculator can help.';
+  }});
+}
+function regTable(rows,i,lv,extraRow){
+  const L=LV[lv];
+  const body=rows.map((r,k)=>{
+    const cls=k===i?'cur':(k>i?'later':'')+(r.fee?' fee':'');
+    const b=k<i?`${money(r.bal)} ${r.st==='shown'?'👀':'✅'}`:(k===i?'❓':'');
+    return `<tr class="${cls}"><td>${r.d}</td><td>${h(r.w)}${r.fee?' ⚠️':''}</td><td class="num">${r.out?money(r.out):''}</td><td class="num">${r.inn?money(r.inn):''}</td><td class="num">${b}</td></tr>`;
+  }).join('');
+  return `<table class="reg"><thead><tr><th>Date</th><th>What it was for</th><th class="num">Money out</th><th class="num">Money in</th><th class="num">Balance</th></tr></thead>
+    <tbody><tr><td></td><td><b>Starting balance</b></td><td></td><td></td><td class="num"><b>${money(L.bal)}</b></td></tr>${body}${extraRow||''}</tbody></table>`;
+}
+function checkView(lv){
+  const L=LV[lv];
+  const rows=checkRows(lv,DB.set.challenge);
+  const final=rows[rows.length-1].bal;
+  const st={phase:'card',i:0,S:null,hints:0,shown:false,aff:0,affOk:false,affTries:0,stmtPick:null};
+  const realBal=final-FORGOT.row.out;
+  function startRow(){ st.S=rowStep(rows[st.i],lv); }
+  function bankHTML(){
+    const all=rows.map(r=>({d:r.d,w:r.w,out:r.out,inn:r.inn}));
+    const day=d=>parseInt(d.replace(/\D/g,''),10); const idx=all.findIndex(r=>day(r.d)>day(FORGOT.row.d));
+    all.splice(idx<0?all.length:idx,0,{d:FORGOT.row.d,w:FORGOT.row.w,out:FORGOT.row.out,inn:0});
+    return `<table class="reg"><thead><tr><th>Date</th><th>Bank record</th><th class="num">Out</th><th class="num">In</th></tr></thead><tbody>${all.map(r=>`<tr><td>${r.d}</td><td>${h(r.w)}</td><td class="num">${r.out?money(r.out):''}</td><td class="num">${r.inn?money(r.inn):''}</td></tr>`).join('')}</tbody></table>`;
+  }
+  function finish(){
+    const stars=st.shown?1:(st.hints<=3?3:2);
+    const amt=lv===3?realBal:final;
+    const lines=[`Final balance: ${money(amt)}.`,`Hints used: ${st.hints}.`,st.shown?'You saw at least one answer. Try again for more stars.':'You did every row yourself!'];
+    go(finishView({m:'C',lv,stars,amt,title:'Account checked!',lines,resultText:`Final balance ${money(amt)}. Hints ${st.hints}`}));
+  }
+  function nextAfterRows(){ if(lv===3){ st.phase='stmt'; } else { st.phase='aff'; } }
+  const v={
+    html(){
+      const head=`<p class="stepline say">Level ${lv}: Checking Account Check-Up</p>`;
+      if(st.phase==='card') return shopperCardHTML(lv,'C',lv===3?'':'<p class="say">Type each new balance in the register.</p>');
+      if(st.phase==='reg'){
+        const r=rows[st.i], isOut=r.out>0;
+        return `${head}<div class="regwrap"><section>${regTable(rows,st.i,lv)}${lv===3?'<p class="warnbox say">If your balance goes below zero, the bank charges $25.</p>':''}</section>
+          <section class="card workpanel"><p class="stepline">Row ${st.i+1} of ${rows.length}</p>
+          <h2 class="say">${r.d}: ${h(r.w)}</h2>
+          ${r.fee?'<p class="warnbox say">The balance went below $0. The bank charges $25.</p>':''}
+          <p class="say bigmoney">${isOut?'Money out':'Money in'}: ${money(isOut?r.out:r.inn)}</p>
+          <p class="say">Old balance: ${money(r.prev)}</p>
+          <p class="say">What is the new balance?</p>${numPanel(st.S)}</section></div>`;
+      }
+      if(st.phase==='stmt'){
+        return `${head}<div class="regwrap"><section><h2 class="say">🏦 Bank statement</h2>${bankHTML()}</section>
+          <section class="card workpanel"><h2 class="say">Compare it to your register</h2>
+          <p class="say">One thing on the bank statement is not in your register. Which one?</p>
+          <div style="display:grid;gap:.5rem">${FORGOT.options.map((o,k)=>`<button class="btn" data-a="pickf" data-k="${k}">${o}</button>`).join('')}</div>
+          ${hintsOn()?'<div class="row"><button class="btn" data-a="shint">💡 Hint</button></div>':''}
+          <div class="fb" id="fb"></div></section></div>`;
+      }
+      if(st.phase==='stmtbal'){
+        const extra=`<tr class="cur"><td>${FORGOT.row.d}</td><td>${h(FORGOT.row.w)} (forgot!)</td><td class="num">${money(FORGOT.row.out)}</td><td></td><td class="num">❓</td></tr>`;
+        return `${head}<div class="regwrap"><section>${regTable(rows,rows.length,lv,extra)}</section>
+          <section class="card workpanel"><h2 class="say">Add the pizza to your register</h2>
+          <p class="say">Money out: ${money(FORGOT.row.out)}. Old balance: ${money(final)}.</p>
+          <p class="say">What is your real balance?</p>${numPanel(st.S)}</section></div>`;
+      }
+      if(st.phase==='aff'){
+        const A=AFFORD[lv], it=A.items[st.aff];
+        return `<section class="card narrow">${head}<p class="stepline">Can I afford it? ${st.aff+1} of 3</p>
+          <h1 class="say">Can I afford it?</h1>
+          <ul class="facts say"><li>🏦 Balance: ${money(A.bal)}</li><li>📅 ${A.bill[0]} of ${money(A.bill[1])} is due ${A.bill[2]}.</li></ul>
+          <p class="say bigmoney">${it[1]} ${it[0]}: ${money(it[2])}</p>
+          <p class="say">Can you buy it and still pay the bill?</p>
+          ${st.affOk?`<div class="fb" id="fb">${fbHTML('good',st.affMsg)}</div><div class="row"><button class="btn primary big" data-a="affnext">Next ➡️</button></div>`
+          :`<div class="yn"><button class="btn primary" data-a="yn" data-v="1">👍 YES</button><button class="btn" data-a="yn" data-v="0">✋ NO</button></div>
+          <div class="row"><button class="btn" data-a="affmath">🧮 Show me the math</button></div><div class="fb" id="fb"></div>`}
+          </section>`;
+      }
+      return '';
+    },
+    after(){ if(st.phase==='reg'||st.phase==='stmtbal') focusEl('ans'); },
+    act(a,b){
+      if(a==='start'){ st.phase='reg'; startRow(); draw(); return; }
+      if(st.phase==='reg'||st.phase==='stmtbal'){
+        if(a==='nhint') st.hints++;
+        const res=numAct(a,st.S); if(!res) return;
+        if(res==='shown') st.shown=true;
+        const msg=res==='ok'?`✅ ${goodWord()} ${money(st.S.cfg.expect)}.`:`👀 The answer is ${money(st.S.cfg.expect)}. Let's keep going.`;
+        if(res==='ok') chime();
+        if(st.phase==='stmtbal'){ st.stmtMsg=msg; st.phase='aff'; draw(); setFb(res==='ok'?'good':'info',msg); return; }
+        rows[st.i].st=res==='ok'?'ok':'shown'; st.i++;
+        if(st.i<rows.length){ startRow(); st.S.msg=fbHTML(res==='ok'?'good':'info',msg); draw(); }
+        else { nextAfterRows(); draw(); setFb(res==='ok'?'good':'info',msg+' Your register is done!'); }
+        return;
+      }
+      if(a==='pickf'){
+        if(+b.dataset.k===0){
+          chime(); st.phase='stmtbal';
+          st.S=rowStep(Object.assign({},FORGOT.row,{prev:final,bal:realBal}),lv);
+          st.S.msg=fbHTML('good','✅ Yes! You forgot the pizza. Now add it to your register.');
+          draw();
+        } else setFb('notyet','🤔 Not yet. That one is in your register. Look for one you did not write down.');
+        return;
+      }
+      if(a==='shint'){ st.hints++; setFb('info','💡 Look at each bank record. Find it in your register. One is missing.'); return; }
+      if(a==='yn'){
+        const A=AFFORD[lv], it=A.items[st.aff], left=A.bal-it[2], can=left>=A.bill[1], said=b.dataset.v==='1';
+        const expl=`${money(A.bal)} - ${money(it[2])} = ${money(left)}. ${can?`That still covers the ${money(A.bill[1])} ${A.bill[0].toLowerCase()}.`:`That is not enough for the ${money(A.bill[1])} ${A.bill[0].toLowerCase()}.`}`;
+        if(said===can){ st.affOk=true; st.affMsg=`✅ ${can?'YES works.':'NO is right.'} ${expl}${!can&&lv===3?' Going below zero costs $25.':''}`; chime(); draw(); }
+        else setFb('notyet',`🤔 Not yet. Find what is left after you buy it. Is it enough for the ${A.bill[0].toLowerCase()}?`);
+        return;
+      }
+      if(a==='affmath'){ const A=AFFORD[lv], it=A.items[st.aff];
+        mathModal(`<p>Balance minus the purchase:</p>${vmath(A.bal,'-',it[2])}<p>Is what is left at least ${money(A.bill[1])}? If yes, you can buy it.</p>`); return; }
+      if(a==='affnext'){ st.aff++; st.affOk=false; if(st.aff>=3) finish(); else draw(); }
+    }
+  };
+  return v;
+}
+
+/* ================= RECEIPTS ================= */
+const RC_FIXED={
+  1:{lines:[['Milk',384],['Bread',280],['Bread',280,0,'dup'],['Rice',320],['Canned beans',120],['Apples (bag)',576]],cmis:false},
+  2:{lines:[['Milk',384],['Chicken breast',1020,960,'price'],['Rice',320],['Canned beans',120],['Shredded cheese',432],['Apples (bag)',576],['Peanut butter',320]],cmis:true},
+  3:{lines:[['Milk',384],['Milk',384,0,'dup'],['Ground beef',896],['Chicken breast',960],['Pasta',160],['Frozen vegetables',156],['Cereal',560,500,'price'],
+            ['Apples (bag)',576],['Shredded cheese',432],['Cookies',420,378,'cookie'],['Rice',320],['Canned beans',120],['Peanut butter',320],['Bread',280]],cmis:false}
+};
+function rLine(a){ return {n:a[0],s:a[1],r:a[2]===undefined?a[1]:a[2],kind:a[3]||null}; }
+function makeRc(lv,lines,cmis){
+  const L=LV[lv], rSub=sum(lines.map(l=>l.r));
+  let coupon=null;
+  if(L.coupon){ const rc=rSub>=L.coupon.min?L.coupon.off:0; coupon={s:cmis?0:rc,r:rc}; }
+  return {lv,lines,coupon};
+}
+function fixedRc(lv,challenge){
+  const lines=RC_FIXED[lv].lines.map(rLine);
+  if(challenge){
+    if(lv===1){ const l=lines.find(x=>x.n==='Rice'); l.s=380; l.kind='price'; }
+    if(lv===2){ const l=lines.find(x=>x.n==='Peanut butter'); l.s=360; l.kind='price'; }
+    if(lv===3){ const k=lines.findIndex(x=>x.n==='Rice'); lines.splice(k+1,0,{n:'Rice',s:320,r:0,kind:'dup'}); }
+  }
+  return makeRc(lv,lines,RC_FIXED[lv].cmis);
+}
+function randomRc(lv){
+  const L=LV[lv];
+  const n=Math.min(4,1+rnd(3)+(DB.set.challenge?1:0));
+  const pool=shuffle(['dup','price','cookie'].concat(L.coupon?['coupon']:[]));
+  const kinds=[]; for(let i=0;i<n;i++) kinds.push(i<pool.length?pool[i]:(rnd(2)?'dup':'price'));
+  let items=shuffle(ITEMS.filter(i=>i.id!=='cookies')).slice(0,5+rnd(4));
+  if(kinds.includes('cookie')||rnd(3)===0) items.splice(rnd(items.length+1),0,BYID.cookies);
+  if(kinds.includes('coupon')){
+    const rest=shuffle(ITEMS.filter(i=>!items.includes(i)));
+    while(sum(items.map(pr))<L.coupon.min && rest.length) items.push(rest.pop());
+  }
+  const lines=items.map(it=>({n:it.name,s:pr(it),r:pr(it),kind:null,id:it.id}));
+  let cmis=false;
+  kinds.forEach(k=>{
+    if(k==='coupon'){ cmis=true; return; }
+    if(k==='cookie'){ const l=lines.find(x=>x.id==='cookies'); l.s=BYID.cookies.c; l.kind='cookie'; return; }
+    const free=lines.filter(x=>!x.kind && x.id!=='cookies' && !lines.some(y=>y.kind==='dup'&&y.src===x));
+    const l=free[rnd(free.length)]; if(!l) return;
+    if(k==='price'){ l.s=l.r+(2+rnd(8))*10; l.kind='price'; }
+    else { const i=lines.indexOf(l); lines.splice(i+1,0,{n:l.n,s:l.s,r:0,kind:'dup',src:l}); }
+  });
+  return makeRc(lv,lines,cmis);
+}
+function rcCalc(rc){
+  const sSub=sum(rc.lines.map(l=>l.s)), rSub=sum(rc.lines.map(l=>l.r));
+  const sTot=sSub-(rc.coupon?rc.coupon.s:0), rTot=rSub-(rc.coupon?rc.coupon.r:0);
+  const bad=rc.lines.map((l,i)=>l.s!==l.r?String(i):null).filter(x=>x!==null);
+  if(rc.coupon && rc.coupon.s!==rc.coupon.r) bad.push('c');
+  return {sSub,rSub,sTot,rTot,owe:sTot-rTot,bad};
+}
+function whyLine(rc,key){
+  const L=LV[rc.lv];
+  if(key==='c'){ const c=rcCalc(rc); return `The right items add up to ${money(c.rSub)}. That is ${money(L.coupon.min,true)} or more. The ${money(L.coupon.off,true)} coupon should come off.`; }
+  const l=rc.lines[+key];
+  if(l.kind==='dup') return `${l.n} was scanned twice. You only bought one.`;
+  if(l.kind==='cookie') return `Cookies are 10% off. They should be ${money(l.r)}, not ${money(l.s)}.`;
+  return `The ad says ${l.n} is ${money(l.r)}. The receipt says ${money(l.s)}.`;
+}
+function adTable(){
+  return `<table class="ad"><thead><tr><th>Store ad</th><th class="num">Price</th></tr></thead><tbody>${ITEMS.map(it=>`<tr><td>${it.e} ${h(it.name)}</td><td class="num">${it.sale?`${money(it.sale)} (10% off ${money(it.c)})`:money(it.c)}</td></tr>`).join('')}</tbody></table>`;
+}
+function rcState(rc){ return {rc,marked:new Set(),checks:0,reveal:false,ok:false,msg:''}; }
+function receiptHTML(RS,stepline){
+  const rc=RS.rc, c=rcCalc(rc), L=LV[rc.lv];
+  const line=(key,label,amt)=>{
+    const m=RS.marked.has(key), sh=RS.reveal && c.bad.includes(key);
+    return `<button class="rline${m?' marked':''}${sh?' shown':''}" data-a="rline" data-k="${key}" aria-pressed="${m}">
+      <span>${m?'🚩 ':''}${h(label)}${sh?`<span class="why">⬆️ ${whyLine(rc,key)}</span>`:''}</span><span>${amt}</span></button>`;
+  };
+  return `${stepline||''}<h1 class="say">Check the receipt</h1>
+    <p class="say">Compare each line to the store ad. Tap any line that does not match. Tap again to unmark it.</p>
+    <div class="rwrap"><section>
+      <div class="receipt"><div class="rh">MAPLE STREET MARKET<br>Thank you for shopping!</div>
+        ${rc.lines.map((l,i)=>line(String(i),l.n,money(l.s))).join('')}
+        <div class="rflat rtot"><span>SUBTOTAL</span><span>${money(c.sSub)}</span></div>
+        ${rc.coupon?line('c',`COUPON ${money(L.coupon.off,true)} OFF ${money(L.coupon.min,true)}`,money(-rc.coupon.s)):''}
+        <div class="rflat"><span>TOTAL</span><span>${money(c.sTot)}</span></div>
+        <div class="rh" style="margin-top:.4rem">No tax on food</div></div>
+      <div class="row">
+        ${RS.ok?'<button class="btn primary big" data-a="rnext">Next ➡️</button>':'<button class="btn primary big" data-a="rcheck">✅ Check my answers</button>'}
+        ${hintsOn()&&!RS.ok?'<button class="btn" data-a="rhint">💡 Hint</button>':''}
+        <button class="btn" data-a="rmath">🧮 Show me the math</button>
+        ${RS.checks>0&&!RS.reveal&&!RS.ok?'<button class="btn" data-a="rreveal">👀 Show me which</button>':''}
+      </div>
+      <div class="fb" id="fb">${RS.msg}</div>
+    </section><section>${adTable()}${L.coupon?`<p class="say">🎟️ Coupon: ${couponText(L)}.</p>`:''}</section></div>`;
+}
+// returns true when receipt step is solved on this press
+function receiptAct(a,b,RS){
+  const rc=RS.rc, c=rcCalc(rc), L=LV[rc.lv];
+  if(a==='rline'){ if(RS.ok) return false; const k=b.dataset.k; RS.marked.has(k)?RS.marked.delete(k):RS.marked.add(k); RS.msg=''; draw(); const n=app.querySelector(`.rline[data-k="${k}"]`); if(n) n.focus({preventScroll:true}); return false; }
+  if(a==='rmath'){
+    mathModal(`<p>Check each line against the ad.</p><ul><li>Same item twice? You only pay once.</li><li>Price higher than the ad? Use the ad price.</li><li>Cookies are 10% off: $4.20 - $0.42 = $3.78.</li>${L.coupon?`<li>Coupon: are the items ${money(L.coupon.min,true)} or more? Then ${money(L.coupon.off,true)} comes off.</li>`:''}</ul>`);
+    return false;
+  }
+  if(a==='rhint'){
+    const un=c.bad.filter(k=>!RS.marked.has(k)), extra=[...RS.marked].filter(k=>!c.bad.includes(k));
+    let m;
+    if(extra.length) m='One line you marked matches the ad. Check your marks again.';
+    else if(un.length){ const k=un[0]; const kind=k==='c'?'coupon':rc.lines[+k].kind;
+      m=kind==='dup'?'Look for an item that shows up twice.':kind==='cookie'?'Check the cookies. They are on sale.':kind==='coupon'?'Check the coupon line. Did it come off?':'Compare each price to the ad. One costs more.'; }
+    else m='You marked them all. Tap Check my answers.';
+    RS.msg=fbHTML('info','💡 '+m); setFb('info','💡 '+m); return false;
+  }
+  if(a==='rreveal'){ RS.reveal=true; RS.msg=fbHTML('info','👀 The mistakes are outlined. Tap them so they are marked.'); draw(); return false; }
+  if(a==='rcheck'){
+    RS.checks++;
+    const found=c.bad.filter(k=>RS.marked.has(k)).length, extra=[...RS.marked].filter(k=>!c.bad.includes(k)).length;
+    if(found===c.bad.length && !extra){
+      RS.ok=true; RS.reveal=true; chime();
+      RS.msg=fbHTML('good',`✅ ${c.bad.length>1?`You found all ${c.bad.length} mistakes!`:'You found the mistake!'} ${c.bad.map(k=>whyLine(rc,k)).join(' ')}`);
+      draw(); return true;
+    }
+    let m=`🤔 Not yet. You found ${found} of ${c.bad.length} mistake${c.bad.length>1?'s':''}.`;
+    if(extra) m+=` ${extra} line${extra>1?'s':''} you marked match${extra>1?'':'es'} the ad.`;
+    RS.msg=fbHTML('notyet',m+' Keep looking!'); draw(); return false;
+  }
+  return false;
+}
+function totalStep(rc){
+  const c=rcCalc(rc), L=LV[rc.lv];
+  const good=rc.lines.filter(l=>l.r>0);
+  let math=`<p>Add the right prices:</p><p>${good.map(l=>plainM(l.r)).join(' + ')} = ?</p>`;
+  if(rc.coupon && rc.coupon.r) math+=`<p>Then take off the coupon: ? - ${plainM(rc.coupon.r)}</p>`;
+  math+=`<p>Or start with the receipt total ${money(c.sTot)} and take away each mistake.</p>`;
+  return numState({label:'Correct total: $',expect:c.rTot,math,
+    hints:['Take out the mistakes. Then add again.',`Start with ${money(c.sTot)}. Take away the extra money from each mistake.`,rc.coupon&&rc.coupon.r?`Do not forget the ${money(rc.coupon.r)} coupon.`:'The calculator can help.'],
+    why:t=>{
+      if(t===c.sTot) return 'That is the total on the receipt. Fix the mistakes first.';
+      if(rc.coupon && rc.coupon.r && t===c.rSub) return 'Close! Now take off the coupon.';
+      return closeWhy(t,c.rTot)||'Not yet. Try again. Show me the math can help.';
+    }});
+}
+function refundStep(rc){
+  const c=rcCalc(rc);
+  return numState({label:'Store owes you: $',expect:c.owe,math:`<p>Receipt total minus correct total:</p>${vmath(c.sTot,'-',c.rTot)}`,
+    hints:['Find the difference between the two totals.',`Do ${plainM(c.sTot)} - ${plainM(c.rTot)}.`],
+    why:t=>{
+      if(t===-c.owe) return 'Close. The store owes you, so make it positive.';
+      if(t===c.rTot||t===c.sTot) return 'That is a total. Find the difference between the two totals.';
+      return closeWhy(t,c.owe)||'Not yet. Try again. The calculator can help.';
+    }});
+}
+
+/* ================= MODE 4: BOSS LEVEL ================= */
+function bossView(lv){
+  const L=LV[lv];
+  const steps=['card','list'].concat(L.coupon?['coupon']:[]).concat(['xpick','xdecide','xreason','rcheck','rtotal','rrefund','regout','regbal']);
+  const graded=['list','coupon','xdecide','rcheck','rtotal','rrefund','regout','regbal'].filter(s=>steps.includes(s));
+  const NAMES={list:'Built the list',coupon:'Checked the coupon',xdecide:'Add or skip the extra',rcheck:'Found the receipt mistakes',rtotal:'Fixed the total',rrefund:'Found the refund',regout:'Wrote the money out',regbal:'Found the new balance'};
+  const st={k:0,B:newB(),fp:{},xorder:shuffle(EXTRAS),xid:null,xadd:null,xdone:false,xmsg:'',RS:rcState(fixedRc(lv,DB.set.challenge)),S:null,msg:''};
+  const rc=st.RS.rc, rcc=rcCalc(rc), finalBal=L.bal-rcc.rTot;
+  const cur=()=>steps[st.k];
+  const mark=(key,ok)=>{ if(!(key in st.fp)) st.fp[key]=ok; };
+  const listSub=()=>tot(st.B,lv,true).sub;
+  function nextStep(){ st.k++; st.msg=''; const s=cur();
+    if(s==='rtotal') st.S=totalStep(rc);
+    if(s==='rrefund') st.S=refundStep(rc);
+    if(s==='regout') st.S=numState({label:'Money out: $',expect:rcc.rTot,math:`<p>Money out is what you really paid.</p><p>That is the correct total from the receipt.</p>`,
+      hints:['Use the correct total, not the receipt total.',`You found it two steps ago.`],
+      why:t=>t===rcc.sTot?'That is the receipt total. Use the correct total.':(closeWhy(t,rcc.rTot)||'Not yet. Use the correct total you found.')});
+    if(s==='regbal') st.S=numState({label:'New balance: $',expect:finalBal,math:`<p>Balance minus money out:</p>${vmath(L.bal,'-',rcc.rTot)}`,
+      hints:['Money out means subtract.',`Do ${plainM(L.bal)} - ${plainM(rcc.rTot)}.`],
+      why:t=>t===L.bal+rcc.rTot?'Close. You added. Money out means subtract.':t===L.bal-rcc.sTot?'Close. Use the correct total, not the receipt total.':(closeWhy(t,finalBal)||'Not yet. Try again. The calculator can help.')});
+    draw();
+  }
+  function finish(){
+    const firsts=graded.filter(g=>st.fp[g]).length;
+    const stars=firsts===graded.length?3:(firsts*2>=graded.length?2:1);
+    const lines=graded.map(g=>`${st.fp[g]?'✅':'👍'} ${NAMES[g]}${st.fp[g]?' (first try)':''}`);
+    lines.push(`New balance: ${money(finalBal)}.`);
+    go(finishView({m:'B',lv,stars,amt:finalBal,title:'Boss Level beaten! 👑',lines,resultText:`Final balance ${money(finalBal)}. First tries ${firsts} of ${graded.length}`,
+      extra:[{label:'🧾 Another receipt',fn:()=>go(receiptPractice(lv))}]}));
+  }
+  const v={
+    html(){
+      const s=cur(), n=steps.indexOf(s);
+      const head=`<p class="stepline say">👑 Boss Level ${lv}. Step ${n} of ${steps.length-1}</p>`;
+      if(s==='card') return shopperCardHTML(lv,'B','<p class="say">Shop, check the receipt, then update the bank account.</p>');
+      if(s==='list') return builderHTML(st.B,lv,true,head);
+      if(s==='coupon'){
+        const sub=listSub();
+        return `<section class="card narrow">${head}<h1 class="say">🎟️ Can you use the coupon?</h1>
+          <p class="say bigmoney">Your list total: ${money(sub)}</p><p class="say">Coupon: ${couponText(L)}.</p>
+          ${st.msg?`<div class="fb" id="fb">${st.msg}</div><div class="row"><button class="btn primary big" data-a="next">Next ➡️</button></div>`:
+          `<div class="yn"><button class="btn primary" data-a="cp" data-v="1">👍 YES</button><button class="btn" data-a="cp" data-v="0">✋ NO</button></div>
+          <div class="row"><button class="btn" data-a="cmath">🧮 Show me the math</button></div><div class="fb" id="fb"></div>`}</section>`;
+      }
+      if(s==='xpick'){
+        return `<section class="card">${head}<h1 class="say">Surprise at the checkout!</h1>
+          <p class="say">Pick one card to flip it over.</p>
+          <div class="picks">${st.xorder.map(x=>st.xid===x.id?`<div class="pick on"><span class="pe">${x.e}</span><b>${x.name}</b><span>${money(x.c)}</span></div>`
+            :`<button class="pick face" data-a="flip" data-id="${x.id}" ${st.xid?'disabled':''} aria-label="Face down card">🎁 ?</button>`).join('')}</div>
+          ${st.xid?`<p class="say bigmoney">You flipped: ${XBYID[st.xid].name} for ${money(XBYID[st.xid].c)}.</p><div class="row"><button class="btn primary big" data-a="next">Next ➡️</button></div>`:''}</section>`;
+      }
+      if(s==='xdecide'){
+        const x=XBYID[st.xid], paid=paidFor(listSub(),L);
+        return `<section class="card narrow">${head}<h1 class="say">${x.e} Add it or skip it?</h1>
+          <ul class="facts say"><li>🛒 Your list: you pay ${money(paid)}</li><li>💵 Budget: ${money(L.budget)}</li><li>${x.e} ${x.name}: ${money(x.c)}</li></ul>
+          ${st.xdone?`<div class="fb" id="fb">${st.xmsg}</div><div class="row"><button class="btn primary big" data-a="next">Next ➡️</button></div>`:
+          `<div class="yn"><button class="btn primary" data-a="xd" data-v="1">➕ Add it</button><button class="btn" data-a="xd" data-v="0">⏭️ Skip it</button></div>
+          <div class="row"><button class="btn" data-a="xmath">🧮 Show me the math</button></div><div class="fb" id="fb"></div>`}</section>`;
+      }
+      if(s==='xreason'){
+        const opts=st.xadd?['I need it','It fits my budget','It is a good deal','I have room for a treat']:['I can live without it','It costs too much right now','I want to save money','It would put me over'];
+        return `<section class="card narrow">${head}<h1 class="say">Why?</h1><p class="say">You chose to ${st.xadd?'add':'skip'} the ${XBYID[st.xid].name.toLowerCase()}. Pick your reason.</p>
+          <div class="choices">${opts.map(o=>`<button class="btn big" data-a="why" data-o="${o}">${o}</button>`).join('')}</div></section>`;
+      }
+      if(s==='rcheck') return receiptHTML(st.RS,head);
+      if(s==='rtotal'||s==='rrefund'){
+        return `<section class="card narrow">${head}<h1 class="say">${s==='rtotal'?'What should the total be?':'How much does the store owe you?'}</h1>
+          <p class="say">Receipt total: ${money(rcc.sTot)}.</p>${s==='rrefund'?`<p class="say">Correct total: ${money(rcc.rTot)}.</p>`:'<p class="say">Use the ad prices. Take out the mistakes.</p>'}
+          ${numPanel(st.S)}</section>`;
+      }
+      if(s==='regout'||s==='regbal'){
+        const row=`<tr class="cur"><td>Oct 15</td><td>Maple Street Market</td><td class="num">${s==='regbal'?money(rcc.rTot):'❓'}</td><td></td><td class="num">${s==='regbal'?'❓':''}</td></tr>`;
+        return `${head}<div class="regwrap"><section><table class="reg"><thead><tr><th>Date</th><th>What it was for</th><th class="num">Money out</th><th class="num">Money in</th><th class="num">Balance</th></tr></thead>
+          <tbody><tr><td></td><td><b>Starting balance</b></td><td></td><td></td><td class="num"><b>${money(L.bal)}</b></td></tr>${row}</tbody></table></section>
+          <section class="card workpanel"><h2 class="say">${s==='regout'?'Write the trip in your register':'Find the new balance'}</h2>
+          <p class="say">${s==='regout'?'How much money went out? Use what you really paid.':`Starting balance ${money(L.bal)}. Money out ${money(rcc.rTot)}.`}</p>
+          ${numPanel(st.S)}</section></div>`;
+      }
+      return '';
+    },
+    after(){ if(['rtotal','rrefund','regout','regbal'].includes(cur())) focusEl('ans'); },
+    act(a,b){
+      const s=cur();
+      if(a==='start'||a==='next'){ nextStep(); return; }
+      if(s==='list'){
+        if(builderAct(a,b,st.B,lv,true)) return;
+        if(a==='done'){
+          const r=checkList(st.B,lv,false);
+          mark('list',r.ok);
+          if(!r.ok){ setFb('notyet','🤔 Not yet. '+r.msg); return; }
+          chime(); nextStep();
+        }
+        return;
+      }
+      if(s==='coupon'){
+        if(a==='cmath'){ mathModal(`<p>Is ${money(listSub())} at least ${money(L.coupon.min)}?</p><p>If yes, the coupon works. Then ${money(listSub())} - ${money(L.coupon.off)} = ?</p>`); return; }
+        if(a==='cp'){
+          const sub=listSub(), can=sub>=L.coupon.min, said=b.dataset.v==='1';
+          mark('coupon',said===can);
+          if(said!==can){ setFb('notyet',`🤔 Not yet. Look again. Is ${money(sub)} at least ${money(L.coupon.min,true)}?`); return; }
+          chime();
+          st.msg=fbHTML('good',can?`✅ Yes! ${money(sub)} is ${money(L.coupon.min,true)} or more. You pay ${money(sub-L.coupon.off)}.`:`✅ Right. ${money(sub)} is less than ${money(L.coupon.min,true)}. No coupon this time.`);
+          draw();
+        }
+        return;
+      }
+      if(s==='xpick' && a==='flip'){ st.xid=b.dataset.id; draw(); return; }
+      if(s==='xdecide'){
+        const x=XBYID[st.xid], sub=listSub(), before=paidFor(sub,L), after=paidFor(sub+x.c,L), fits=after<=L.budget;
+        if(a==='xmath'){ mathModal(`<p>Your list plus the ${x.name.toLowerCase()}:</p>${vmath(sub,'+',x.c)}${L.coupon?`<p>Coupon comes off if the total is ${money(L.coupon.min,true)} or more.</p>`:''}<p>Is that under ${money(L.budget)}?</p>`); return; }
+        if(a==='xd'){
+          const add=b.dataset.v==='1';
+          if(add && !fits){ mark('xdecide',false); setFb('notyet',`🤔 Not yet. Adding it makes ${money(after)}. That is ${money(after-L.budget)} over budget. Try again.`); return; }
+          mark('xdecide',true); st.xadd=add; st.xdone=true; chime();
+          st.xmsg=fbHTML('good',add?`✅ Added. You pay ${money(after)}. You still have ${money(L.budget-after)} left.`:`✅ Skipped. You keep ${money(L.budget-before)} for later.${fits?'':` Adding it would put you ${money(after-L.budget)} over.`}`);
+          draw();
+        }
+        return;
+      }
+      if(s==='xreason' && a==='why'){ nextStep(); return; }
+      if(s==='rcheck'){
+        if(a==='rnext'){ nextStep(); return; }
+        if(a==='rcheck') mark('rcheck',(()=>{ const c=rcCalc(rc); return c.bad.every(k=>st.RS.marked.has(k)) && [...st.RS.marked].every(k=>c.bad.includes(k)); })());
+        receiptAct(a,b,st.RS); return;
+      }
+      if(['rtotal','rrefund','regout','regbal'].includes(s)){
+        if(a==='ncheck'){ const t=parseMoney(val('ans')); if(val('ans').trim()) mark(s,t===st.S.cfg.expect); }
+        if(a==='nshow') mark(s,false);
+        const res=numAct(a,st.S); if(!res) return;
+        chime();
+        if(s==='regbal'){ finish(); return; }
+        const m=res==='ok'?`✅ ${goodWord()} ${money(st.S.cfg.expect)}.`:`👀 The answer is ${money(st.S.cfg.expect)}.`;
+        nextStep(); if(st.S && cur()!=='rcheck'){ st.S.msg=fbHTML(res==='ok'?'good':'info',m); draw(); }
+      }
+    }
+  };
+  return v;
+}
+
+/* ================= ANOTHER RECEIPT (practice) ================= */
+function receiptPractice(lv){
+  const st={phase:'rcheck',RS:rcState(randomRc(lv)),S:null};
+  const rc=st.RS.rc, c=rcCalc(rc);
+  return {
+    html(){
+      const head=`<p class="stepline say">🧾 Receipt practice. Level ${lv}</p>`;
+      if(st.phase==='rcheck') return receiptHTML(st.RS,head);
+      if(st.phase==='rtotal'||st.phase==='rrefund')
+        return `<section class="card narrow">${head}<h1 class="say">${st.phase==='rtotal'?'What should the total be?':'How much does the store owe you?'}</h1>
+          <p class="say">Receipt total: ${money(c.sTot)}.</p>${st.phase==='rrefund'?`<p class="say">Correct total: ${money(c.rTot)}.</p>`:''}${numPanel(st.S)}</section>`;
+      return `<section class="card narrow center">${head}<div class="emoji-big">🧾</div><h1 class="say">Nice checking!</h1>
+        <p class="say">The correct total is ${money(c.rTot)}. The store owes you ${money(c.owe)}.</p>
+        <div class="row" style="justify-content:center"><button class="btn primary big" data-a="more">🧾 Another receipt</button><button class="btn" data-a="home">🏠 Home</button></div></section>`;
+    },
+    after(){ if(st.phase==='rtotal'||st.phase==='rrefund') focusEl('ans'); },
+    act(a,b){
+      if(a==='more'){ go(receiptPractice(lv)); return; }
+      if(a==='home'){ go(homeView()); return; }
+      if(st.phase==='rcheck'){ if(a==='rnext'){ st.phase='rtotal'; st.S=totalStep(rc); draw(); return; } receiptAct(a,b,st.RS); return; }
+      const res=numAct(a,st.S); if(!res) return;
+      chime();
+      if(st.phase==='rtotal'){ st.phase='rrefund'; st.S=refundStep(rc); st.S.msg=fbHTML('good',`✅ ${money(c.rTot)} is the correct total.`); draw(); }
+      else { st.phase='done'; draw(); }
+    }
+  };
+}
+
+/* ================= TEACHER AREA ================= */
+function teacherView(){
+  return {
+    html(){
+      const sw=(k,label,desc)=>{ const on=!!DB.set[k]; return `<div class="sw"><span><b>${label}</b><br><span class="note">${desc}</span></span><button class="btn" role="switch" aria-checked="${on}" data-a="sw" data-k="${k}">${on?'On':'Off'}</button></div>`; };
+      const kids=Object.values(DB.kids);
+      const cols=[];['G','E','C','B'].forEach(m=>[1,2,3].forEach(l=>cols.push(m+l)));
+      return `<h1 class="say">🔒 Teacher area</h1>
+        <section class="card"><h2>Student on this Chromebook</h2>
+          <p>${DB.name?`Current student: <b>${h(DB.name)}</b>`:'No student name yet.'}</p>
+          ${DB.name?`<button class="btn" data-a="reset">🧹 Reset ${h(DB.name)}'s progress</button>`:''}</section>
+        <section class="card"><h2>Switches (this Chromebook)</h2>
+          ${sw('challenge','More challenge','Hides unit prices in Grocery and Boss. Adds one receipt mistake. Adds one register row with a second overdraft risk.')}
+          ${sw('hideHints','Hide hints','Hides the Hint buttons. Show me the math and the calculator stay.')}</section>
+        <section class="card"><h2>Stars saved on this Chromebook</h2>
+          <p class="note">G = Grocery, E = Extras, C = Checking, B = Boss. Numbers are levels.</p>
+          <div style="overflow-x:auto"><table class="keytable"><tr><th>Name</th>${cols.map(c=>`<th>${c}</th>`).join('')}</tr>
+          ${kids.length?kids.map(k=>`<tr><td>${h(k.name)}</td>${cols.map(c=>`<td>${k.p&&k.p[c]?k.p[c].s:''}</td>`).join('')}</tr>`).join(''):'<tr><td colspan="13">No saved stars yet.</td></tr>'}</table></div></section>
+        <div class="row"><button class="btn primary" data-a="key">🔑 Show the answer key</button><button class="btn" data-a="home">🏠 Done</button></div>`;
+    },
+    act(a,b){
+      if(a==='home') go(homeView());
+      if(a==='key') go(answerKeyView());
+      if(a==='sw'){ const k=b.dataset.k; DB.set[k]=!DB.set[k]; save(); draw(); }
+      if(a==='reset') openModal('Reset progress?',`<p>Erase all stars for <b>${h(DB.name)}</b> on this Chromebook?</p><div class="row"><button class="btn primary" data-m="yes">Yes, reset</button><button class="btn" data-m="no">No, keep them</button></div>`,(m)=>{
+        if(m==='yes'){ delete DB.kids[DB.name.trim().toLowerCase()]; save(); closeModal(); draw(); toast('Progress reset.'); }
+        else closeModal();
+      });
+    }
+  };
+}
+function answerKeyView(){
+  return {
+    html(){
+      const needs=ITEMS.filter(i=>i.n), wants=ITEMS.filter(i=>!i.n);
+      let s=`<h1>🔑 Answer key</h1><p class="note">Shown for ${DB.set.challenge?'More challenge ON':'regular mode'}. Flip the switch to see the other set.</p>`;
+      s+=`<section class="card"><h2>Store ad (unit prices, best first)</h2><table class="keytable"><tr><th>Item</th><th>N/W</th><th>Size</th><th>Price</th><th>Unit price</th></tr>
+        ${ITEMS.slice().sort((a,b)=>unitC(a)-unitC(b)).map(i=>`<tr><td>${i.name}</td><td>${i.n?'Need':'Want'}</td><td>${i.oz} oz</td><td>${money(pr(i))}${i.sale?' (sale)':''}</td><td>${unitText(i)}</td></tr>`).join('')}</table>
+        <p>All needs: ${money(sum(needs.map(i=>i.c)))}. All wants at ad price: ${money(sum(wants.map(i=>i.c)))}.</p></section>`;
+      s+=`<section class="card"><h2>Levels</h2><table class="keytable"><tr><th>Level</th><th>Shopper</th><th>Budget</th><th>Balance</th><th>Coupon</th><th>Needs</th></tr>
+        ${[1,2,3].map(l=>{const L=LV[l];return `<tr><td>${l}</td><td>${h(L.who)}</td><td>${money(L.budget)}</td><td>${money(L.bal)}</td><td>${couponText(L)}</td><td>${L.needs}+</td></tr>`;}).join('')}</table>
+        <p>Grocery: any list with enough needs that fits the budget after the coupon. Stars: 3 if the first I am done passes, 2 on the second, 1 after that.</p></section>`;
+      s+=`<section class="card"><h2>Extras Challenge start lists</h2>${[1,2,3].map(l=>`<p><b>Level ${l}:</b> ${XSTART[l].map(id=>BYID[id].name).join(', ')} = <b>${money(sum(XSTART[l].map(id=>pr(BYID[id]))))}</b></p>`).join('')}
+        <p>Extras: ${EXTRAS.map(x=>`${x.name} ${money(x.c)}`).join(', ')}.</p></section>`;
+      s+=`<section class="card"><h2>Checking Account Check-Up</h2>${[1,2,3].map(l=>{const rows=checkRows(l,DB.set.challenge);const A=AFFORD[l];
+        return `<h3>Level ${l} (start ${money(LV[l].bal)})</h3><table class="keytable"><tr><th>Date</th><th>What</th><th>Out</th><th>In</th><th>Balance</th></tr>${rows.map(r=>`<tr><td>${r.d}</td><td>${h(r.w)}</td><td>${r.out?money(r.out):''}</td><td>${r.inn?money(r.inn):''}</td><td>${money(r.bal)}</td></tr>`).join('')}</table>
+        ${l===3?`<p>Statement: forgot ${FORGOT.row.w} ${money(FORGOT.row.out)}. Real balance: <b>${money(rows[rows.length-1].bal-FORGOT.row.out)}</b></p>`:''}
+        <p>Can I afford it? Balance ${money(A.bal)}, ${A.bill[0]} ${money(A.bill[1])}: ${A.items.map(it=>`${it[0]} ${money(it[2])} = ${A.bal-it[2]>=A.bill[1]?'YES':'NO'}`).join('; ')}.</p>`;}).join('')}
+        <p>Stars: 3 = every row with 3 or fewer hints. 2 = done with more hints. 1 = an answer was shown.</p></section>`;
+      s+=`<section class="card"><h2>Boss Level receipts</h2>${[1,2,3].map(l=>{const rc=fixedRc(l,DB.set.challenge), c=rcCalc(rc);
+        return `<h3>Level ${l}</h3><p>Receipt total ${money(c.sTot)}. Mistakes: ${c.bad.map(k=>whyLine(rc,k)).join(' ')}</p>
+        <p>Correct total <b>${money(c.rTot)}</b>. Store owes <b>${money(c.owe)}</b>. New balance ${money(LV[l].bal)} - ${money(c.rTot)} = <b>${money(LV[l].bal-c.rTot)}</b>.</p>`;}).join('')}
+        <p>Boss stars: 3 = every step right on the first press. 2 = at least half. 1 = finished.</p></section>
+        <p>Completion code: mode letter + level, stars, final amount in cents. Example G2-3-5938 = Grocery Level 2, 3 stars, $59.38. N means below zero.</p>
+        <div class="row"><button class="btn" data-a="back">⬅️ Teacher area</button><button class="btn" data-a="print">🖨️ Print</button></div>`;
+      return s;
+    },
+    act(a){ if(a==='back') go(teacherView()); if(a==='print') window.print(); }
+  };
+}
+
+/* ================= START ================= */
+load(); applySettings();
+$('#legal').textContent=LEGAL;
+go(homeView());
+</script>
+</body>
+</html>
