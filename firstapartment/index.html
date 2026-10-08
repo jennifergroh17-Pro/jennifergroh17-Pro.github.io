@@ -208,6 +208,12 @@ const CONFIG = {
   // Fill the boxes with the words NAME, CODE, DAY, SCORE, CHECK, TAPE before copying the link.
   formPrefilledLink: "https://docs.google.com/forms/d/e/1FAIpQLSc9R9WJwXiAAVl8HvR6kQn5wZCa9Hg5OXurWgZdwIgrgzlxSQ/viewform?usp=pp_url&entry.142082172=NAME&entry.1573987806=CODE&entry.1465630537=DAY&entry.1481547865=SCORE&entry.92298649=CHECK&entry.247348893=TAPE",
 
+  // SAVE PROGRESS ACROSS CHROMEBOOKS (see Teacher page, "Save progress").
+  // saveFormLink: pre-filled link for the "First Apartment Saves" form (CODE + PROGRESS boxes).
+  // saveSheetCsv: the "Publish to web" CSV link for the saves tab. Leave "" until you have it.
+  saveFormLink: "https://docs.google.com/forms/d/e/1FAIpQLSd7F9sOOLXrXGBFTUwpQuba_BvVdkJ4An9NyHsawMKQzV4khw/viewform?usp=pp_url&entry.535165407=SSCODE&entry.1637512101=SSPROGRESS",
+  saveSheetCsv: "",
+
   budgetSimUrl: "https://mrs-groh-math-budget.netlify.app/",
   arcadeUrl: "https://mrs-groh-math-models.netlify.app/",
 
@@ -248,12 +254,124 @@ function checkCode(name, code, day, score){
 }
 const store = {
   get(k,d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
-  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} try{ cloudTouch(k,v); }catch(e){} }
 };
 function tierFromCode(raw){
   const digits = String(raw||'').replace(/[^0-9]/g,'');
   for (const t of [1,2,3]) if (CONFIG.codes[t].includes(digits)) return {tier:t, code: CONFIG.codePrefix + digits};
   return null;
+}
+
+/* ---------- Save progress across Chromebooks ----------
+   Saving: after a finished shift, a new job, a purchase, or a promotion, the game
+   quietly sends CODE + PROGRESS to the saves form. Loading: at login it reads the
+   published saves tab and keeps whichever copy (this Chromebook or the sheet) is
+   further along. If Google can't be reached, the game just uses this Chromebook. */
+const CLOUD = (() => {
+  const c = {postUrl:null, eCode:null, eProg:null};
+  try{
+    const u = new URL(CONFIG.saveFormLink);
+    for (const [k,v] of u.searchParams){
+      if (!k.startsWith('entry.')) continue;
+      const w = v.trim().toUpperCase();
+      if (w.endsWith('PROGRESS')) c.eProg = k; else if (w.endsWith('CODE')) c.eCode = k;
+    }
+    c.postUrl = u.origin + u.pathname.replace(/\/viewform\/?$/, '/formResponse');
+  }catch(e){}
+  c.canSave = !!(c.postUrl && c.eCode && c.eProg);
+  c.canLoad = !!String(CONFIG.saveSheetCsv||'').trim();
+  return c;
+})();
+let cloudLastOwned = -1, cloudLastRank = -1, cloudTimer = null;
+const cloudEnc = o => btoa(unescape(encodeURIComponent(JSON.stringify(o))));
+function cloudDec(str){ try{ return JSON.parse(decodeURIComponent(escape(atob(String(str).trim())))); }catch(e){ return null; } }
+function cloudSnap(){
+  const base = keyBase() + '|', k = {};
+  try{
+    for (let i = 0; i < localStorage.length; i++){
+      const key = localStorage.key(i); if (!key || !key.startsWith(base)) continue;
+      const sfx = key.slice(base.length); if (sfx === 't' || sfx.startsWith('flow|')) continue;
+      k[sfx] = JSON.parse(localStorage.getItem(key));
+    }
+  }catch(e){}
+  return {v:1, t: store.get(base + 't', 0), k};
+}
+function cloudRank(snap){
+  const k = (snap && snap.k) || {};
+  return [Object.keys(k).filter(x => x.startsWith('done|')).length, +((k.bank && k.bank.earned) || 0), +(snap && snap.t || 0)];
+}
+function cloudCmp(a, b){ for (let i = 0; i < 3; i++){ if (a[i] !== b[i]) return a[i] > b[i] ? 1 : -1; } return 0; }
+function cloudPush(now){
+  if (!CLOUD.canSave || S.preview || !S.code) return;
+  clearTimeout(cloudTimer);
+  const send = () => {
+    try{
+      const p = new URLSearchParams();
+      p.append(CLOUD.eCode, S.code); p.append(CLOUD.eProg, cloudEnc(cloudSnap()));
+      fetch(CLOUD.postUrl, {method:'POST', mode:'no-cors', body:p, keepalive:true}).catch(() => {});
+    }catch(e){}
+  };
+  if (now) send(); else cloudTimer = setTimeout(send, 1500);
+}
+function cloudTouch(k, v){
+  if (!S.code || S.preview) return;
+  const base = keyBase() + '|'; if (!k.startsWith(base)) return;
+  const sfx = k.slice(base.length); if (sfx === 't' || sfx.startsWith('flow|')) return;
+  let big = sfx === 'job' || sfx.startsWith('done|');
+  if (sfx === 'bank' && v){
+    const o = (v.owned || []).length;
+    if (o !== cloudLastOwned || v.rank !== cloudLastRank){ big = big || cloudLastOwned !== -1; cloudLastOwned = o; cloudLastRank = v.rank; }
+  }
+  try{ localStorage.setItem(base + 't', JSON.stringify(Date.now())); }catch(e){}
+  if (big) cloudPush();
+}
+function cloudCSV(text){
+  const rows = []; let row = [], cell = '', q = false;
+  for (let i = 0; i < text.length; i++){
+    const ch = text[i];
+    if (q){ if (ch === '"'){ if (text[i+1] === '"'){ cell += '"'; i++; } else q = false; } else cell += ch; }
+    else if (ch === '"') q = true;
+    else if (ch === ','){ row.push(cell); cell = ''; }
+    else if (ch === '\n' || ch === '\r'){ if (ch === '\r' && text[i+1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+    else cell += ch;
+  }
+  if (cell !== '' || row.length){ row.push(cell); rows.push(row); }
+  return rows;
+}
+async function cloudFetchRows(){
+  const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 7000);
+  try{
+    const r = await fetch(String(CONFIG.saveSheetCsv).trim(), {signal:ctl.signal, cache:'no-store'});
+    if (!r.ok) return null;
+    return cloudCSV(await r.text());
+  }catch(e){ return null; } finally { clearTimeout(tm); }
+}
+async function cloudPull(code){
+  if (!CLOUD.canLoad) return null;
+  const rows = await cloudFetchRows(); if (!rows) return null;
+  let best = null;
+  for (const row of rows){
+    if (String(row[0]||'').trim().toUpperCase() !== code.toUpperCase()) continue;
+    const snap = cloudDec(row[1]); if (!snap || !snap.k) continue;
+    if (!best || cloudCmp(cloudRank(snap), cloudRank(best)) > 0) best = snap;
+  }
+  return best;
+}
+function cloudApply(snap){
+  const base = keyBase() + '|';
+  try{
+    const kill = [];
+    for (let i = 0; i < localStorage.length; i++){ const key = localStorage.key(i); if (key && key.startsWith(base)) kill.push(key); }
+    kill.forEach(key => localStorage.removeItem(key));
+    for (const sfx in snap.k) localStorage.setItem(base + sfx, JSON.stringify(snap.k[sfx]));
+    localStorage.setItem(base + 't', JSON.stringify(snap.t || Date.now()));
+  }catch(e){}
+}
+function cloudNote(msg){
+  const d = document.createElement('div');
+  d.setAttribute('role','status');
+  d.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:9999;background:#fff;color:#111;border:2px solid #2f7d4f;border-radius:14px;padding:12px 18px;font-size:18px;font-weight:700;box-shadow:0 6px 24px rgba(0,0,0,.25);max-width:90vw;text-align:center';
+  d.textContent = msg; document.body.appendChild(d); setTimeout(() => d.remove(), 4500);
 }
 
 /* ---------- read aloud ---------- */
@@ -2772,6 +2890,10 @@ function teacherView(){
   <div class="card"><div class="row" style="justify-content:space-between"><h1>Teacher</h1><button class="btn ghost" id="tback">Back to login</button></div>
     <p class="muted" style="margin:0">Nothing on this page is visible to students unless they know the passcode. Change it at the top of the file.</p></div>
 
+  <div class="card"><h2>Save progress across Chromebooks ${CLOUD.canSave && CLOUD.canLoad ? '<span class="ok">· on</span>' : CLOUD.canSave ? '<span class="no">· saving on, loading not connected yet</span>' : '<span class="no">· off</span>'}</h2>
+    <p class="muted">Kids only need their code. Progress saves to your "First Apartment Saves" form after each shift, job pick, purchase, or promotion. At login the game loads the newest copy, so any Chromebook works. New saves can take about 5 minutes to show up on a different Chromebook.</p>
+    <div class="row"><button class="btn ghost" id="cloudtest">Test loading</button></div><div id="cloudout" style="margin-top:10px"></div></div>
+
   <div class="card"><h2>Preview as a student</h2>
     <p class="muted">Runs the lessons exactly like a kid sees them. Nothing saves or turns in.</p>
     <div class="row">${[1,2,3].map(t => `<button class="btn ghost" data-prev="${t}">Preview Tier ${t}</button>`).join('')}</div></div>
@@ -2840,16 +2962,39 @@ function bind(){
   on('fundchip', () => { S.screen='apt'; S.flow=null; render(); });
   on('promook', () => { S.pendingPromo = null; render(); });
   // login
-  const go = () => {
+  let goBusy = false;
+  const go = async () => {
+    if (goBusy) return;
     const n = normName($('#nm').value), t = tierFromCode($('#cd').value);
     if (n.length < 2){ $('#lerr').textContent = 'Type your first name and last initial.'; return; }
     if (!t){ $('#lerr').textContent = 'That code did not work. Check it, or ask Mrs. Groh.'; return; }
     shownFund = null;
-    Object.assign(S, {name:n, code:t.code, tier:t.tier, preview:false, screen:'home'}); render();
+    Object.assign(S, {name:n, code:t.code, tier:t.tier, preview:false});
+    let restored = false;
+    if (CLOUD.canLoad){
+      goBusy = true;
+      const b = $('#go'); if (b){ b.disabled = true; b.textContent = 'Finding your progress...'; }
+      const cloud = await cloudPull(t.code), local = cloudSnap();
+      if (cloud && cloudCmp(cloudRank(cloud), cloudRank(local)) > 0){ cloudApply(cloud); restored = true; }
+      else if (Object.keys(local.k).length && (!cloud || cloudCmp(cloudRank(local), cloudRank(cloud)) > 0)) cloudPush(true);
+      goBusy = false;
+    }
+    const bk = getBank(); cloudLastOwned = (bk.owned || []).length; cloudLastRank = bk.rank;
+    S.screen = 'home'; render();
+    if (restored) cloudNote('Welcome back! Your progress is loaded.');
   };
   on('go', go);
   if ($('#cd')) $('#cd').onkeydown = e => { if (e.key==='Enter') go(); };
   on('toteacher', () => { S.screen='teacher'; render(); });
+  on('cloudtest', async () => {
+    const out = $('#cloudout'); if (!out) return;
+    if (!CLOUD.canLoad){ out.innerHTML = '<div class="fb warn">No sheet link yet. Paste the Publish to web CSV link into saveSheetCsv at the top of the file.</div>'; return; }
+    out.textContent = 'Checking...';
+    const rows = await cloudFetchRows();
+    if (!rows){ out.innerHTML = '<div class="fb warn">Could not read the sheet. Check that the saves tab is published to the web as CSV.</div>'; return; }
+    const codes = new Set(rows.map(r => String(r[0]||'').trim().toUpperCase()).filter(c => c.startsWith(CONFIG.codePrefix)));
+    out.innerHTML = `<div class="fb good">Connected! The sheet has saves for ${codes.size} student code${codes.size===1?'':'s'}.</div>`;
+  });
   // home + apartment
   document.querySelectorAll('[data-week]').forEach(b => b.onclick = () => { S.week = +b.dataset.week; render(); });
   document.querySelectorAll('[data-day]').forEach(b => b.onclick = () => openDay(b.dataset.day));
