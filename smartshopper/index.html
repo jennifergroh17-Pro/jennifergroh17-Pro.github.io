@@ -4,7 +4,7 @@
   (c) 2026 Brazen Learning. All rights reserved.
 
   QUICK SETTINGS (all at the very top of the <script> section below):
-    TEACHER_PIN  : 4-digit PIN for the Teacher area. Default is 1234.
+    TEACHER_PIN  : PIN for the Teacher area. Letters or numbers.
     SUBMIT_MODE  : 'post' sends scores quietly in the background.
                    'open' opens the pre-filled Google Form in a new tab
                    (use this if 'post' scores do not show up in your form).
@@ -268,7 +268,7 @@ footer.legal{text-align:center;color:var(--muted);padding:1rem;font-size:1rem}
 <script>
 'use strict';
 /* ============ TEACHER SETTINGS: change these ============ */
-const TEACHER_PIN  = '1234';
+const TEACHER_PIN  = 'groh';   // letters or numbers. Capitals do not matter.
 const SUBMIT_MODE  = 'post';   // 'post' = quiet send. 'open' = opens the pre-filled form in a new tab.
 const FORM_URL     = 'https://docs.google.com/forms/d/e/1FAIpQLSdH9clRskRaDBW1PBosVpw3BHjgPQ8xngQRkF65ZxIjK4RYQA/formResponse';
 const ENTRY_NAME   = 'entry.531643174';
@@ -564,9 +564,9 @@ function settingsHTML(){
 function settingsAct(a,b){
   if(a==='sw'){ const k=b.dataset.k; DB.set[k]=!DB.set[k]; save(); applySettings(); $('#mBody').innerHTML=settingsHTML(); if(k==='sound') chime(); }
   if(a==='teacher'){
-    openModal('🔒 Teacher area',`<p class="say">Type the 4-digit PIN.</p><input class="txt" id="pin" type="password" inputmode="numeric" maxlength="8" autocomplete="off" data-menter="pin" aria-label="PIN"><div class="row"><button class="btn primary" data-m="pin">Open</button></div><div class="fb" id="pinfb"></div>`,(a2)=>{
+    openModal('🔒 Teacher area',`<p class="say">Type the teacher PIN.</p><input class="txt" id="pin" type="password" maxlength="20" autocomplete="off" data-menter="pin" aria-label="PIN"><div class="row"><button class="btn primary" data-m="pin">Open</button></div><div class="fb" id="pinfb"></div>`,(a2)=>{
       if(a2!=='pin') return;
-      if(val('pin')===String(TEACHER_PIN)){ closeModal(); go(teacherView()); }
+      if(val('pin').trim().toLowerCase()===String(TEACHER_PIN).trim().toLowerCase()){ closeModal(); go(teacherView()); }
       else setFb('notyet','That PIN does not match. Try again.','pinfb');
     });
   }
